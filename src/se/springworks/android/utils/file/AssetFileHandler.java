@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -78,11 +79,6 @@ public class AssetFileHandler implements IFileHandler {
 	}
 
 	@Override
-	public FileDescriptor getFileDescriptor(String name) throws IOException {
-		return this.assetManager.openFd(name).getFileDescriptor();
-	}
-
-	@Override
 	public Date getFileModifiedDate(String name) {
 		return new Date();
 	}
@@ -104,8 +100,13 @@ public class AssetFileHandler implements IFileHandler {
 	}
 
 	@Override
-	public InputStream getFileAsStream(String name) throws IOException {
+	public InputStream getReadableFile(String name) throws IOException {
 		return this.assetManager.open(name);
+	}
+	
+	@Override
+	public OutputStream getWritableFile(String name, boolean append) throws IOException {
+		throw new RuntimeException("Not able to write files to assets folder");
 	}
 
 }

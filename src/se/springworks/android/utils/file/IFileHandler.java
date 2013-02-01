@@ -3,6 +3,7 @@ package se.springworks.android.utils.file;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 public interface IFileHandler {
@@ -46,17 +47,11 @@ public interface IFileHandler {
 	 * @return Size of the file in bytes or -1 if the file doesn't exist
 	 */
 	public long getSize(String name);
+	
+	
+	public InputStream getReadableFile(String name) throws IOException;
 
-	/**
-	 * Get a file descriptor for a file
-	 * @param name
-	 * @return
-	 * @throws IOException
-	 */
-	public FileDescriptor getFileDescriptor(String name) throws IOException;
-	
-	
-	public InputStream getFileAsStream(String name) throws IOException;
+	public OutputStream getWritableFile(String name, boolean append) throws IOException;
 	
 	
 	/**
