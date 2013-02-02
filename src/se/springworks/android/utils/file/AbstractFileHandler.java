@@ -26,14 +26,22 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	
 	@Override
 	public boolean createEmptyFile(String filename) {
-		byte[] data = new byte[0];//{ (byte)1 };
+		File file = getFile(filename);
 		try {
-			save(filename, data);
-		} catch (Exception e) {
-			logger.error("createEmptyFile()", e);
-			return false;
+			return file.createNewFile();
 		}
-		return true;
+		catch (IOException e) {
+		}
+		return false;
+		
+//		byte[] data = new byte[0];//{ (byte)1 };
+//		try {
+//			save(filename, data);
+//		} catch (Exception e) {
+//			logger.error("createEmptyFile()", e);
+//			return false;
+//		}
+//		return true;
 	}
 	
 	@Override
@@ -49,21 +57,26 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	@Override
 	public boolean exists(String name) {
 		logger.debug("exists() " + name);
-		String path = "";
-		int index = name.lastIndexOf(File.separator);
-		if(index != -1) {
-			path = name.substring(0, index);
-			name = name.substring(index + 1);
-		}
-		logger.debug("exists() name = " + name + " path = " + path);
-
-		String files[] = getFileList(path);
-		for(int i = 0; i < files.length; i++) {
-			if(files[i].equals(name)) {
-				return true;
-			}
-		}
-		return false;
+		File file = getFile(name);
+		return file.exists();
+//		String path = "";
+//		int index = name.lastIndexOf(File.separator);
+//		if(index != -1) {
+//			path = name.substring(0, index);
+//			name = name.substring(index + 1);
+//		}
+//		logger.debug("exists() name = " + name + " path = " + path);
+//
+//		String files[] = getFileList(path);
+//		if(files == null) {
+//			return false;
+//		}
+//		for(int i = 0; i < files.length; i++) {
+//			if(files[i].equals(name)) {
+//				return true;
+//			}
+//		}
+//		return false;
 	}
 
 	@Override
@@ -74,7 +87,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	@Override
 	public String[] getFileList(String path) {
 		File dir = getFile(path);
-		logger.debug("getFileList() path = " + path + "base dir = " + getBaseFolder() + " full path = " + dir.getAbsolutePath());
+		logger.debug("getFileList() path = " + path + " base dir = " + getBaseFolder() + " full path = " + dir.getAbsolutePath());
 		String files[] = dir.list();
 		return files;
 	}
@@ -99,7 +112,9 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	
 	@Override
 	public OutputStream getWritableFile(String name, boolean append) throws IOException {
-		return new FileOutputStream(getFile(name), append);
+		File file = getFile(name);
+		file.getParentFile().mkdirs();
+		return new FileOutputStream(file, append);
 	}
 	
 	@Override
@@ -121,6 +136,13 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	public void save(String name, byte[] data) throws Exception {
 		logger.debug("save() " + name);
 		File file = getFile(name);
+		FileUtils.write(file, data);
+	}
+	
+	@Override
+	public void save(String name, String data) throws Exception{
+		File file = getFile(name);
+		logger.debug("save() " + name + " " + file);
 		FileUtils.write(file, data);
 	}
 

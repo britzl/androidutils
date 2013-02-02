@@ -1,38 +1,26 @@
 package se.springworks.android.utils.file;
 
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import se.springworks.android.utils.stream.StreamUtils;
-
 import android.content.res.AssetManager;
 
-public class AssetFileHandler implements IFileHandler {
+import com.google.inject.Inject;
+
+public class AssetFileHandler implements IAssetFileHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(AssetFileHandler.class);
 
 	private AssetManager assetManager;
 
+	@Inject
 	public AssetFileHandler(AssetManager assetManager) {
 		this.assetManager = assetManager;
-	}
-
-	@Override
-	public boolean createEmptyFile(String filename) {
-		throw new RuntimeException("Not able to save files to assets folder");
-	}
-
-	@Override
-	public boolean delete(String name) throws Exception {
-		throw new RuntimeException(
-				"Not able to delete files from assets folder");
 	}
 
 	@Override
@@ -63,7 +51,7 @@ public class AssetFileHandler implements IFileHandler {
 	@Override
 	public String[] getFileList(String path) {
 		try {
-			return this.assetManager.list(path);
+			return assetManager.list(path);
 		} catch (IOException e) {
 		}
 		return null;
@@ -79,34 +67,13 @@ public class AssetFileHandler implements IFileHandler {
 	}
 
 	@Override
-	public Date getFileModifiedDate(String name) {
-		return new Date();
-	}
-
-	@Override
 	public byte[] load(String name) throws Exception {
 		InputStream stream = this.assetManager.open(name);
 		return StreamUtils.getAsBytes(stream);
 	}
 
 	@Override
-	public void save(String name, byte[] data) throws Exception {
-		throw new RuntimeException("Not able to save files to assets folder");
-	}
-
-	@Override
-	public void save(String name, InputStream stream) throws Exception {
-		throw new RuntimeException("Not able to save files to assets folder");
-	}
-
-	@Override
 	public InputStream getReadableFile(String name) throws IOException {
 		return this.assetManager.open(name);
 	}
-	
-	@Override
-	public OutputStream getWritableFile(String name, boolean append) throws IOException {
-		throw new RuntimeException("Not able to write files to assets folder");
-	}
-
 }

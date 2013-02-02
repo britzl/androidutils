@@ -1,6 +1,5 @@
 package se.springworks.android.utils.file;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,9 +47,21 @@ public interface IFileHandler {
 	 */
 	public long getSize(String name);
 	
-	
+	/**
+	 * Get an input stream (reading) for a file
+	 * @param name
+	 * @return
+	 * @throws IOException
+	 */
 	public InputStream getReadableFile(String name) throws IOException;
 
+	/**
+	 * Get an output stream (writing) for a file
+	 * @param name
+	 * @param append
+	 * @return
+	 * @throws IOException
+	 */
 	public OutputStream getWritableFile(String name, boolean append) throws IOException;
 	
 	
@@ -76,6 +87,14 @@ public interface IFileHandler {
 	 * @throws Exception
 	 */
 	public void save(String name, byte[] data) throws Exception;
+	
+	/**
+	 * Saves a file
+	 * @param name Name of the file to write to
+	 * @param data String to write to the file (using writeUTF)
+	 * @throws Exception
+	 */
+	public void save(String name, String data) throws Exception;
 	
 	/**
 	 * Saves a file

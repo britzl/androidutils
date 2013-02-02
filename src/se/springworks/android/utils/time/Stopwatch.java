@@ -18,6 +18,10 @@ public class Stopwatch {
 		
 	}
 	
+	public Stopwatch(long runningTime) {
+		this.runningTime = runningTime;
+	}
+	
 	public void start() {
 		startTime = System.currentTimeMillis();
 		state = State.RUNNING;

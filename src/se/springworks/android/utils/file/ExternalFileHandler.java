@@ -1,5 +1,7 @@
 package se.springworks.android.utils.file;
 
+import com.google.inject.Inject;
+
 import android.content.Context;
 import android.os.Environment;
 
@@ -14,6 +16,7 @@ public class ExternalFileHandler extends AbstractFileHandler {
 
 	private Context context;
 
+	@Inject
 	public ExternalFileHandler(Context context) {
 		super();
 		this.context = context;

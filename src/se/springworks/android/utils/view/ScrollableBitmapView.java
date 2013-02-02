@@ -134,17 +134,21 @@ public class ScrollableBitmapView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		super.onTouchEvent(event);
 		scaleGestureDetector.onTouchEvent(event);
 		final float x = event.getX();
 		final float y = event.getY();
 
 		boolean distanceAboveThreshold = Math.abs(x - touchDown.x) > CLICKTHRESHOLD || Math.abs(y - touchDown.y) > CLICKTHRESHOLD;
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			logger.debug("down");
 			state = State.NONE;
 			touchDown.set(x, y);
 			lastTouch.set(x, y);
+			return true;
 		}
 		else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			logger.debug("move");
 			final float deltaX = x - lastTouch.x;
 			final float deltaY = y - lastTouch.y;
 			lastTouch.set(x, y);
@@ -155,6 +159,7 @@ public class ScrollableBitmapView extends View {
 			if (state == State.DRAG) {
 				matrix.postTranslate(deltaX, deltaY);
 				limitOffset();
+				logger.debug("ho = " + getHorizontalOffset());
 				invalidate();
 			}
 		}
@@ -162,7 +167,7 @@ public class ScrollableBitmapView extends View {
 			state = State.NONE;
 			invalidate();
 		}
-//		logger.debug("state = " + state);
+		logger.debug("state = " + state);
 		return super.onTouchEvent(event);
 	}
 	
