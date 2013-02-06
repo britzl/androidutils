@@ -58,7 +58,7 @@ public class FileUtils {
 		file.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(file);
 		int read = 0;
-		byte[] bytes = new byte[1024];
+		byte[] bytes = new byte[10000];
 		while ((read = stream.read(bytes)) != -1) {
 			fos.write(bytes, 0, read);
 		}

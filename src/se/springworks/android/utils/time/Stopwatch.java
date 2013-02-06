@@ -32,6 +32,7 @@ public class Stopwatch {
 			return;
 		}
 		runningTime += System.currentTimeMillis() - startTime;
+		state = State.STOPPED;
 	}
 	
 	public void reset() {

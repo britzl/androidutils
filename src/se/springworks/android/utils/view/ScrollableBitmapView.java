@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -30,6 +31,7 @@ public class ScrollableBitmapView extends View {
 	private Bitmap image;
 
 	private ScaleGestureDetector scaleGestureDetector;
+	private GestureDetector gestureDetector;
 
 	private float maxScale = 2.0f;
 	private float minScale = 0.5f;
@@ -63,46 +65,92 @@ public class ScrollableBitmapView extends View {
 		bitmapPaint.setFilterBitmap(true);
 		
 		scaleGestureDetector = new ScaleGestureDetector(context,
-				new ScaleGestureDetector.SimpleOnScaleGestureListener() {
-					private float previousScaleFactor;
+			new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+				private float previousScaleFactor;
 
-					@Override
-					public boolean onScaleBegin(ScaleGestureDetector detector) {
-						logger.debug("onScaleBegin()");
-						zoomCenter.set(detector.getFocusX(), detector.getFocusY());
-						state = State.ZOOM;
-						previousScaleFactor = detector.getScaleFactor();
-						invalidate();
-						return true;
-					}
+				@Override
+				public boolean onScaleBegin(ScaleGestureDetector detector) {
+					logger.debug("onScaleBegin()");
+					zoomCenter.set(detector.getFocusX(), detector.getFocusY());
+					state = State.ZOOM;
+					previousScaleFactor = detector.getScaleFactor();
+					invalidate();
+					return true;
+				}
 
-					@Override
-					public void onScaleEnd(ScaleGestureDetector detector) {
-						logger.debug("onScaleEnd()");
-						state = State.NONE;
-						limitOffset();
-						invalidate();
-					}
+				@Override
+				public void onScaleEnd(ScaleGestureDetector detector) {
+					logger.debug("onScaleEnd()");
+					state = State.NONE;
+					limitOffset();
+					invalidate();
+				}
 
-					@Override
-					public boolean onScale(ScaleGestureDetector detector) {
-						final float currentScale = getScale();
-						final float scaleFactor = detector.getScaleFactor();
-						float scaleRatio = (scaleFactor / previousScaleFactor);
-						float newScale = currentScale * scaleRatio;
-						// keep scale within min and max
-						if (newScale > maxScale) {
-							scaleRatio = maxScale / currentScale;
-						}
-						else if (newScale < minScale) {
-							scaleRatio = minScale / currentScale;
-						}
-						previousScaleFactor = scaleFactor;
-						matrix.postScale(scaleRatio, scaleRatio, detector.getFocusX(), detector.getFocusY());
-						invalidate();
-						return false;
+				@Override
+				public boolean onScale(ScaleGestureDetector detector) {
+					final float currentScale = getScale();
+					final float scaleFactor = detector.getScaleFactor();
+					float scaleRatio = (scaleFactor / previousScaleFactor);
+					float newScale = currentScale * scaleRatio;
+					// keep scale within min and max
+					if (newScale > maxScale) {
+						scaleRatio = maxScale / currentScale;
 					}
-				});
+					else if (newScale < minScale) {
+						scaleRatio = minScale / currentScale;
+					}
+					previousScaleFactor = scaleFactor;
+					matrix.postScale(scaleRatio, scaleRatio, detector.getFocusX(), detector.getFocusY());
+					invalidate();
+					return false;
+				}
+			});
+		
+		gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+			@Override
+			public boolean onSingleTapUp(MotionEvent e) {
+				logger.debug("up");
+				state = State.NONE;
+				invalidate();
+//				onSingleTap(e.getX(), e.getY());
+				return true;
+			}
+			
+			@Override
+			public boolean onDown(MotionEvent e) {
+				logger.debug("down");
+				final float x = e.getX();
+				final float y = e.getY();
+				state = State.NONE;
+				touchDown.set(x, y);
+				lastTouch.set(x, y);	
+				return true;
+			}
+			
+			@Override
+			public boolean onScroll(MotionEvent initial, MotionEvent current, float dx, float dy) {
+				logger.debug("move");
+				final float x = current.getX();
+				final float y = current.getY();
+				boolean distanceAboveThreshold = Math.abs(x - touchDown.x) > CLICKTHRESHOLD || Math.abs(y - touchDown.y) > CLICKTHRESHOLD;
+				lastTouch.set(x, y);
+				if(state == State.NONE && distanceAboveThreshold) {
+					state = State.DRAG;
+				}
+				
+				if (state == State.DRAG) {
+					matrix.postTranslate(-dx, -dy);
+					limitOffset();
+					invalidate();
+				}
+				return true;
+			}
+			
+//			@Override
+//			public void onLongPress(MotionEvent e) {
+//				ScrollableBitmapView.this.onLongPress(e.getX(), e.getY());
+//			}
+		}); 
 	}
 
 	public void setMaxZoom(float max) {
@@ -136,39 +184,7 @@ public class ScrollableBitmapView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		super.onTouchEvent(event);
 		scaleGestureDetector.onTouchEvent(event);
-		final float x = event.getX();
-		final float y = event.getY();
-
-		boolean distanceAboveThreshold = Math.abs(x - touchDown.x) > CLICKTHRESHOLD || Math.abs(y - touchDown.y) > CLICKTHRESHOLD;
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			logger.debug("down");
-			state = State.NONE;
-			touchDown.set(x, y);
-			lastTouch.set(x, y);
-			return true;
-		}
-		else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-			logger.debug("move");
-			final float deltaX = x - lastTouch.x;
-			final float deltaY = y - lastTouch.y;
-			lastTouch.set(x, y);
-			if(state == State.NONE && distanceAboveThreshold) {
-				state = State.DRAG;
-			}
-			
-			if (state == State.DRAG) {
-				matrix.postTranslate(deltaX, deltaY);
-				limitOffset();
-				logger.debug("ho = " + getHorizontalOffset());
-				invalidate();
-			}
-		}
-		else if (event.getAction() == MotionEvent.ACTION_UP) {
-			state = State.NONE;
-			invalidate();
-		}
-		logger.debug("state = " + state);
-		return super.onTouchEvent(event);
+		return gestureDetector.onTouchEvent(event);
 	}
 	
 	public boolean isDragging() {
@@ -211,9 +227,13 @@ public class ScrollableBitmapView extends View {
 		matrix.postTranslate(-dx, -dy);
 	}
 
-	protected void onSingleTap(float x, float y) {
-		// override
-	}
+//	protected void onSingleTap(float x, float y) {
+//		// override
+//	}
+//	
+//	protected void onLongPress(float x, float y) {
+//		// override
+//	}
 
 	public float getMaxScale() {
 		return maxScale;
@@ -267,6 +287,16 @@ public class ScrollableBitmapView extends View {
 		matrix.preTranslate(-(x - midx), -(y - midy));
 		matrix.postScale(zoom, zoom);
 	}
+	
+	public void moveTo(float x, float y) {
+		float zoom = getScale();
+		float midx = (getWidth() / 2) / zoom;
+		float midy = (getHeight() / 2) / zoom;
+		matrix.reset();
+		matrix.preTranslate(-(x - midx), -(y - midy));
+		matrix.postScale(zoom, zoom);
+	}
+
 	
 	public void zoomToFit() {
 		float iw = image.getWidth();

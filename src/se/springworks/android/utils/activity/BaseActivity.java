@@ -4,9 +4,6 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
-import com.google.android.apps.analytics.easytracking.EasyTracker;
-
-import roboguice.activity.RoboFragmentActivity;
 import se.springworks.android.utils.guice.InjectLogger;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,7 +16,10 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public abstract class BaseActivity extends RoboFragmentActivity {
+import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.google.android.apps.analytics.easytracking.EasyTracker;
+
+public abstract class BaseActivity extends RoboSherlockFragmentActivity {
 
 	@InjectLogger Logger logger;
 
@@ -35,11 +35,18 @@ public abstract class BaseActivity extends RoboFragmentActivity {
 		try {
 			EasyTracker.getTracker().setContext(this);
 			createActivity(savedInstanceState);
+//			RoboGuice.getInjector(this).injectMembersWithoutViews(this);
 		}
 		catch(Exception e) {
 			handleError(e);
 		}
 	}
+	
+	@Override
+	public void onContentChanged() {
+        super.onContentChanged();
+//        RoboGuice.getInjector(this).injectViewMembers(this);
+    }
 
 	@Override
 	public final void onRestart() {
@@ -135,6 +142,37 @@ public abstract class BaseActivity extends RoboFragmentActivity {
 
 	public void handleActivityResult(int requestCode, int resultCode, Intent data) {
 		// override
+	}
+	
+	/**
+	 * Get a string from the intent bundle
+	 * @param key Bundle key
+	 * @return The string or null if it doesn't exist
+	 */
+	protected final String getExtrasString(String key) {
+		Bundle b = getIntent().getExtras();
+		if(b == null) {
+			return null;
+		}
+		return b.getString(key); 
+	}
+
+	/**
+	 * Get a string from the intent bundle or a default value if the string doesn't exist
+	 * @param key Bundle key
+	 * @param defaultValue
+	 * @return The string or default value if it doesn't exist
+	 */
+	protected final String getExtrasString(String key, String defaultValue) {
+		Bundle b = getIntent().getExtras();
+		if(b == null) {
+			return defaultValue;
+		}
+		String s = b.getString(key);
+		if(s == null) {
+			s = defaultValue;
+		}
+		return s;
 	}
 
 	protected final String getResourceString(int id) {

@@ -20,6 +20,7 @@ public interface IFileHandler {
 	 * @return true if successful, otherwise false
 	 */
 	public boolean delete(String name) throws Exception;
+	
 	/**
 	 * Checks if a file exists
 	 * @param name Name of the file to look for

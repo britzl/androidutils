@@ -9,10 +9,15 @@ import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.http.SimpleHttpClient;
+import se.springworks.android.utils.image.AsyncImageLoader;
+import se.springworks.android.utils.image.IImageLoader;
+import se.springworks.android.utils.image.ImageLoader;
 import se.springworks.android.utils.json.IJsonParser;
 import se.springworks.android.utils.json.JacksonParser;
 import se.springworks.android.utils.rest.IRestClient;
 import se.springworks.android.utils.rest.RestClient;
+import se.springworks.android.utils.sound.ISoundPlayer;
+import se.springworks.android.utils.sound.SoundPlayer;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -43,5 +48,11 @@ public class LiveModule extends AbstractModule  {
 		bind(IAssetFileHandler.class).to(AssetFileHandler.class);
 		
 		bind(ISimpleHttpClient.class).to(SimpleHttpClient.class);
+		
+		bind(IImageLoader.class).to(ImageLoader.class);
+		
+		bind(AsyncImageLoader.class);
+		
+		bind(ISoundPlayer.class).to(SoundPlayer.class);
 	}
 }
