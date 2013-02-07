@@ -1,12 +1,15 @@
 package se.springworks.android.utils.rest;
 
+import se.springworks.android.utils.http.SimpleHttpClient;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 public class RestClient implements IRestClient {
 
-	private AsyncHttpClient client = new AsyncHttpClient();
+	private AsyncHttpClient asyncClient = new AsyncHttpClient();
+	private SimpleHttpClient syncClient = new SimpleHttpClient();
 
 	private static String baseUrl = "";
 	private static boolean cachingEnabled = true;
@@ -22,9 +25,30 @@ public class RestClient implements IRestClient {
 	}
 
 	@Override
+	public String get(final String url, RequestParams params) {
+		String absoluteUrl = getAbsoluteUrl(AsyncHttpClient.getUrlWithQueryString(url, params));
+		if(!cachingEnabled) {
+			return syncClient.getAsString(absoluteUrl);
+		}
+		
+		// do we have it cached?
+		String cachedData = cache.get(absoluteUrl);
+		if (cachedData != null) {
+			return cachedData;
+		}
+
+		// get new value and cache it
+		String result = syncClient.getAsString(absoluteUrl);
+		if(result != null) {
+			cache.cache(absoluteUrl, result);
+		}
+		return result;
+	}
+	
+	@Override
 	public void get(final String url, RequestParams params, final AsyncHttpResponseHandler responseHandler) {
 		if(!cachingEnabled) {
-			client.get(getAbsoluteUrl(url), params, responseHandler);
+			asyncClient.get(getAbsoluteUrl(url), params, responseHandler);
 			return;
 		}
 		
@@ -33,7 +57,7 @@ public class RestClient implements IRestClient {
 			responseHandler.onSuccess(cachedData);
 		}
 		else {
-			client.get(getAbsoluteUrl(url), params, new AsyncHttpResponseHandler() {
+			asyncClient.get(getAbsoluteUrl(url), params, new AsyncHttpResponseHandler() {
 				@Override
 				public final void onSuccess(String response) {
 					cache.cache(url, response);
@@ -50,7 +74,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-		client.post(getAbsoluteUrl(url), params, responseHandler);
+		asyncClient.post(getAbsoluteUrl(url), params, responseHandler);
 	}
 
 	private String getAbsoluteUrl(String relativeUrl) {

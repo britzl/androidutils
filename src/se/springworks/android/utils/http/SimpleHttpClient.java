@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 public class SimpleHttpClient implements ISimpleHttpClient {
 
@@ -19,6 +20,20 @@ public class SimpleHttpClient implements ISimpleHttpClient {
 			HttpEntity entity = response.getEntity();
 			if(entity != null) {
 				return entity.getContent();
+			}
+		}
+		catch (Exception e) {
+		}
+		return null;
+	}
+	
+	@Override
+	public String getAsString(String url) {
+		try {
+			HttpResponse response = client.execute(new HttpGet(url));
+			HttpEntity entity = response.getEntity();
+			if(entity != null) {
+				return EntityUtils.toString(entity, "UTF-8");
 			}
 		}
 		catch (Exception e) {

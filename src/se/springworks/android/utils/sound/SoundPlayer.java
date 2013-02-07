@@ -3,10 +3,12 @@ package se.springworks.android.utils.sound;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.SoundPool;
 
 import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 public class SoundPlayer implements ISoundPlayer {
 
@@ -19,8 +21,9 @@ public class SoundPlayer implements ISoundPlayer {
 	
 	private float globalVolume = 1.0f;
 	
-	public SoundPlayer() {
-		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+	@Inject
+	public SoundPlayer(@Assisted int maxStreams) {
+		soundPool = new SoundPool(maxStreams, AudioManager.STREAM_MUSIC, 0);
 	}
 	
 	@Override
@@ -29,10 +32,50 @@ public class SoundPlayer implements ISoundPlayer {
 	}
 	
 	@Override
+	public void add(AssetFileDescriptor afd, Object key) {
+		if(soundMap.containsKey(key)) {
+			return;
+		}
+		int soundId = soundPool.load(afd, 1);
+		soundMap.put(key, soundId);
+	}
+	
+	@Override
+	public void add(String path, Object key) {
+		if(soundMap.containsKey(key)) {
+			return;
+		}
+		int soundId = soundPool.load(path, 1);
+		soundMap.put(key, soundId);
+	}
+	
+	@Override
 	public void add(int resId, Object key) {
+		if(soundMap.containsKey(key)) {
+			return;
+		}
 		int soundId = soundPool.load(context, resId, 1);
 		soundMap.put(key, soundId);
 	}
+	
+	@Override
+	public void replace(String path, Object key) {
+		remove(key);
+		add(path, key);
+	}
+	
+	@Override
+	public void replace(AssetFileDescriptor afd, Object key) {
+		remove(key);
+		add(afd, key);
+	}
+	
+	@Override
+	public void replace(int resId, Object key) {
+		remove(key);
+		add(resId, key);
+	}
+	
 	
 	@Override
 	public void remove(Object key) {
@@ -78,5 +121,15 @@ public class SoundPlayer implements ISoundPlayer {
 		    float finalVolume = globalVolume * volume * (streamVolumeCurrent / streamVolumeMax);
 			soundPool.play(soundMap.get(key), finalVolume, finalVolume, 1, loop, speed);
 		}
+	}
+
+	@Override
+	public void pause() {
+		soundPool.autoPause();
+	}
+
+	@Override
+	public void resume() {
+		soundPool.autoResume();
 	}
 }

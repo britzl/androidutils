@@ -18,10 +18,13 @@ import se.springworks.android.utils.rest.IRestClient;
 import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayer;
+import se.springworks.android.utils.sound.SoundPlayerFactory;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
+import com.squareup.otto.Bus;
 
 public class LiveModule extends AbstractModule  {
 
@@ -53,6 +56,10 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(AsyncImageLoader.class);
 		
-		bind(ISoundPlayer.class).to(SoundPlayer.class);
+		bind(Bus.class).in(Singleton.class);
+		
+		//bind(ISoundPlayer.class).to(SoundPlayer.class).in(Singleton.class);
+		
+		install(new FactoryModuleBuilder().implement(ISoundPlayer.class, SoundPlayer.class).build(SoundPlayerFactory.class));
 	}
 }
