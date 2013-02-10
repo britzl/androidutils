@@ -1,7 +1,9 @@
 package se.springworks.android.utils.time;
 
+import java.util.Observable;
 
-public class Stopwatch {
+
+public class Stopwatch extends Observable {
 
 	enum State {
 		RUNNING,
@@ -25,6 +27,8 @@ public class Stopwatch {
 	public void start() {
 		startTime = System.currentTimeMillis();
 		state = State.RUNNING;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void stop() {
@@ -33,11 +37,15 @@ public class Stopwatch {
 		}
 		runningTime += System.currentTimeMillis() - startTime;
 		state = State.STOPPED;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void reset() {
 		state = State.STOPPED;
 		runningTime = 0;	
+		setChanged();
+		notifyObservers();
 	}
 	
 	public boolean isRunning() {
