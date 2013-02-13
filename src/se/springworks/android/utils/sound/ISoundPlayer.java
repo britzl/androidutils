@@ -44,6 +44,13 @@ public interface ISoundPlayer {
 	public void play(Object key);
 	
 	/**
+	 * Plays a sound one time
+	 * @param key
+	 * @param volume
+	 */
+	public void play(Object key, float volume);
+	
+	/**
 	 * Loops a sound forever
 	 * @param key
 	 */

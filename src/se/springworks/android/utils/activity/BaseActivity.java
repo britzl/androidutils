@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
+import se.springworks.android.utils.guice.GrapeGuice;
 import se.springworks.android.utils.guice.InjectLogger;
 import android.app.Activity;
 import android.content.Intent;
@@ -16,10 +17,10 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.rtyley.android.sherlock.roboguice.activity.RoboSherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.apps.analytics.easytracking.EasyTracker;
 
-public abstract class BaseActivity extends RoboSherlockFragmentActivity {
+public abstract class BaseActivity extends SherlockFragmentActivity {
 
 	@InjectLogger Logger logger;
 
@@ -30,6 +31,8 @@ public abstract class BaseActivity extends RoboSherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		GrapeGuice.injectMembers(this);
+
 		this.logger.debug("onCreate() " + this);
 
 		try {

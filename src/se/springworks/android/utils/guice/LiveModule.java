@@ -19,6 +19,10 @@ import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayerFactory;
+import android.app.Application;
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -30,14 +34,23 @@ public class LiveModule extends AbstractModule  {
 
 	private static final Logger logger = LoggerFactory.getLogger(LiveModule.class);
 
-	public LiveModule() {
+	private Application app;
+	
+	public LiveModule(Application app) {
         super();
+        this.app = app;
     }
 
 	@Override
 	public void configure() {
 		logger.debug("configure()");
 
+		bind(Context.class).toInstance(app.getApplicationContext());
+
+		bind(Resources.class).toInstance(app.getResources());
+		
+		bind(AssetManager.class).toInstance(app.getAssets());
+		
 		bind(IJsonParser.class).to(JacksonParser.class);
 		
 		bindListener(Matchers.any(), new Slf4jTypeListener());
@@ -57,8 +70,6 @@ public class LiveModule extends AbstractModule  {
 		bind(AsyncImageLoader.class);
 		
 		bind(Bus.class).in(Singleton.class);
-		
-		//bind(ISoundPlayer.class).to(SoundPlayer.class).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder().implement(ISoundPlayer.class, SoundPlayer.class).build(SoundPlayerFactory.class));
 	}

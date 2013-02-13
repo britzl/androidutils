@@ -90,6 +90,11 @@ public class SoundPlayer implements ISoundPlayer {
 	}
 	
 	@Override
+	public void play(Object key, float volume) {
+		play(key, volume, 0, 1.0f);
+	}
+	
+	@Override
 	public void loop(Object key) {
 		play(key, 1.0f, -1, 1.0f);
 	}

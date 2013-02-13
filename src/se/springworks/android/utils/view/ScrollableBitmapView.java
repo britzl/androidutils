@@ -129,7 +129,7 @@ public class ScrollableBitmapView extends View {
 			
 			@Override
 			public boolean onScroll(MotionEvent initial, MotionEvent current, float dx, float dy) {
-				logger.debug("move");
+//				logger.debug("move");
 				final float x = current.getX();
 				final float y = current.getY();
 				boolean distanceAboveThreshold = Math.abs(x - touchDown.x) > CLICKTHRESHOLD || Math.abs(y - touchDown.y) > CLICKTHRESHOLD;
@@ -205,23 +205,36 @@ public class ScrollableBitmapView extends View {
 		final float bmph = image.getHeight() * scale;
 		
 		float dx = 0;
-		float dy = 0;
 		float leftedge = getPaddingLeft();
 		float rightedge = -(bmpw + getPaddingRight() - scrw);
 		if(ox > leftedge) {
+			logger.debug("left edge");
 			dx = ox - leftedge;
 		}
 		else if(ox < rightedge) {
+			logger.debug("right edge");
 			dx = ox - rightedge;
 		}
 		
+		float dy = 0;
 		float topedge = getPaddingTop();
 		float bottomedge = -(bmph + getPaddingBottom() - scrh);
 		if(oy > topedge) {
+			logger.debug("top edge");
 			dy = oy - topedge; 
 		}
 		else if(oy < bottomedge) {
+			logger.debug("bottom edge");
 			dy = oy - bottomedge;
+		}
+		
+		if(bmpw < scrw) {
+			float diffx = scrw - bmpw;
+			dx = ox - leftedge - diffx / 2;
+		}
+		if(bmph < scrh) {
+			float diffy = scrh - bmph;
+			dy = oy - topedge - diffy / 2;
 		}
 		
 		matrix.postTranslate(-dx, -dy);
