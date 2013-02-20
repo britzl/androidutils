@@ -9,6 +9,9 @@ import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.http.SimpleHttpClient;
+import se.springworks.android.utils.iab.IIabHelper;
+import se.springworks.android.utils.iab.IabHelper;
+import se.springworks.android.utils.iab.IabHelperFactory;
 import se.springworks.android.utils.image.AsyncImageLoader;
 import se.springworks.android.utils.image.IImageLoader;
 import se.springworks.android.utils.image.ImageLoader;
@@ -72,5 +75,7 @@ public class LiveModule extends AbstractModule  {
 		bind(Bus.class).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder().implement(ISoundPlayer.class, SoundPlayer.class).build(SoundPlayerFactory.class));
+
+		install(new FactoryModuleBuilder().implement(IIabHelper.class, IabHelper.class).build(IabHelperFactory.class));
 	}
 }

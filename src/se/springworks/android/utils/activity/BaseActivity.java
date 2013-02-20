@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
-import se.springworks.android.utils.guice.GrapeGuice;
 import se.springworks.android.utils.guice.InjectLogger;
+import se.springworks.android.utils.inject.GrapeGuice;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -19,13 +19,18 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.apps.analytics.easytracking.EasyTracker;
+import com.google.inject.Inject;
+import com.squareup.otto.Bus;
 
 public abstract class BaseActivity extends SherlockFragmentActivity {
 
-	@InjectLogger Logger logger;
+	@InjectLogger
+	Logger logger;
+	
+	@Inject
+	protected Bus bus; 
 
 	private Resources resources;
-
 
 	/** Called when the activity is first created. */
 	@Override
@@ -33,33 +38,34 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 		GrapeGuice.injectMembers(this);
 
-		this.logger.debug("onCreate() " + this);
+		logger.debug("onCreate() " + this);
 
 		try {
 			EasyTracker.getTracker().setContext(this);
 			createActivity(savedInstanceState);
-//			RoboGuice.getInjector(this).injectMembersWithoutViews(this);
+			GrapeGuice.injectViews(this);
+			// RoboGuice.getInjector(this).injectMembersWithoutViews(this);
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
-	
+
 	@Override
 	public void onContentChanged() {
-        super.onContentChanged();
-//        RoboGuice.getInjector(this).injectViewMembers(this);
-    }
+		super.onContentChanged();
+		// RoboGuice.getInjector(this).injectViewMembers(this);
+	}
 
 	@Override
 	public final void onRestart() {
 		super.onRestart();
-		this.logger.debug("onRestart() " + this);
+		logger.debug("onRestart() " + this);
 
 		try {
 			restartActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
@@ -73,7 +79,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 			EasyTracker.getTracker().trackActivityStart(this);
 			startActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
@@ -81,12 +87,13 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		this.logger.debug("onResume() " + this);
+		logger.debug("onResume() " + this);
+		bus.register(this);
 
 		try {
 			resumeActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
@@ -94,12 +101,13 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		this.logger.debug("onPause() " + this);
+		logger.debug("onPause() " + this);
+		bus.unregister(this);
 
 		try {
 			pauseActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
@@ -107,13 +115,13 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public final void onStop() {
 		super.onStop();
-		this.logger.debug("onStop() " + this);
+		logger.debug("onStop() " + this);
 
 		try {
 			EasyTracker.getTracker().trackActivityStop(this);
 			stopActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
@@ -121,21 +129,19 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public final void onDestroy() {
 		super.onDestroy();
-		this.logger.debug("onDestroy() " + this);
+		logger.debug("onDestroy() " + this);
 
 		try {
 			destroyActivity();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			handleError(e);
 		}
 	}
 
-
-
 	@Override
 	public void startActivityForResult(android.content.Intent intent, int requestCode) {
-		if(getParent() != null) {
+		if (getParent() != null) {
 			getParent().startActivityForResult(intent, requestCode);
 		}
 		else {
@@ -146,54 +152,59 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	public void handleActivityResult(int requestCode, int resultCode, Intent data) {
 		// override
 	}
-	
+
 	/**
 	 * Get a string from the intent bundle
-	 * @param key Bundle key
+	 * 
+	 * @param key
+	 *            Bundle key
 	 * @return The string or null if it doesn't exist
 	 */
 	protected final String getExtrasString(String key) {
 		Bundle b = getIntent().getExtras();
-		if(b == null) {
+		if (b == null) {
 			return null;
 		}
-		return b.getString(key); 
+		return b.getString(key);
 	}
 
 	/**
-	 * Get a string from the intent bundle or a default value if the string doesn't exist
-	 * @param key Bundle key
+	 * Get a string from the intent bundle or a default value if the string
+	 * doesn't exist
+	 * 
+	 * @param key
+	 *            Bundle key
 	 * @param defaultValue
 	 * @return The string or default value if it doesn't exist
 	 */
 	protected final String getExtrasString(String key, String defaultValue) {
 		Bundle b = getIntent().getExtras();
-		if(b == null) {
+		if (b == null) {
 			return defaultValue;
 		}
 		String s = b.getString(key);
-		if(s == null) {
+		if (s == null) {
 			s = defaultValue;
 		}
 		return s;
 	}
 
 	protected final String getResourceString(int id) {
-		if(this.resources == null) {
+		if (this.resources == null) {
 			this.resources = getResources();
 		}
 		return this.resources.getString(id);
 	}
 
 	protected final Drawable getResourceDrawable(int id) {
-		if(this.resources == null) {
+		if (this.resources == null) {
 			this.resources = getResources();
 		}
 		return this.resources.getDrawable(id);
 	}
 
 	private final void handleError(Exception e) {
-		this.logger.debug(e.getMessage(), e);
+		logger.debug(e.getMessage(), e);
 	}
 
 	protected final Toast showToast(String text) {
@@ -227,8 +238,9 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		Bitmap bitmap = null;
 		try {
 			bitmap = BitmapFactory.decodeStream(assetManager.open(name));
-		} catch (IOException e) {
-			logger.warn("Unable to load bitmap from assets" , e);
+		}
+		catch (IOException e) {
+			logger.warn("Unable to load bitmap from assets", e);
 		}
 		return bitmap;
 	}

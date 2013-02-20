@@ -11,7 +11,7 @@ public class RestCache {
 		public final long expires;
 		
 		// time when the data was created
-		private final long created;
+		public final long created;
 		
 		public final String data;
 		
