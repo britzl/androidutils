@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 
+import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.guice.InjectLogger;
 import se.springworks.android.utils.inject.GrapeGuice;
 import android.app.Activity;
@@ -20,7 +21,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.android.apps.analytics.easytracking.EasyTracker;
 import com.google.inject.Inject;
-import com.squareup.otto.Bus;
 
 public abstract class BaseActivity extends SherlockFragmentActivity {
 
@@ -28,7 +28,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	Logger logger;
 	
 	@Inject
-	protected Bus bus; 
+	protected IEventBus bus; 
 
 	private Resources resources;
 

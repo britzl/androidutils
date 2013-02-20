@@ -3,6 +3,8 @@ package se.springworks.android.utils.guice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.springworks.android.utils.eventbus.IEventBus;
+import se.springworks.android.utils.eventbus.OttoBus;
 import se.springworks.android.utils.file.AssetFileHandler;
 import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.file.IFileHandler;
@@ -31,7 +33,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
-import com.squareup.otto.Bus;
 
 public class LiveModule extends AbstractModule  {
 
@@ -72,7 +73,7 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(AsyncImageLoader.class);
 		
-		bind(Bus.class).in(Singleton.class);
+		bind(IEventBus.class).to(OttoBus.class).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder().implement(ISoundPlayer.class, SoundPlayer.class).build(SoundPlayerFactory.class));
 
