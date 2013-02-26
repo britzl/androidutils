@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <item type="id" name="viewhookid"/>
+	<item name="ASYNCVIEWTASKID" type="id">1696</item>
 </resources>

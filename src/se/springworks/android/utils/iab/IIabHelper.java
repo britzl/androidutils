@@ -4,12 +4,87 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
-import se.springworks.android.utils.iab.IabHelper.OnConsumeFinishedListener;
-import se.springworks.android.utils.iab.IabHelper.OnIabPurchaseFinishedListener;
-import se.springworks.android.utils.iab.IabHelper.OnIabSetupFinishedListener;
-import se.springworks.android.utils.iab.IabHelper.QueryInventoryFinishedListener;
 
 public interface IIabHelper {
+
+	/**
+	 * Callback that notifies when a consumption operation finishes.
+	 */
+	public interface OnConsumeFinishedListener {
+		/**
+		 * Called to notify that a consumption has finished.
+		 * 
+		 * @param purchase
+		 *            The purchase that was (or was to be) consumed.
+		 * @param result
+		 *            The result of the consumption operation.
+		 */
+		public void onConsumeFinished(Purchase purchase, IabResult result);
+	}
+
+	/**
+	 * Callback that notifies when a multi-item consumption operation finishes.
+	 */
+	public interface OnConsumeMultiFinishedListener {
+		/**
+		 * Called to notify that a consumption of multiple items has finished.
+		 * 
+		 * @param purchases
+		 *            The purchases that were (or were to be) consumed.
+		 * @param results
+		 *            The results of each consumption operation, corresponding
+		 *            to each sku.
+		 */
+		public void onConsumeMultiFinished(List<Purchase> purchases, List<IabResult> results);
+	}
+
+	/**
+	 * Callback that notifies when a purchase is finished.
+	 */
+	public interface OnIabPurchaseFinishedListener {
+		/**
+		 * Called to notify that an in-app purchase finished. If the purchase
+		 * was successful, then the sku parameter specifies which item was
+		 * purchased. If the purchase failed, the sku and extraData parameters
+		 * may or may not be null, depending on how far the purchase process
+		 * went.
+		 * 
+		 * @param result
+		 *            The result of the purchase.
+		 * @param info
+		 *            The purchase information (null if purchase failed)
+		 */
+		public void onIabPurchaseFinished(IabResult result, Purchase info);
+	}
+
+	/**
+	 * Callback for setup process. This listener's {@link #onIabSetupFinished}
+	 * method is called when the setup process is complete.
+	 */
+	public interface OnIabSetupFinishedListener {
+		/**
+		 * Called to notify that setup is complete.
+		 * 
+		 * @param result
+		 *            The result of the setup process.
+		 */
+		public void onIabSetupFinished(IabResult result);
+	}
+
+	/**
+	 * Listener that notifies when an inventory query operation completes.
+	 */
+	public interface QueryInventoryFinishedListener {
+		/**
+		 * Called to notify that an inventory query operation completed.
+		 * 
+		 * @param result
+		 *            The result of the operation.
+		 * @param inv
+		 *            The inventory.
+		 */
+		public void onQueryInventoryFinished(IabResult result, Inventory inv);
+	}
 
 	/**
 	 * Starts the setup process. This will start up the setup process

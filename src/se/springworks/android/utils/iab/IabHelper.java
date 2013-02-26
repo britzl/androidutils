@@ -182,20 +182,6 @@ public class IabHelper implements IIabHelper {
 		mDebugLog = enable;
 	}
 
-	/**
-	 * Callback for setup process. This listener's {@link #onIabSetupFinished}
-	 * method is called when the setup process is complete.
-	 */
-	public interface OnIabSetupFinishedListener {
-		/**
-		 * Called to notify that setup is complete.
-		 * 
-		 * @param result
-		 *            The result of the setup process.
-		 */
-		public void onIabSetupFinished(IabResult result);
-	}
-
 	@Override
 	public void startSetup(final OnIabSetupFinishedListener listener) {
 		// If already set up, can't do it again.
@@ -303,25 +289,6 @@ public class IabHelper implements IIabHelper {
 		return mSubscriptionsSupported;
 	}
 
-	/**
-	 * Callback that notifies when a purchase is finished.
-	 */
-	public interface OnIabPurchaseFinishedListener {
-		/**
-		 * Called to notify that an in-app purchase finished. If the purchase
-		 * was successful, then the sku parameter specifies which item was
-		 * purchased. If the purchase failed, the sku and extraData parameters
-		 * may or may not be null, depending on how far the purchase process
-		 * went.
-		 * 
-		 * @param result
-		 *            The result of the purchase.
-		 * @param info
-		 *            The purchase information (null if purchase failed)
-		 */
-		public void onIabPurchaseFinished(IabResult result, Purchase info);
-	}
-
 	// The listener registered on launchPurchaseFlow, which we have to call back
 	// when
 	// the purchase finishes
@@ -354,13 +321,11 @@ public class IabHelper implements IIabHelper {
 	public void launchPurchaseFlow(Activity act, String sku, String itemType, int requestCode,
 			OnIabPurchaseFinishedListener listener, String extraData) {
 		checkSetupDone("launchPurchaseFlow");
-		flagStartAsync("launchPurchaseFlow");
-		IabResult result;
 
 		if (itemType.equals(ITEM_TYPE_SUBS) && !mSubscriptionsSupported) {
-			IabResult r = new IabResult(IABHELPER_SUBSCRIPTIONS_NOT_AVAILABLE, "Subscriptions are not available.");
-			if (listener != null)
-				listener.onIabPurchaseFinished(r, null);
+			if (listener != null) {
+				listener.onIabPurchaseFinished(new IabResult(IABHELPER_SUBSCRIPTIONS_NOT_AVAILABLE, "Subscriptions are not available."), null);
+			}
 			return;
 		}
 
@@ -370,10 +335,9 @@ public class IabHelper implements IIabHelper {
 			int response = getResponseCodeFromBundle(buyIntentBundle);
 			if (response != BILLING_RESPONSE_RESULT_OK) {
 				logError("Unable to buy item, Error response: " + getResponseDesc(response));
-
-				result = new IabResult(response, "Unable to buy item");
-				if (listener != null)
-					listener.onIabPurchaseFinished(result, null);
+				if (listener != null) {
+					listener.onIabPurchaseFinished(new IabResult(response, "Unable to buy item"), null);
+				}
 				return;
 			}
 
@@ -382,24 +346,23 @@ public class IabHelper implements IIabHelper {
 			mRequestCode = requestCode;
 			mPurchaseListener = listener;
 			mPurchasingItemType = itemType;
+			flagStartAsync("launchPurchaseFlow");
 			act.startIntentSenderForResult(pendingIntent.getIntentSender(), requestCode, new Intent(),
 					Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
 		}
 		catch (SendIntentException e) {
 			logError("SendIntentException while launching purchase flow for sku " + sku);
 			e.printStackTrace();
-
-			result = new IabResult(IABHELPER_SEND_INTENT_FAILED, "Failed to send intent.");
-			if (listener != null)
-				listener.onIabPurchaseFinished(result, null);
+			if (listener != null) {
+				listener.onIabPurchaseFinished(new IabResult(IABHELPER_SEND_INTENT_FAILED, "Failed to send intent."), null);
+			}
 		}
 		catch (RemoteException e) {
 			logError("RemoteException while launching purchase flow for sku " + sku);
 			e.printStackTrace();
-
-			result = new IabResult(IABHELPER_REMOTE_EXCEPTION, "Remote exception while starting purchase flow");
-			if (listener != null)
-				listener.onIabPurchaseFinished(result, null);
+			if (listener != null) {
+				listener.onIabPurchaseFinished(new IabResult(IABHELPER_REMOTE_EXCEPTION, "Remote exception while starting purchase flow"), null);
+			}
 		}
 	}
 
@@ -542,21 +505,6 @@ public class IabHelper implements IIabHelper {
 		}
 	}
 
-	/**
-	 * Listener that notifies when an inventory query operation completes.
-	 */
-	public interface QueryInventoryFinishedListener {
-		/**
-		 * Called to notify that an inventory query operation completed.
-		 * 
-		 * @param result
-		 *            The result of the operation.
-		 * @param inv
-		 *            The inventory.
-		 */
-		public void onQueryInventoryFinished(IabResult result, Inventory inv);
-	}
-
 	@Override
 	public void queryInventoryAsync(final boolean querySkuDetails, final List<String> moreSkus,
 			final QueryInventoryFinishedListener listener) {
@@ -631,37 +579,6 @@ public class IabHelper implements IIabHelper {
 			throw new IabException(IABHELPER_REMOTE_EXCEPTION, "Remote exception while consuming. PurchaseInfo: "
 					+ itemInfo, e);
 		}
-	}
-
-	/**
-	 * Callback that notifies when a consumption operation finishes.
-	 */
-	public interface OnConsumeFinishedListener {
-		/**
-		 * Called to notify that a consumption has finished.
-		 * 
-		 * @param purchase
-		 *            The purchase that was (or was to be) consumed.
-		 * @param result
-		 *            The result of the consumption operation.
-		 */
-		public void onConsumeFinished(Purchase purchase, IabResult result);
-	}
-
-	/**
-	 * Callback that notifies when a multi-item consumption operation finishes.
-	 */
-	public interface OnConsumeMultiFinishedListener {
-		/**
-		 * Called to notify that a consumption of multiple items has finished.
-		 * 
-		 * @param purchases
-		 *            The purchases that were (or were to be) consumed.
-		 * @param results
-		 *            The results of each consumption operation, corresponding
-		 *            to each sku.
-		 */
-		public void onConsumeMultiFinished(List<Purchase> purchases, List<IabResult> results);
 	}
 
 	@Override
