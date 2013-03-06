@@ -1,16 +1,31 @@
 package se.springworks.android.utils.view;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+/**
+ * An adapter with support for sections/segments. You can add single items and
+ * collections of items to a section. The order in which sections are created is
+ * preserved
+ * @author bjornritzl
+ *
+ * @param <S> Type of sections
+ * @param <I> Type of items in sections
+ */
 public abstract class SectionedAdapter<S, I> extends BaseAdapter {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SectionedAdapter.class);
 
-	private Hashtable<S, List<I>> itemMap = new Hashtable<S, List<I>>();
+	private LinkedHashMap<S, List<I>> itemMap = new LinkedHashMap<S, List<I>>();
 	
 	private List<Object> allItems = new ArrayList<Object>();
 	
@@ -18,6 +33,22 @@ public abstract class SectionedAdapter<S, I> extends BaseAdapter {
 		super();
 	}
 	
+	/**
+	 * Adds a new empty section. If the section already exist nothing happens
+	 * @param section
+	 */
+	public void addSection(S section) {
+		if(!itemMap.containsKey(section)) {
+			itemMap.put(section, new ArrayList<I>());
+		}
+		rebuildAllItems();
+	}
+	
+	/**
+	 * Adds an item to a section. If the section doesn't exist it is created
+	 * @param section
+	 * @param item
+	 */
 	public void addItem(S section, I item) {
 		if(!itemMap.containsKey(section)) {
 			itemMap.put(section, new ArrayList<I>());
@@ -27,7 +58,12 @@ public abstract class SectionedAdapter<S, I> extends BaseAdapter {
 		rebuildAllItems();
 	}
 	
-	public void addItems(S section, List<I> items) {
+	/**
+	 * Adds a collection of items to a section. If the section doesn't exist it is created
+	 * @param section
+	 * @param items
+	 */
+	public void addItems(S section, Collection<I> items) {
 		if(!itemMap.containsKey(section)) {
 			itemMap.put(section, new ArrayList<I>());
 		}
@@ -73,13 +109,22 @@ public abstract class SectionedAdapter<S, I> extends BaseAdapter {
 	public long getItemId(int position) {
 		return 0;
 	}
-
+	
+	@Override
+	public boolean isEnabled(int position) {
+		return !isSection(position);
+	}
+	
+	public boolean isSection(int position) {
+		return getItemViewType(position) == 0;
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		boolean isSection = getItemViewType(position) == 0;
 		Object o = getItem(position);
-		if(isSection) {
+		logger.debug("getView() " + o);
+		if(isSection(position)) {
 			convertView = getSectionView((S)o, convertView, parent);
 		}
 		else {
@@ -88,7 +133,21 @@ public abstract class SectionedAdapter<S, I> extends BaseAdapter {
 		return convertView;
 	}
 	
+	/**
+	 * Creates a view to represent a section
+	 * @param section The section to create a view for
+	 * @param convertView
+	 * @param parent
+	 * @return
+	 */
 	public abstract View getSectionView(S section, View convertView, ViewGroup parent);
 
+	/**
+	 * Creates a view to represent an item
+	 * @param item The item to create a view for
+	 * @param convertView
+	 * @param parent
+	 * @return
+	 */
 	public abstract View getItemView(I item, View convertView, ViewGroup parent);
 }

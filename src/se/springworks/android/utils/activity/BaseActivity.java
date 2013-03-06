@@ -1,9 +1,8 @@
 package se.springworks.android.utils.activity;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 
+import se.springworks.android.utils.analytics.IAnalyticsTracker;
 import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.guice.InjectLogger;
 import se.springworks.android.utils.inject.GrapeGuice;
@@ -11,15 +10,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.google.android.apps.analytics.easytracking.EasyTracker;
 import com.google.inject.Inject;
 
 public abstract class BaseActivity extends SherlockFragmentActivity {
@@ -28,9 +23,16 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	Logger logger;
 	
 	@Inject
-	protected IEventBus bus; 
-
+	protected IEventBus bus;
+	
+	@Inject
 	private Resources resources;
+	
+	@Inject
+	private AssetManager assets;
+	
+	@Inject
+	private IAnalyticsTracker tracker;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -41,7 +43,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		logger.debug("onCreate() " + this);
 
 		try {
-			EasyTracker.getTracker().setContext(this);
+			tracker.init(this);
 			createActivity(savedInstanceState);
 			GrapeGuice.injectViews(this);
 			// RoboGuice.getInjector(this).injectMembersWithoutViews(this);
@@ -76,7 +78,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		this.logger.debug("onStart() " + this);
 
 		try {
-			EasyTracker.getTracker().trackActivityStart(this);
+			tracker.trackActivityStart(this);
 			startActivity();
 		}
 		catch (Exception e) {
@@ -118,7 +120,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		logger.debug("onStop() " + this);
 
 		try {
-			EasyTracker.getTracker().trackActivityStop(this);
+			tracker.trackActivityStop(this);
 			stopActivity();
 		}
 		catch (Exception e) {
@@ -138,6 +140,8 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 			handleError(e);
 		}
 	}
+	
+	
 
 	@Override
 	public void startActivityForResult(android.content.Intent intent, int requestCode) {
@@ -190,27 +194,15 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	}
 
 	protected final String getResourceString(int id) {
-		if (this.resources == null) {
-			this.resources = getResources();
-		}
-		return this.resources.getString(id);
+		return resources.getString(id);
 	}
 
 	protected final Drawable getResourceDrawable(int id) {
-		if (this.resources == null) {
-			this.resources = getResources();
-		}
-		return this.resources.getDrawable(id);
+		return resources.getDrawable(id);
 	}
 
 	private final void handleError(Exception e) {
 		logger.debug(e.getMessage(), e);
-	}
-
-	protected final Toast showToast(String text) {
-		Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-		toast.show();
-		return toast;
 	}
 
 	protected final void switchActivity(Class<? extends Activity> c) {
@@ -231,18 +223,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		tv.setTextAppearance(this, styleId);
 		tv.setText(text);
 		return tv;
-	}
-
-	protected Bitmap getBitmapFromAssets(String name) {
-		AssetManager assetManager = getAssets();
-		Bitmap bitmap = null;
-		try {
-			bitmap = BitmapFactory.decodeStream(assetManager.open(name));
-		}
-		catch (IOException e) {
-			logger.warn("Unable to load bitmap from assets", e);
-		}
-		return bitmap;
 	}
 
 	abstract protected void createActivity(Bundle savedInstanceState);
