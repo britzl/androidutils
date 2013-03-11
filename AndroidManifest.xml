@@ -14,4 +14,10 @@
         android:theme="@style/AppTheme" >
     </application>
 
+	<service android:name="org.OpenUDID.OpenUDID_service">
+		<intent-filter>
+			<action android:name="org.OpenUDID.GETUDID" />
+		</intent-filter>
+	</service>
+    
 </manifest>

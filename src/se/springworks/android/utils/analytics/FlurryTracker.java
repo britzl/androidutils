@@ -20,6 +20,8 @@ public class FlurryTracker implements IAnalyticsTracker {
 	
 	private String appId;
 	
+	private boolean initialized = false;
+	
 	public FlurryTracker() {
 		
 	}
@@ -33,6 +35,9 @@ public class FlurryTracker implements IAnalyticsTracker {
 	
 	@Override
 	public void init(final Context context) {
+		if(initialized) {
+			return;
+		}
 		ParameterLoader loader = new ParameterLoader(context);
 		appId = loader.getString(KEY_APPID);
 		if(loader.hasBoolean(KEY_CAPTUREUNCAIGHTEXCEPTIONS)) {
@@ -50,6 +55,7 @@ public class FlurryTracker implements IAnalyticsTracker {
 		if(loader.hasBoolean(KEY_USEHTTPS)) {
 			FlurryAgent.setUseHttps(loader.getBoolean(KEY_USEHTTPS));
 		}
+		initialized = true;
 	}
 	
 	@Override

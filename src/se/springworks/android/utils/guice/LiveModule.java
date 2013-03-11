@@ -3,8 +3,6 @@ package se.springworks.android.utils.guice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import se.springworks.android.utils.analytics.GoogleTracker;
-import se.springworks.android.utils.analytics.IAnalyticsTracker;
 import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.eventbus.OttoBus;
 import se.springworks.android.utils.file.AssetFileHandler;

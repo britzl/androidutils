@@ -167,6 +167,14 @@ public class ScrollableBitmapView extends View {
 		int height = MeasureSpec.getSize(heightMeasureSpec);
 		setMeasuredDimension(width, height);
 	}
+	
+	public void destroy() {
+		logger.debug("destroy()");
+		if(image != null) {
+			image.recycle();
+			image = null;
+		}
+	}
 
 	public Bitmap getImage() {
 		return image;
@@ -309,6 +317,15 @@ public class ScrollableBitmapView extends View {
 		float midy = (getHeight() / 2) / zoom;
 		matrix.reset();
 		matrix.preTranslate(-(x - midx), -(y - midy));
+		matrix.postScale(zoom, zoom);
+	}
+	
+	public void move(float dx, float dy) {
+		float zoom = getScale();
+		float x = -getHorizontalOffset() / zoom;
+		float y = -getVerticalOffset() / zoom;
+		matrix.reset();
+		matrix.preTranslate(-(x + dx), -(y + dy));
 		matrix.postScale(zoom, zoom);
 	}
 

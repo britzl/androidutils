@@ -6,10 +6,12 @@ import android.content.Context;
 import com.google.analytics.tracking.android.EasyTracker;
 
 public class GoogleTracker implements IAnalyticsTracker {
+	
 
 	@Override
 	public void trackActivityStart(Activity activity) {
 		EasyTracker.getInstance().activityStart(activity);
+		EasyTracker.getTracker().sendView(activity.getLocalClassName());
 	}
 
 	@Override

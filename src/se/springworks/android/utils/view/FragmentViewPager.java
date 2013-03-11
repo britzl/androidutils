@@ -20,9 +20,15 @@ import com.actionbarsherlock.app.ActionBar.TabListener;
  *
  */
 public class FragmentViewPager extends ViewPager implements TabListener {
+	
+	public static interface Listener {
+		void onTabSelected(String title);
+	}
 
 	private ActionBar actionBar;
 	private SectionedFragmentPagerAdapter<Fragment> adapter;
+	
+	private Listener listener;
 	
 	public FragmentViewPager(Context context) {
 		super(context);
@@ -30,6 +36,10 @@ public class FragmentViewPager extends ViewPager implements TabListener {
 	
 	public FragmentViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
+	}
+	
+	public void setListener(Listener l) {
+		this.listener = l;
 	}
 	
 	public void init(final ActionBar actionBar, FragmentManager fragmentManager) {
@@ -55,6 +65,7 @@ public class FragmentViewPager extends ViewPager implements TabListener {
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		setCurrentItem(tab.getPosition());
+		if(listener != null) listener.onTabSelected(tab.getText().toString());
 	}
 
 	@Override
