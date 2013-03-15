@@ -25,8 +25,7 @@ public class MixpanelTracker implements IAnalyticsTracker {
 
 	@Override
 	public void trackActivityStart(Activity activity) {
-		mixpanel.track(activity.getLocalClassName(), null);
-        mixpanel.flush();
+		// do nothing
 	}
 
 	@Override
@@ -38,6 +37,11 @@ public class MixpanelTracker implements IAnalyticsTracker {
 	public void trackEvent(String category, String action, String label, int value) {
 		mixpanel.track(category + "_" + label + "_" + action, null);
         mixpanel.flush();
+	}
+
+	@Override
+	public void trackScreen(String name) {
+		mixpanel.track(name, null);
 	}
 
 }

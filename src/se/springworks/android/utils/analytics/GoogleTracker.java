@@ -11,7 +11,6 @@ public class GoogleTracker implements IAnalyticsTracker {
 	@Override
 	public void trackActivityStart(Activity activity) {
 		EasyTracker.getInstance().activityStart(activity);
-		EasyTracker.getTracker().sendView(activity.getLocalClassName());
 	}
 
 	@Override
@@ -27,6 +26,11 @@ public class GoogleTracker implements IAnalyticsTracker {
 	@Override
 	public void init(Context context) {
 		EasyTracker.getInstance().setContext(context);
+	}
+
+	@Override
+	public void trackScreen(String name) {
+		EasyTracker.getTracker().sendView(name);
 	}
 
 }

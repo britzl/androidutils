@@ -42,5 +42,12 @@ public class MultiTracker implements IAnalyticsTracker {
 		}
 	}
 
+	@Override
+	public void trackScreen(String name) {
+		for(IAnalyticsTracker tracker : trackers) {
+			tracker.trackScreen(name);
+		}
+	}
+
 	
 }

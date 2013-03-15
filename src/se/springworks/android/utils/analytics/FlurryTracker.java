@@ -61,7 +61,6 @@ public class FlurryTracker implements IAnalyticsTracker {
 	@Override
 	public void trackActivityStart(final Activity activity) {
 		FlurryAgent.onStartSession(activity, appId);
-		FlurryAgent.onPageView();
 	}
 	
 	@Override
@@ -72,5 +71,11 @@ public class FlurryTracker implements IAnalyticsTracker {
 	@Override
 	public void trackEvent(String category, String action, String label, int value) {
 		FlurryAgent.logEvent(category + "_" + action + "_" + label);
+	}
+
+	@Override
+	public void trackScreen(String name) {
+		FlurryAgent.onPageView();
+		FlurryAgent.logEvent(name);
 	}
 }

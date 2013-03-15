@@ -1,11 +1,16 @@
 package se.springworks.android.utils.threading;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import se.springworks.android.utils.R;
 import android.os.AsyncTask;
 import android.view.View;
 
 public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T, U, V> {
 
+	private static final Logger logger = LoggerFactory.getLogger(AsyncViewTask.class);
+	
 	protected S view;
 	
 	public AsyncViewTask() {
@@ -43,13 +48,36 @@ public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T
 		@SuppressWarnings("rawtypes")
 		AsyncTask task = (AsyncTask)view.getTag(R.id.ASYNCVIEWTASKID);
 		if(task == this) {
-			handleResult(result, view);
+			try {
+				handleResult(result, view);
+			}
+			catch(Exception e) {
+				logger.warn("onPostExecute()", e);
+			}
 		}
 	}
+	
+	@Override
+	protected final V doInBackground(T... params) {
+		try {
+			return performTask(params);
+		}
+		catch(Exception e) {
+			logger.warn("doInBackground()", e);
+		}
+		return null;
+	}
+	
+	/**
+	 * Perform the task
+	 * @param params
+	 * @return
+	 */
+	protected abstract V performTask(T... params);
 	
 	/**
 	 * Handles the result. This method will only be called if the view is still valid
 	 * @param result
 	 */
-	public abstract void handleResult(V result, S view);
+	protected abstract void handleResult(V result, S view);
 }

@@ -32,7 +32,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	private AssetManager assets;
 	
 	@Inject
-	private IAnalyticsTracker tracker;
+	protected IAnalyticsTracker tracker;
 
 	/** Called when the activity is first created. */
 	@Override

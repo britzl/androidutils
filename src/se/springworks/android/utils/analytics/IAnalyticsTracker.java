@@ -22,6 +22,12 @@ public interface IAnalyticsTracker {
 	void trackActivityStop(final Activity activity);
 	
 	/**
+	 * Tracks a screen view within your application
+	 * @param name
+	 */
+	void trackScreen(final String name);
+	
+	/**
 	 * Tracks an event within your application. This can be anything from a button press to the user
 	 * dragging a slider.
 	 * @param category

@@ -15,7 +15,6 @@ public class CountlyTracker implements IAnalyticsTracker {
 	@Override
 	public void trackActivityStart(Activity activity) {
 		Countly.sharedInstance().onStart();
-		Countly.sharedInstance().recordEvent(activity.getLocalClassName(), 1);
 	}
 
 	@Override
@@ -41,6 +40,11 @@ public class CountlyTracker implements IAnalyticsTracker {
 		String appKey = loader.getString(KEY_APPKEY);
         Countly.sharedInstance().init(context, url, appKey);
 		initialized = true;
+	}
+
+	@Override
+	public void trackScreen(String name) {
+		Countly.sharedInstance().recordEvent(name, 1);
 	}
 
 }
