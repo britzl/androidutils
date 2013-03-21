@@ -28,4 +28,21 @@ public interface IRestClient {
 	 * @param responseHandler
 	 */
 	void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler);
+	
+	/**
+	 * Set base url to use for all requests
+	 * @param baseUrl
+	 */
+	void setBaseUrl(String baseUrl);
+	
+	/**
+	 * Set basic auth credentials for use
+	 * @param username
+	 * @param password
+	 */
+	void setBasicAuth(final String username, final String password);
+	
+	void enableCaching();
+	
+	void disableCaching();
 }

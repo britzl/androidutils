@@ -45,7 +45,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	}
 	
 	@Override
-	public boolean delete(String name) throws Exception {
+	public boolean delete(String name) throws IOException {
 		logger.debug("delete() " + name);
 		File fileToDelete = getFile(name);
 		if(fileToDelete != null) {
@@ -127,27 +127,27 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	}
 
 	@Override
-	public byte[] load(String name) throws Exception {
+	public byte[] load(String name) throws IOException {
 		File file = getFile(name);
 		return FileUtils.read(file);
 	}
 
 	@Override
-	public void save(String name, byte[] data) throws Exception {
+	public void save(String name, byte[] data) throws IOException {
 		logger.debug("save() " + name);
 		File file = getFile(name);
 		FileUtils.write(file, data);
 	}
 	
 	@Override
-	public void save(String name, String data) throws Exception{
+	public void save(String name, String data) throws IOException{
 		File file = getFile(name);
 		logger.debug("save() " + name + " " + file);
 		FileUtils.write(file, data);
 	}
 
 	@Override
-	public void save(String name, InputStream stream) throws Exception {
+	public void save(String name, InputStream stream) throws IOException {
 		logger.debug("save() " + name);
 		File file = getFile(name);
 		FileUtils.write(file, stream);

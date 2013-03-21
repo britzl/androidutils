@@ -67,7 +67,7 @@ public class AssetFileHandler implements IAssetFileHandler {
 	}
 
 	@Override
-	public byte[] load(String name) throws Exception {
+	public byte[] load(String name) throws IOException {
 		InputStream stream = this.assetManager.open(name);
 		return StreamUtils.getAsBytes(stream);
 	}

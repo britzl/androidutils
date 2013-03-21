@@ -182,10 +182,12 @@ public class ScrollableBitmapView extends View {
 
 	public void setImage(Bitmap image) {
 		this.image = image;
+		invalidate();
 	}
 
 	public void setImageBitmap(Bitmap bitmap) {
 		image = bitmap;
+		invalidate();
 	}
 
 	@Override
@@ -204,6 +206,9 @@ public class ScrollableBitmapView extends View {
 	}
 
 	private void limitOffset() {		
+		if(image == null) {
+			return;
+		}
 		final float ox = getHorizontalOffset();
 		final float oy = getVerticalOffset();
 		final float scale = getScale();

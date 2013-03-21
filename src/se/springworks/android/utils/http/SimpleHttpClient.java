@@ -4,14 +4,18 @@ import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 public class SimpleHttpClient implements ISimpleHttpClient {
 
-	private HttpClient client = new DefaultHttpClient();
+	private DefaultHttpClient client = new DefaultHttpClient();
 	
 	@Override
 	public InputStream get(String url) {
@@ -39,5 +43,15 @@ public class SimpleHttpClient implements ISimpleHttpClient {
 		catch (Exception e) {
 		}
 		return null;
+	}
+
+	@Override
+	public void setBasicAuth(String username, String password) {
+		CredentialsProvider credProvider = new BasicCredentialsProvider();
+	    credProvider.setCredentials(
+	    		new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), 
+	    		new UsernamePasswordCredentials(username, password));
+
+	    client.setCredentialsProvider(credProvider);
 	}
 }

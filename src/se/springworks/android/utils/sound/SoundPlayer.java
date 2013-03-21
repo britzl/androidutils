@@ -1,6 +1,7 @@
 package se.springworks.android.utils.sound;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -18,6 +19,7 @@ public class SoundPlayer implements ISoundPlayer {
 	private SoundPool soundPool;
 	
 	private HashMap<Object, Integer> soundMap = new HashMap<Object, Integer>();
+	private HashMap<Object, Float> volumeMap = new HashMap<Object, Float>();
 	
 	private float globalVolume = 1.0f;
 	
@@ -38,6 +40,7 @@ public class SoundPlayer implements ISoundPlayer {
 		}
 		int soundId = soundPool.load(afd, 1);
 		soundMap.put(key, soundId);
+		volumeMap.put(key, 1.0f);
 	}
 	
 	@Override
@@ -47,6 +50,7 @@ public class SoundPlayer implements ISoundPlayer {
 		}
 		int soundId = soundPool.load(path, 1);
 		soundMap.put(key, soundId);
+		volumeMap.put(key, 1.0f);
 	}
 	
 	@Override
@@ -56,6 +60,17 @@ public class SoundPlayer implements ISoundPlayer {
 		}
 		int soundId = soundPool.load(context, resId, 1);
 		soundMap.put(key, soundId);
+		volumeMap.put(key, 1.0f);
+	}
+	
+	@Override
+	public void add(int resId, Object key, float volume) {
+		if(soundMap.containsKey(key)) {
+			return;
+		}
+		int soundId = soundPool.load(context, resId, 1);
+		soundMap.put(key, soundId);
+		volumeMap.put(key, volume);
 	}
 	
 	@Override
@@ -82,11 +97,19 @@ public class SoundPlayer implements ISoundPlayer {
 		if(soundMap.containsKey(key)) {
 			soundPool.unload(soundMap.get(key));
 		}
+		volumeMap.remove(key);
+	}
+	
+	private float getVolume(Object key) {
+		if(volumeMap.containsKey(key)) {
+			return volumeMap.get(key);
+		}
+		return 1.0f;
 	}
 	
 	@Override
 	public void play(Object key) {
-		play(key, 1.0f, 0, 1.0f);
+		play(key, getVolume(key), 0, 1.0f);
 	}
 	
 	@Override
@@ -96,12 +119,12 @@ public class SoundPlayer implements ISoundPlayer {
 	
 	@Override
 	public void loop(Object key) {
-		play(key, 1.0f, -1, 1.0f);
+		play(key, getVolume(key), -1, 1.0f);
 	}
 	
 	@Override
 	public void loop(Object key, int loops) {
-		play(key, 1.0f, loops, 1.0f);
+		play(key, getVolume(key), loops, 1.0f);
 	}
 	
 	@Override

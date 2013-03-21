@@ -33,11 +33,17 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	
 	@Inject
 	protected IAnalyticsTracker tracker;
+	
+	private static int defaultStartActivityEnterAnimationId = 0;
+	private static int defaultStartActivityExitAnimationId = 0;
+	private static int defaultFinishActivityEnterAnimationId = 0;
+	private static int defaultFinishActivityExitAnimationId = 0;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		long time = System.currentTimeMillis();
 		GrapeGuice.injectMembers(this);
 
 		logger.debug("onCreate() " + this);
@@ -51,6 +57,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		catch (Exception e) {
 			handleError(e);
 		}
+		logger.debug("onCreate() took = " + (System.currentTimeMillis() - time));
 	}
 
 	@Override
@@ -140,18 +147,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 			handleError(e);
 		}
 	}
-	
-	
-
-	@Override
-	public void startActivityForResult(android.content.Intent intent, int requestCode) {
-		if (getParent() != null) {
-			getParent().startActivityForResult(intent, requestCode);
-		}
-		else {
-			super.startActivityForResult(intent, requestCode);
-		}
-	}
 
 	public void handleActivityResult(int requestCode, int resultCode, Intent data) {
 		// override
@@ -204,18 +199,67 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	private final void handleError(Exception e) {
 		logger.debug(e.getMessage(), e);
 	}
+	
+	/**
+	 * Set the default start activity transitions
+	 * @param enterId
+	 * @param exitId
+	 */
+	public static void setDefaultStartActivityTransition(int enterId, int exitId) {
+		defaultStartActivityEnterAnimationId = enterId;
+		defaultStartActivityExitAnimationId = exitId;
+	}
+	
+	public static void setDefaultFinishActivityTransition(int enterId, int exitId) {
+		defaultFinishActivityEnterAnimationId = enterId;
+		defaultFinishActivityExitAnimationId = exitId;
+	}
 
 	protected final void switchActivity(Class<? extends Activity> c) {
 		Intent i = new Intent(this, c);
 		startActivity(i);
-		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 	}
 
 	protected final void switchActivity(Class<? extends Activity> c, Bundle extras) {
 		Intent i = new Intent(this, c);
 		i.putExtras(extras);
 		startActivity(i);
-		overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+	}
+	
+	@Override
+	public void startActivity(Intent intent) {
+		super.startActivity(intent);
+		overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+	}
+	
+	@Override
+	public void startActivityForResult(Intent intent, int requestCode) {
+		if (getParent() != null) {
+			getParent().startActivityForResult(intent, requestCode);
+			overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+		}
+		else {
+			super.startActivityForResult(intent, requestCode);
+			overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+		}
+	}
+		
+	@Override
+	public void startActivity(Intent intent, Bundle options) {
+		super.startActivity(intent, options);
+		overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+	}
+	
+	@Override
+	public void finish() {
+		super.finish();
+		overridePendingTransition(defaultFinishActivityEnterAnimationId, defaultFinishActivityExitAnimationId);
+	}
+	
+	@Override
+	public void finishActivity(int requestCode) {
+		super.finishActivity(requestCode);
+		overridePendingTransition(defaultFinishActivityEnterAnimationId, defaultFinishActivityExitAnimationId);
 	}
 
 	protected TextView createTextView(String text, int styleId) {

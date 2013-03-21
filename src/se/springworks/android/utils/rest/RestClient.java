@@ -11,16 +11,20 @@ public class RestClient implements IRestClient {
 	private AsyncHttpClient asyncClient = new AsyncHttpClient();
 	private SimpleHttpClient syncClient = new SimpleHttpClient();
 
-	private static String baseUrl = "";
-	private static boolean cachingEnabled = true;
+	private String baseUrl = "";
+	private boolean cachingEnabled = true;
+	private String username;
+	private String password;
 
 	private RestCache cache = new RestCache();
 
-	public static void enableCaching() {
+	@Override
+	public void enableCaching() {
 		cachingEnabled = true;
 	}
 
-	public static void disableCaching() {
+	@Override
+	public void disableCaching() {
 		cachingEnabled = false;
 	}
 
@@ -57,6 +61,7 @@ public class RestClient implements IRestClient {
 			responseHandler.onSuccess(cachedData);
 		}
 		else {
+			asyncClient.setBasicAuth(username, password);
 			asyncClient.get(getAbsoluteUrl(url), params, new AsyncHttpResponseHandler() {
 				@Override
 				public final void onSuccess(String response) {
@@ -81,7 +86,16 @@ public class RestClient implements IRestClient {
 		return baseUrl + relativeUrl;
 	}
 
-	public static void setBaseUrl(String url) {
+	@Override
+	public void setBaseUrl(String url) {
 		baseUrl = url;
+	}
+	
+	@Override
+	public void setBasicAuth(final String username, final String password) {
+		this.username = username;
+		this.password = password;
+		asyncClient.setBasicAuth(username, password);
+		syncClient.setBasicAuth(username, password);
 	}
 }

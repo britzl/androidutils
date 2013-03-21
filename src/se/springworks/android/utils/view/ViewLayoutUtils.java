@@ -23,4 +23,13 @@ public class ViewLayoutUtils {
 			v.setLayoutParams(mlp);
 		}
 	}
+	
+	
+	public static void setWidth(View v, int width) {
+		LayoutParams lp = v.getLayoutParams();
+		if(lp != null) {
+			lp.width = width;
+			v.setLayoutParams(lp);
+		}
+	}
 }

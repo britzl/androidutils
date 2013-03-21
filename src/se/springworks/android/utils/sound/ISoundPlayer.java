@@ -18,6 +18,14 @@ public interface ISoundPlayer {
 	 * @param key
 	 */
 	public void add(int resId, Object key);
+	
+	/**
+	 * Ads a sound and associates it with the specified key. 
+	 * @param resId
+	 * @param key
+	 * @param volume Volume to use when playing the sound
+	 */
+	public void add(int resId, Object key, float volume);
 	public void add(AssetFileDescriptor afd, Object key);
 	public void add(String path, Object key);
 

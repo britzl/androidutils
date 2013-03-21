@@ -19,7 +19,7 @@ public interface IFileHandler {
 	 * @param name Name of the file to delete
 	 * @return true if successful, otherwise false
 	 */
-	public boolean delete(String name) throws Exception;
+	public boolean delete(String name) throws IOException;
 	
 	/**
 	 * Checks if a file exists
@@ -79,7 +79,7 @@ public interface IFileHandler {
 	 * @return The bytes of the file
 	 * @throws Exception
 	 */
-	public byte[] load(String name) throws Exception;
+	public byte[] load(String name) throws IOException;
 
 	/**
 	 * Saves a file
@@ -87,7 +87,7 @@ public interface IFileHandler {
 	 * @param data Bytes to write to the file
 	 * @throws Exception
 	 */
-	public void save(String name, byte[] data) throws Exception;
+	public void save(String name, byte[] data) throws IOException;
 	
 	/**
 	 * Saves a file
@@ -95,7 +95,7 @@ public interface IFileHandler {
 	 * @param data String to write to the file (using writeUTF)
 	 * @throws Exception
 	 */
-	public void save(String name, String data) throws Exception;
+	public void save(String name, String data) throws IOException;
 	
 	/**
 	 * Saves a file
@@ -103,6 +103,6 @@ public interface IFileHandler {
 	 * @param stream Stream of bytes to write to the file
 	 * @throws Exception
 	 */
-	public void save(String name, InputStream stream) throws Exception;
+	public void save(String name, InputStream stream) throws IOException;
 
 }

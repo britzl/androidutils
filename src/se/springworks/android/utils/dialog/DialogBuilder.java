@@ -29,4 +29,14 @@ public class DialogBuilder {
 		dialog.show();
 		return dialog;
 	}
+
+	public static Dialog show(Context context, int titleId, int messageId) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(titleId);
+		builder.setMessage(messageId);
+		final AlertDialog dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.show();
+		return dialog;
+	}
 }

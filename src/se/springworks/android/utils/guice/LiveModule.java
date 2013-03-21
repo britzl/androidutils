@@ -61,8 +61,6 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(IRestClient.class).to(RestClient.class).in(Singleton.class);
 
-		bind(AssetFileHandler.class).in(Singleton.class);
-		
 		bind(IFileHandler.class).to(StorageFileHandler.class);
 		
 		bind(IAssetFileHandler.class).to(AssetFileHandler.class);
