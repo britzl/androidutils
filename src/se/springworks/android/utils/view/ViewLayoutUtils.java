@@ -1,6 +1,7 @@
 package se.springworks.android.utils.view;
 
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 
@@ -17,7 +18,12 @@ public class ViewLayoutUtils {
 	 */
 	public static void setMargins(View v, int left, int top, int right, int bottom) {
 		LayoutParams lp = v.getLayoutParams();
-		if(lp instanceof MarginLayoutParams) {
+		if(lp == null) {
+			MarginLayoutParams mlp = new MarginLayoutParams(MarginLayoutParams.WRAP_CONTENT, MarginLayoutParams.WRAP_CONTENT);
+			mlp.setMargins(left, top, right, bottom);
+			v.setLayoutParams(mlp);
+		}
+		else if(lp instanceof MarginLayoutParams) {
 			MarginLayoutParams mlp = (MarginLayoutParams)lp;
 			mlp.setMargins(left, top, right, bottom);
 			v.setLayoutParams(mlp);
@@ -25,11 +31,15 @@ public class ViewLayoutUtils {
 	}
 	
 	
-	public static void setWidth(View v, int width) {
+	public static void setSize(View v, int width, int height) {
 		LayoutParams lp = v.getLayoutParams();
-		if(lp != null) {
-			lp.width = width;
-			v.setLayoutParams(lp);
+		if(lp == null) {
+			lp = new LayoutParams(width, height);
 		}
+		else if(lp != null) {
+			lp.width = width;
+			lp.height = height;
+		}
+		v.setLayoutParams(lp);
 	}
 }

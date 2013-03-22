@@ -7,11 +7,11 @@ import se.springworks.android.utils.R;
 import android.os.AsyncTask;
 import android.view.View;
 
-public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T, U, V> {
+public abstract class AsyncViewTask<SomeView extends View, Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
 	private static final Logger logger = LoggerFactory.getLogger(AsyncViewTask.class);
 	
-	protected S view;
+	protected SomeView view;
 	
 	public AsyncViewTask() {
 	}
@@ -23,7 +23,7 @@ public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T
 	 * @param params Task parameters
 	 * @return This task
 	 */
-	public final AsyncTask<T, U, V> execute(S view, T... params) {
+	public final AsyncTask<Params, Progress, Result> execute(SomeView view, Params... params) {
 		this.view = view;		
 
 		// check if there's another task assigned to view
@@ -44,7 +44,7 @@ public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T
 	 * if the view is still assigned to this task
 	 */
 	@Override
-	protected final void onPostExecute(V result) {
+	protected final void onPostExecute(Result result) {
 		@SuppressWarnings("rawtypes")
 		AsyncTask task = (AsyncTask)view.getTag(R.id.ASYNCVIEWTASKID);
 		if(task == this) {
@@ -58,7 +58,7 @@ public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T
 	}
 	
 	@Override
-	protected final V doInBackground(T... params) {
+	protected final Result doInBackground(Params... params) {
 		try {
 			return performTask(params);
 		}
@@ -73,11 +73,11 @@ public abstract class AsyncViewTask<S extends View, T, U, V> extends AsyncTask<T
 	 * @param params
 	 * @return
 	 */
-	protected abstract V performTask(T... params);
+	protected abstract Result performTask(Params... params);
 	
 	/**
 	 * Handles the result. This method will only be called if the view is still valid
 	 * @param result
 	 */
-	protected abstract void handleResult(V result, S view);
+	protected abstract void handleResult(Result result, SomeView view);
 }

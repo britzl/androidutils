@@ -1,6 +1,5 @@
 package se.springworks.android.utils.threading;
 
-import se.springworks.android.utils.R;
 import android.os.AsyncTask;
 
 /**
