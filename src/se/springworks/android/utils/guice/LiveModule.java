@@ -3,6 +3,8 @@ package se.springworks.android.utils.guice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import se.springworks.android.utils.auth.GoogleAuthentication;
+import se.springworks.android.utils.auth.IAuthentication;
 import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.eventbus.OttoBus;
 import se.springworks.android.utils.file.AssetFileHandler;
@@ -72,6 +74,8 @@ public class LiveModule extends AbstractModule  {
 		bind(AsyncImageLoader.class);
 		
 		bind(IEventBus.class).to(OttoBus.class).in(Singleton.class);
+		
+		bind(IAuthentication.class).toInstance(new GoogleAuthentication(app.getApplicationContext()));
 		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		

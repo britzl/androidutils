@@ -3,6 +3,7 @@ package se.springworks.android.utils.activity;
 import org.slf4j.Logger;
 
 import se.springworks.android.utils.analytics.IAnalyticsTracker;
+import se.springworks.android.utils.application.BaseApplication;
 import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.guice.InjectLogger;
 import se.springworks.android.utils.inject.GrapeGuice;
@@ -18,7 +19,11 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.inject.Inject;
 
 public abstract class BaseActivity extends SherlockFragmentActivity {
-
+	
+	public interface OnActivityResultListener {
+		public void onActivityResult(int requestCode, int resultCode, Intent data); 
+	}
+	
 	@InjectLogger
 	Logger logger;
 	
@@ -34,6 +39,8 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Inject
 	protected IAnalyticsTracker tracker;
 	
+	private OnActivityResultListener activityResultListener = null;
+	
 	private static int defaultStartActivityEnterAnimationId = 0;
 	private static int defaultStartActivityExitAnimationId = 0;
 	private static int defaultFinishActivityEnterAnimationId = 0;
@@ -45,6 +52,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		super.onCreate(savedInstanceState);
 		long time = System.currentTimeMillis();
 		GrapeGuice.injectMembers(this);
+		BaseApplication.getInstance().setCurrentActivity(this);
 
 		logger.debug("onCreate() " + this);
 
@@ -98,6 +106,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		super.onResume();
 		logger.debug("onResume() " + this);
 		bus.register(this);
+		BaseApplication.getInstance().setCurrentActivity(this);
 
 		try {
 			resumeActivity();
@@ -112,6 +121,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		super.onPause();
 		logger.debug("onPause() " + this);
 		bus.unregister(this);
+		BaseApplication.getInstance().setCurrentActivity(null);
 
 		try {
 			pauseActivity();
@@ -139,6 +149,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	public final void onDestroy() {
 		super.onDestroy();
 		logger.debug("onDestroy() " + this);
+		BaseApplication.getInstance().setCurrentActivity(null);
 
 		try {
 			destroyActivity();
@@ -146,10 +157,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		catch (Exception e) {
 			handleError(e);
 		}
-	}
-
-	public void handleActivityResult(int requestCode, int resultCode, Intent data) {
-		// override
 	}
 
 	/**
@@ -232,6 +239,12 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
 	}
 	
+	
+	public void startActivityForResult(Intent intent, int requestCode, OnActivityResultListener listener) {
+		this.activityResultListener = listener;
+		startActivityForResult(intent, requestCode);
+	}
+	
 	@Override
 	public void startActivityForResult(Intent intent, int requestCode) {
 		if (getParent() != null) {
@@ -243,6 +256,15 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 			overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
 		}
 	}
+	
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if(activityResultListener != null) {
+    		activityResultListener.onActivityResult(requestCode, resultCode, data);
+    		activityResultListener = null;
+    	}
+    	super.onActivityResult(requestCode, resultCode, data);
+    }
 		
 	@Override
 	public void startActivity(Intent intent, Bundle options) {
