@@ -85,7 +85,7 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 		}
 	}
 
-	private void getToken(String accountName, final OnTokenCallback callback) {
+	private void getToken(final String accountName, final OnTokenCallback callback) {
 		logger.debug("getToken() account name = " + accountName);
 		ParameterLoader paramLoader = new ParameterLoader(context);
 		final String apiKey = paramLoader.getString(KEY_APIKEY);

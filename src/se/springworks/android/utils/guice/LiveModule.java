@@ -21,6 +21,8 @@ import se.springworks.android.utils.image.IImageLoader;
 import se.springworks.android.utils.image.ImageLoader;
 import se.springworks.android.utils.json.IJsonParser;
 import se.springworks.android.utils.json.JacksonParser;
+import se.springworks.android.utils.persistence.IKeyValueStorage;
+import se.springworks.android.utils.persistence.SharedPreferencesStorage;
 import se.springworks.android.utils.rest.IRestClient;
 import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
@@ -76,6 +78,8 @@ public class LiveModule extends AbstractModule  {
 		bind(IEventBus.class).to(OttoBus.class).in(Singleton.class);
 		
 		bind(IAuthentication.class).toInstance(new GoogleAuthentication(app.getApplicationContext()));
+		
+		bind(IKeyValueStorage.class).to(SharedPreferencesStorage.class).in(Singleton.class);
 		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		

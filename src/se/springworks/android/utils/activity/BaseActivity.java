@@ -24,20 +24,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		public void onActivityResult(int requestCode, int resultCode, Intent data); 
 	}
 	
-	@InjectLogger
-	Logger logger;
-	
-	@Inject
-	protected IEventBus bus;
-	
-	@Inject
-	private Resources resources;
-	
-	@Inject
-	private AssetManager assets;
-	
-	@Inject
-	protected IAnalyticsTracker tracker;
 	
 	private OnActivityResultListener activityResultListener = null;
 	
@@ -50,35 +36,19 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		long time = System.currentTimeMillis();
-		GrapeGuice.injectMembers(this);
 		BaseApplication.getInstance().setCurrentActivity(this);
 
-		logger.debug("onCreate() " + this);
-
 		try {
-			tracker.init(this);
 			createActivity(savedInstanceState);
-			GrapeGuice.injectViews(this);
-			// RoboGuice.getInjector(this).injectMembersWithoutViews(this);
 		}
 		catch (Exception e) {
 			handleError(e);
 		}
-		logger.debug("onCreate() took = " + (System.currentTimeMillis() - time));
-	}
-
-	@Override
-	public void onContentChanged() {
-		super.onContentChanged();
-		// RoboGuice.getInjector(this).injectViewMembers(this);
 	}
 
 	@Override
 	public final void onRestart() {
 		super.onRestart();
-		logger.debug("onRestart() " + this);
-
 		try {
 			restartActivity();
 		}
@@ -88,12 +58,9 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	}
 
 	@Override
-	public final void onStart() {
+	public void onStart() {
 		super.onStart();
-		this.logger.debug("onStart() " + this);
-
 		try {
-			tracker.trackActivityStart(this);
 			startActivity();
 		}
 		catch (Exception e) {
@@ -104,8 +71,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		logger.debug("onResume() " + this);
-		bus.register(this);
 		BaseApplication.getInstance().setCurrentActivity(this);
 
 		try {
@@ -119,8 +84,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		logger.debug("onPause() " + this);
-		bus.unregister(this);
 		BaseApplication.getInstance().setCurrentActivity(null);
 
 		try {
@@ -132,12 +95,10 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	}
 
 	@Override
-	public final void onStop() {
+	public void onStop() {
 		super.onStop();
-		logger.debug("onStop() " + this);
 
 		try {
-			tracker.trackActivityStop(this);
 			stopActivity();
 		}
 		catch (Exception e) {
@@ -148,7 +109,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public final void onDestroy() {
 		super.onDestroy();
-		logger.debug("onDestroy() " + this);
 		BaseApplication.getInstance().setCurrentActivity(null);
 
 		try {
@@ -159,52 +119,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		}
 	}
 
-	/**
-	 * Get a string from the intent bundle
-	 * 
-	 * @param key
-	 *            Bundle key
-	 * @return The string or null if it doesn't exist
-	 */
-	protected final String getExtrasString(String key) {
-		Bundle b = getIntent().getExtras();
-		if (b == null) {
-			return null;
-		}
-		return b.getString(key);
-	}
-
-	/**
-	 * Get a string from the intent bundle or a default value if the string
-	 * doesn't exist
-	 * 
-	 * @param key
-	 *            Bundle key
-	 * @param defaultValue
-	 * @return The string or default value if it doesn't exist
-	 */
-	protected final String getExtrasString(String key, String defaultValue) {
-		Bundle b = getIntent().getExtras();
-		if (b == null) {
-			return defaultValue;
-		}
-		String s = b.getString(key);
-		if (s == null) {
-			s = defaultValue;
-		}
-		return s;
-	}
-
-	protected final String getResourceString(int id) {
-		return resources.getString(id);
-	}
-
-	protected final Drawable getResourceDrawable(int id) {
-		return resources.getDrawable(id);
-	}
-
-	private final void handleError(Exception e) {
-		logger.debug(e.getMessage(), e);
+	protected void handleError(Exception e) {
 	}
 	
 	/**
@@ -315,11 +230,5 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 
 	protected void pauseActivity() {
 		// override if needed
-	}
-
-	@Override
-	public void onBackPressed() {
-		this.logger.debug("onBackPressed()");
-		super.onBackPressed();
 	}
 }

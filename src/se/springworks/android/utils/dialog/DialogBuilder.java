@@ -39,4 +39,14 @@ public class DialogBuilder {
 		dialog.show();
 		return dialog;
 	}
+	
+	public static Dialog show(Context context, String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setMessage(message);
+		final AlertDialog dialog = builder.create();
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.show();
+		return dialog;
+	}
 }

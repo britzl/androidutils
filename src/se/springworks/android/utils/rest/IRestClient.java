@@ -1,9 +1,17 @@
 package se.springworks.android.utils.rest;
 
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import java.util.Map;
 
 public interface IRestClient {
+	
+	public interface OnHttpResponseHandler {
+		
+		public void onSuccess(String response);
+		
+		public void onFailure(Throwable t, String response);
+	}
+	
+	void cancelRequests();
 	
 	/**
 	 * Perform a synchronous GET 
@@ -11,7 +19,7 @@ public interface IRestClient {
 	 * @param params
 	 * @return
 	 */
-	String get(final String url, RequestParams params);
+	String get(final String url, Map<String, String> params);
 	
 	/**
 	 * Perform an asynchronous GET
@@ -19,7 +27,7 @@ public interface IRestClient {
 	 * @param params
 	 * @param responseHandler
 	 */
-	void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler);
+	void get(String url, Map<String, String> params, OnHttpResponseHandler responseHandler);
 	
 	/**
 	 * Perform an asynchronous POST
@@ -27,7 +35,15 @@ public interface IRestClient {
 	 * @param params
 	 * @param responseHandler
 	 */
-	void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler);
+	void post(String url, Map<String, String> params, OnHttpResponseHandler responseHandler);
+	
+	/**
+	 * Perform an asynchronous POST
+	 * @param url
+	 * @param json
+	 * @param responseHandler
+	 */
+	void post(String url, String json, OnHttpResponseHandler responseHandler);
 	
 	/**
 	 * Set base url to use for all requests
