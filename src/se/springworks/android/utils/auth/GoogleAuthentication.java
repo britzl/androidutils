@@ -38,8 +38,6 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 	
 	private State state = State.IDLE;
 	
-	private AccountManager manager;
-	
 	private OnTokenCallback callback;
 	
 	private Context context;
@@ -66,7 +64,7 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 			return;
 		}
 		
-		manager = AccountManager.get(context);
+		AccountManager manager = AccountManager.get(context);
 		Account[] accounts = manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
 		if(accounts == null || accounts.length == 0) {
 			logger.debug("getToken() No accounts");
@@ -85,7 +83,8 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 		}
 	}
 
-	private void getToken(final String accountName, final OnTokenCallback callback) {
+	@Override
+	public void getToken(final String accountName, final OnTokenCallback callback) {
 		logger.debug("getToken() account name = " + accountName);
 		ParameterLoader paramLoader = new ParameterLoader(context);
 		final String apiKey = paramLoader.getString(KEY_APIKEY);
@@ -127,7 +126,7 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 					callback.onError(AuthenticationError.UNRECOVERABLE);
 					return;
 				}
-				callback.onToken(token);
+				callback.onToken(accountName, token);
 			}
 		};
 		task.execute(accountName);

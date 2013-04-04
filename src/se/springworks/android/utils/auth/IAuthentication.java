@@ -15,9 +15,11 @@ public interface IAuthentication {
 	}
 	
 	public interface OnTokenCallback {
-		void onToken(String token);
+		void onToken(String accountName, String token);
 		void onError(AuthenticationError error);
 	}
 	
 	void getToken(OnTokenCallback callback);
+	
+	void getToken(String accountName, OnTokenCallback callback);
 }

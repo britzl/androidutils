@@ -1,7 +1,6 @@
 package se.springworks.android.utils.sound;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;

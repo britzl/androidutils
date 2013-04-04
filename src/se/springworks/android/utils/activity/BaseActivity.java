@@ -1,22 +1,12 @@
 package se.springworks.android.utils.activity;
 
-import org.slf4j.Logger;
-
-import se.springworks.android.utils.analytics.IAnalyticsTracker;
 import se.springworks.android.utils.application.BaseApplication;
-import se.springworks.android.utils.eventbus.IEventBus;
-import se.springworks.android.utils.guice.InjectLogger;
-import se.springworks.android.utils.inject.GrapeGuice;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.google.inject.Inject;
 
 public abstract class BaseActivity extends SherlockFragmentActivity {
 	

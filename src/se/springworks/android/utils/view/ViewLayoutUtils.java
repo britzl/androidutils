@@ -1,7 +1,6 @@
 package se.springworks.android.utils.view;
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 

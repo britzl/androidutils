@@ -17,23 +17,17 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 			sp = context.getSharedPreferences(context.getPackageName(), 0);
 		}
 	}
-	
-	@Override
-	public void put(String key, String value) {
-		init();
-		sp.edit().putString(key, value).commit();
-	}
-
-	@Override
-	public String getString(String key) {
-		init();
-		return sp.getString(key, key);
-	}
 
 	@Override
 	public void remove(String key) {
 		init();
 		sp.edit().remove(key).commit();
+	}
+	
+	@Override
+	public void put(String key, String value) {
+		init();
+		sp.edit().putString(key, value).commit();
 	}
 
 	@Override
@@ -46,6 +40,12 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	public void put(String key, boolean value) {
 		init();
 		sp.edit().putBoolean(key, value).commit();
+	}
+
+	@Override
+	public String getString(String key) {
+		init();
+		return sp.getString(key, null);
 	}
 
 	@Override

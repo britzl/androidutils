@@ -3,6 +3,7 @@ package se.springworks.android.utils.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,31 +17,39 @@ public class AssetFileHandler implements IAssetFileHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(AssetFileHandler.class);
 
-	private AssetManager assetManager;
-
 	@Inject
-	public AssetFileHandler(AssetManager assetManager) {
-		this.assetManager = assetManager;
-	}
+	private AssetManager assetManager;
+	
+	private Hashtable<String, Boolean> fileExistsLookup = new Hashtable<String, Boolean>();
+
 
 	@Override
-	public boolean exists(String name) {
+	public boolean exists(final String name) {
 		logger.debug("exists() " + name);
+		// file lookups on Assets is slow, cache results
+		if(fileExistsLookup.containsKey(name)) {
+			return fileExistsLookup.get(name);
+		}
+		
 		String path = "";
+		String filename = name;
 		int index = name.lastIndexOf(File.separator);
 		if (index != -1) {
 			path = name.substring(0, index);
-			name = name.substring(index + 1);
+			filename = name.substring(index + 1);
 		}
-		logger.debug("exists() name = " + name + " path = " + path);
+		logger.debug("exists() name = " + filename + " path = " + path);
 
+		boolean exists = false;
 		String files[] = getFileList(path);
 		for (int i = 0; i < files.length; i++) {
-			if (files[i].equals(name)) {
-				return true;
+			if (files[i].equals(filename)) {
+				exists = true;
+				break;
 			}
 		}
-		return false;
+		fileExistsLookup.put(name, exists);
+		return exists;
 	}
 
 	@Override
