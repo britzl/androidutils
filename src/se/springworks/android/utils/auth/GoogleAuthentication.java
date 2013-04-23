@@ -2,11 +2,10 @@ package se.springworks.android.utils.auth;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import se.springworks.android.utils.activity.BaseActivity.OnActivityResultListener;
 import se.springworks.android.utils.application.BaseApplication;
+import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.logging.LoggerFactory;
 import se.springworks.android.utils.resource.ParameterLoader;
 import se.springworks.android.utils.threading.SimpleAsyncTask;
 import android.accounts.Account;

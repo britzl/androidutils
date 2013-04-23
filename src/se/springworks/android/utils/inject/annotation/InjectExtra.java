@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.greenrobot.inject.annotation;
+package se.springworks.android.utils.inject.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,30 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface OnClick {
-    // We cannot use int[] until Android 2.2 is minimum requirement due to
-    // http://code.google.com/p/android/issues/detail?id=5964
-    
-    int id();
-
-    int id2() default 0;
-
-    int id3() default 0;
-
-    int id4() default 0;
-
-    int id5() default 0;
-
-    int id6() default 0;
-
-    int id7() default 0;
-
-    int id8() default 0;
-
-    int id9() default 0;
-
-    int id10() default 0;
-
-    boolean newThread() default false;
+@Target(ElementType.FIELD)
+public @interface InjectExtra {
+    String key();
 }

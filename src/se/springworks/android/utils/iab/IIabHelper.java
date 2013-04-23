@@ -101,14 +101,14 @@ public interface IIabHelper {
 
 	void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener);
 
-	void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener,
-			String extraData);
+	void launchPurchaseFlow(Activity act, String sku, int requestCode, String developerPayload,
+			OnIabPurchaseFinishedListener listener);
 
 	void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
 			OnIabPurchaseFinishedListener listener);
 
-	void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
-			OnIabPurchaseFinishedListener listener, String extraData);
+	void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode, String developerPayload,
+			OnIabPurchaseFinishedListener listener);
 
 	/**
 	 * Initiate the UI flow for an in-app purchase. Call this method to initiate
@@ -130,16 +130,16 @@ public interface IIabHelper {
 	 * @param requestCode
 	 *            A request code (to differentiate from other responses -- as in
 	 *            {@link android.app.Activity#startActivityForResult}).
-	 * @param listener
-	 *            The listener to notify when the purchase process finishes
-	 * @param extraData
+	 * @param developerPayload
 	 *            Extra data (developer payload), which will be returned with
 	 *            the purchase data when the purchase completes. This extra data
 	 *            will be permanently bound to that purchase and will always be
 	 *            returned when the purchase is queried.
+	 * @param listener
+	 *            The listener to notify when the purchase process finishes
 	 */
-	void launchPurchaseFlow(Activity act, String sku, String itemType, int requestCode,
-			OnIabPurchaseFinishedListener listener, String extraData);
+	void launchPurchaseFlow(Activity act, String sku, String itemType, int requestCode, String developerPayload,
+			OnIabPurchaseFinishedListener listener);
 
 	/**
 	 * Handles an activity result that's part of the purchase flow in in-app

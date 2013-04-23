@@ -1,14 +1,17 @@
 package se.springworks.android.utils.inject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import se.springworks.android.utils.inject.annotation.InjectView;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
 
 /**
  * Wrapper for Guice {@link com.google.inject.Guice} and GreenRobot {@link de.greenrobot.inject.Injector}
@@ -39,30 +42,42 @@ public class GrapeGuice {
 	}
 	
 	/**
-	 * Injects views, extras and resources from an activity into fields of an object
-	 * This uses the following GreenRobot annotations:
-	 * 
-	 *  - @InjectView(id = R.id.name) View v
-	 *  - @InjectExtra(id = "key") Object o
-	 *  - @InjectResource(id = R.drawable.name) Drawable d
-	 *  - @InjectResource(id = R.strings.name) String s
-	 *  - @InjectResource(id = R.drawable.name) Bitmap b
+	 * Injects views from the specified activity into fields annotated
+	 * with @InjectView(id = R.id.name) in the specified target object
 	 * 
 	 * @param a The activity to get views from
 	 * @param o The object to inject views into
 	 */
 	public static void injectViews(Activity a, Object o) {
-		de.greenrobot.inject.Injector.inject(a, o);
+    	Class<?> targetClass = o.getClass();
+        Field[] fields = targetClass.getDeclaredFields();
+        for (Field field : fields) {
+        	if(field.isAnnotationPresent(InjectView.class)) {
+        		InjectView injectView = (InjectView)field.getAnnotation(InjectView.class);
+        		field.setAccessible(true);
+        		try {
+					field.set(o, a.findViewById(injectView.id()));
+				}
+				catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        }
 	}
 
 	/**
-	 * Injects views, extras and resources for an activity
+	 * Injects views into the members of an activity
 	 * Refer to {@link #injectViews(Activity, Object)} for details
 	 * 
 	 * @param a The activity to get views from and fields to inject to
 	 */
 	public static void injectViews(Activity a) {
-		de.greenrobot.inject.Injector.injectInto(a);
+		injectViews(a, a);
 	}
 
 	/**
@@ -77,6 +92,5 @@ public class GrapeGuice {
 	public static <T> T getInstance(Class<T> t) {
 		return injector.getInstance(t);
 	}
-	
 	
 }

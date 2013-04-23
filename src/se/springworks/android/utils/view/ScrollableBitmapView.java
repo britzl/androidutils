@@ -1,8 +1,7 @@
 package se.springworks.android.utils.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.logging.LoggerFactory;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -205,7 +204,7 @@ public class ScrollableBitmapView extends View {
 		return state == State.ZOOM;
 	}
 
-	private void limitOffset() {		
+	protected void limitOffset() {		
 		if(image == null) {
 			return;
 		}

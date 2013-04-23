@@ -26,7 +26,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		BaseApplication.getInstance().setCurrentActivity(this);
+		BaseApplication.getInstance().onActivityCreated(this);
 
 		try {
 			createActivity(savedInstanceState);
@@ -61,7 +61,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		BaseApplication.getInstance().setCurrentActivity(this);
+		BaseApplication.getInstance().onActivityResumed(this);
 
 		try {
 			resumeActivity();
@@ -74,7 +74,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		BaseApplication.getInstance().setCurrentActivity(null);
+		BaseApplication.getInstance().onActivityPaused(this);
 
 		try {
 			pauseActivity();
@@ -99,7 +99,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public final void onDestroy() {
 		super.onDestroy();
-		BaseApplication.getInstance().setCurrentActivity(null);
+		BaseApplication.getInstance().onActivityDestroyed(this);
 
 		try {
 			destroyActivity();

@@ -1,9 +1,8 @@
 package se.springworks.android.utils.threading;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import se.springworks.android.utils.R;
+import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.logging.LoggerFactory;
 import android.os.AsyncTask;
 import android.view.View;
 

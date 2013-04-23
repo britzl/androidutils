@@ -11,11 +11,6 @@ public class AsyncSequence {
 		COMPLETED
 	}
 
-	public interface OnSequenceCompletedCallback {
-		void onCompleted();
-		void onError(Throwable t);
-	}
-	
 	public static abstract class AsyncEvent implements ICallback {
 		
 		private AsyncSequence sequence;
@@ -37,7 +32,7 @@ public class AsyncSequence {
 	
 	private List<AsyncEvent> asyncEvents = new ArrayList<AsyncEvent>();
 	
-	private OnSequenceCompletedCallback callback;
+	private ICallback callback;
 	
 	public void addAsyncEvent(AsyncEvent event) {
 		event.sequence = this;
@@ -49,13 +44,13 @@ public class AsyncSequence {
 		state = State.COMPLETED;
 	}
 	
-	public void start(final OnSequenceCompletedCallback callback) {
+	public void start(final ICallback callback) {
 		this.callback = callback;
 		if(state == State.STARTED) {
 			return;
 		}
 		if(state == State.COMPLETED) {
-			callback.onCompleted();
+			callback.onDone();
 			return;
 		}
 		state = State.STARTED;
@@ -70,7 +65,7 @@ public class AsyncSequence {
 	private void executeNextTask() {
 		if(asyncEvents.isEmpty()) {
 			state = State.COMPLETED;
-			callback.onCompleted();
+			callback.onDone();
 			return;
 		}
 		

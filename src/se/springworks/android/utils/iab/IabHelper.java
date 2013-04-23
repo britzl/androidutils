@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.json.JSONException;
 
+import se.springworks.android.utils.inject.annotation.InjectLogger;
+import se.springworks.android.utils.logging.Logger;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -32,7 +34,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.google.inject.Inject;
@@ -71,10 +72,10 @@ import com.google.inject.assistedinject.Assisted;
  * 
  */
 public class IabHelper implements IIabHelper {
-	// Is debug logging enabled?
-	boolean mDebugLog = false;
-	String mDebugTag = "IabHelper";
 
+	@InjectLogger
+	private static Logger logger;
+	
 	// Is setup done?
 	boolean mSetupDone = false;
 
@@ -167,19 +168,6 @@ public class IabHelper implements IIabHelper {
 	@Inject
 	public IabHelper(@Assisted String base64PublicKey) {
 		mSignatureBase64 = base64PublicKey;
-		logDebug("IAB helper created.");
-	}
-
-	/**
-	 * Enables or disable debug logging through LogCat.
-	 */
-	public void enableDebugLogging(boolean enable, String tag) {
-		mDebugLog = enable;
-		mDebugTag = tag;
-	}
-
-	public void enableDebugLogging(boolean enable) {
-		mDebugLog = enable;
 	}
 
 	@Override
@@ -296,30 +284,29 @@ public class IabHelper implements IIabHelper {
 
 	@Override
 	public void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener) {
-		launchPurchaseFlow(act, sku, requestCode, listener, "");
+		launchPurchaseFlow(act, sku, requestCode, "", listener);
 	}
 
 	@Override
-	public void launchPurchaseFlow(Activity act, String sku, int requestCode, OnIabPurchaseFinishedListener listener,
-			String extraData) {
-		launchPurchaseFlow(act, sku, ITEM_TYPE_INAPP, requestCode, listener, extraData);
+	public void launchPurchaseFlow(Activity act, String sku, int requestCode, String developerPayload, OnIabPurchaseFinishedListener listener) {
+		launchPurchaseFlow(act, sku, ITEM_TYPE_INAPP, requestCode, developerPayload, listener);
 	}
 
 	@Override
 	public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
 			OnIabPurchaseFinishedListener listener) {
-		launchSubscriptionPurchaseFlow(act, sku, requestCode, listener, "");
+		launchSubscriptionPurchaseFlow(act, sku, requestCode, "", listener);
 	}
 
 	@Override
-	public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode,
-			OnIabPurchaseFinishedListener listener, String extraData) {
-		launchPurchaseFlow(act, sku, ITEM_TYPE_SUBS, requestCode, listener, extraData);
+	public void launchSubscriptionPurchaseFlow(Activity act, String sku, int requestCode, String developerPayload,
+			OnIabPurchaseFinishedListener listener) {
+		launchPurchaseFlow(act, sku, ITEM_TYPE_SUBS, requestCode, developerPayload, listener);
 	}
 
 	@Override
-	public void launchPurchaseFlow(Activity act, String sku, String itemType, int requestCode,
-			OnIabPurchaseFinishedListener listener, String extraData) {
+	public void launchPurchaseFlow(Activity act, String sku, String itemType, int requestCode, String developerPayload,
+			OnIabPurchaseFinishedListener listener) {
 		checkSetupDone("launchPurchaseFlow");
 
 		if (itemType.equals(ITEM_TYPE_SUBS) && !mSubscriptionsSupported) {
@@ -331,7 +318,7 @@ public class IabHelper implements IIabHelper {
 
 		try {
 			logDebug("Constructing buy intent for " + sku + ", item type: " + itemType);
-			Bundle buyIntentBundle = mService.getBuyIntent(3, mContext.getPackageName(), sku, itemType, extraData);
+			Bundle buyIntentBundle = mService.getBuyIntent(3, mContext.getPackageName(), sku, itemType, developerPayload);
 			int response = getResponseCodeFromBundle(buyIntentBundle);
 			if (response != BILLING_RESPONSE_RESULT_OK) {
 				logError("Unable to buy item, Error response: " + getResponseDesc(response));
@@ -833,15 +820,14 @@ public class IabHelper implements IIabHelper {
 	}
 
 	void logDebug(String msg) {
-		if (mDebugLog)
-			Log.d(mDebugTag, msg);
+		logger.debug(msg);
 	}
 
 	void logError(String msg) {
-		Log.e(mDebugTag, "In-app billing error: " + msg);
+		logger.error("In-app billing error: " + msg);
 	}
 
 	void logWarn(String msg) {
-		Log.w(mDebugTag, "In-app billing warning: " + msg);
+		logger.warn("In-app billing warning: " + msg);
 	}
 }

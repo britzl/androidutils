@@ -6,7 +6,8 @@ import java.util.Map;
 import org.apache.http.entity.StringEntity;
 
 import se.springworks.android.utils.http.SimpleHttpClient;
-
+import se.springworks.android.utils.inject.annotation.InjectLogger;
+import se.springworks.android.utils.logging.Logger;
 import android.content.Context;
 
 import com.google.inject.Inject;
@@ -26,6 +27,8 @@ public class RestClient implements IRestClient {
 
 	private RestCache cache = new RestCache();
 	
+	@InjectLogger Logger logger;
+	
 	@Inject
 	private Context context;
 
@@ -41,19 +44,20 @@ public class RestClient implements IRestClient {
 	
 	@Override
 	public String get(final String url, Map<String, String> params) {
-		String absoluteUrl = getAbsoluteUrl(url, params);
+		logger.debug("get() " + url);
+		final String absoluteUrl = getAbsoluteUrl(url, params);
 		if(!cachingEnabled) {
 			return syncClient.getAsString(absoluteUrl);
 		}
 		
 		// do we have it cached?
-		String cachedData = cache.get(absoluteUrl);
+		final String cachedData = cache.get(absoluteUrl);
 		if (cachedData != null) {
 			return cachedData;
 		}
 
 		// get new value and cache it
-		String result = syncClient.getAsString(absoluteUrl);
+		final String result = syncClient.getAsString(absoluteUrl);
 		if(result != null) {
 			cache.cache(absoluteUrl, result);
 		}
@@ -62,8 +66,10 @@ public class RestClient implements IRestClient {
 	
 	@Override
 	public void get(final String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
+		final String absoluteUrl = getAbsoluteUrl(url, params);
+		logger.debug("get() " + absoluteUrl);
 		if(!cachingEnabled) {
-			asyncClient.get(getAbsoluteUrl(url, params), new AsyncHttpResponseHandler() {
+			asyncClient.get(absoluteUrl, new AsyncHttpResponseHandler() {
 				@Override
 				public final void onSuccess(String response) {
 					responseHandler.onSuccess(response);
@@ -77,7 +83,7 @@ public class RestClient implements IRestClient {
 			return;
 		}
 		
-		String cachedData = cache.get(url);
+		String cachedData = cache.get(absoluteUrl);
 		if (cachedData != null) {
 			responseHandler.onSuccess(cachedData);
 		}
@@ -86,7 +92,7 @@ public class RestClient implements IRestClient {
 			asyncClient.get(getAbsoluteUrl(url, params), new AsyncHttpResponseHandler() {
 				@Override
 				public final void onSuccess(String response) {
-					cache.cache(url, response);
+					cache.cache(absoluteUrl, response);
 					responseHandler.onSuccess(response);
 				}
 
@@ -100,6 +106,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void post(String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
+		logger.debug("post() " + url);
 		RequestParams rp = (params != null) ? new RequestParams(params) : null;
 		asyncClient.post(getAbsoluteUrl(url), rp, new AsyncHttpResponseHandler() {
 			@Override
@@ -116,6 +123,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void post(String url, String json, final OnHttpResponseHandler responseHandler) {
+		logger.debug("post() " + url);
 		try {
 			StringEntity se = new StringEntity(json);
 			asyncClient.post(context, getAbsoluteUrl(url), se, "application/json", new AsyncHttpResponseHandler() {

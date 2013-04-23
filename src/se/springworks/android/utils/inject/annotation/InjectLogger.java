@@ -1,4 +1,4 @@
-package se.springworks.android.utils.guice;
+package se.springworks.android.utils.inject.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import java.lang.annotation.Retention;
