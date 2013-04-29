@@ -7,6 +7,7 @@ import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.stream.StreamUtils.FlushedInputStream;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 
 import com.google.inject.Inject;
@@ -18,6 +19,10 @@ public class ImageLoader implements IImageLoader {
 	
 	@Inject
 	private IAssetFileHandler assetFileHandler;
+
+	private int maxDownsampling = 1;
+
+	private Config config;
 
 	@Override
 	public InputStream getAsStream(String url) {
@@ -34,12 +39,27 @@ public class ImageLoader implements IImageLoader {
 		if(in == null) {
 			return null;
 		}
-		return BitmapFactory.decodeStream(in);
+		return getAsBitmap(in);
 	}
 	
 	@Override
 	public Bitmap getAsBitmap(InputStream in) {
-		return BitmapFactory.decodeStream(in);
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inSampleSize = 1;	
+		options.inPreferredConfig = config;
+		Bitmap bitmap = null;
+		while(bitmap == null && options.inSampleSize <= maxDownsampling) {
+			try {
+				bitmap = BitmapFactory.decodeStream(in, null, options);
+			}
+			catch(Exception e) {
+				break;
+			}
+			catch(OutOfMemoryError error) {
+				options.inSampleSize *= 2;
+			}
+		}
+		return bitmap;
 	}
 
 	@Override
@@ -51,5 +71,16 @@ public class ImageLoader implements IImageLoader {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+
+	@Override
+	public void setMaxDownsampling(int max) {
+		this.maxDownsampling = max;
+	}
+
+	@Override
+	public void setBitmapConfig(Config config) {
+		this.config = config;
 	}
 }

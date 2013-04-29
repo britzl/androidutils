@@ -30,7 +30,6 @@ import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayerFactory;
-import android.app.Application;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -46,11 +45,11 @@ public class LiveModule extends AbstractModule  {
 
 	private static final Logger logger = LoggerFactory.getLogger(LiveModule.class);
 
-	private Application app;
+	private Context context;
 	
-	public LiveModule(Application app) {
+	public LiveModule(Context context) {
         super();
-        this.app = app;
+        this.context = context;
     }
 
 	@Override
@@ -59,22 +58,22 @@ public class LiveModule extends AbstractModule  {
 
 		bindListener(Matchers.any(), new InjectLoggerListener());
 		bindListener(Matchers.any(), new InjectExtraListener());
-		bindListener(Matchers.any(), new InjectResourceListener(app.getResources()));
+		bindListener(Matchers.any(), new InjectResourceListener(context.getResources()));
 		
 
-		bind(LayoutInflater.class).toInstance((LayoutInflater)app.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
+		bind(LayoutInflater.class).toInstance((LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE));
 		
-		bind(NotificationManager.class).toInstance((NotificationManager)app.getSystemService(Context.NOTIFICATION_SERVICE));
+		bind(NotificationManager.class).toInstance((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE));
 		
 		bind(INotificationManager.class).to(AndroidNotificationManager.class);
 		
-		bind(Context.class).toInstance(app.getApplicationContext());
+		bind(Context.class).toInstance(context.getApplicationContext());
 		
-		bind(ParameterLoader.class).toInstance(new ParameterLoader(app.getApplicationContext()));
+		bind(ParameterLoader.class).toInstance(new ParameterLoader(context.getApplicationContext()));
 
-		bind(Resources.class).toInstance(app.getResources());
+		bind(Resources.class).toInstance(context.getResources());
 		
-		bind(AssetManager.class).toInstance(app.getAssets());
+		bind(AssetManager.class).toInstance(context.getAssets());
 		
 		bind(IJsonParser.class).to(JacksonParser.class);
 		
@@ -92,9 +91,11 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(IEventBus.class).to(OttoBus.class).in(Singleton.class);
 		
-		bind(IAuthentication.class).toInstance(new GoogleAuthentication(app.getApplicationContext()));
+		bind(IAuthentication.class).toInstance(new GoogleAuthentication(context.getApplicationContext()));
 		
 		bind(IKeyValueStorage.class).to(SharedPreferencesStorage.class).in(Singleton.class);
+		
+		bind(IIabHelper.class).to(IabHelper.class).in(Singleton.class);
 		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		

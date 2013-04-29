@@ -22,6 +22,7 @@ import org.json.JSONException;
 
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.resource.ParameterLoader;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -166,8 +167,12 @@ public class IabHelper implements IIabHelper {
 	 *            "developer public key".
 	 */
 	@Inject
-	public IabHelper(@Assisted String base64PublicKey) {
-		mSignatureBase64 = base64PublicKey;
+	public IabHelper(ParameterLoader loader) {
+		mSignatureBase64 = loader.getString("iab_publickey");
+	}
+
+	public IabHelper(String publicKey) {
+		mSignatureBase64 = publicKey;
 	}
 
 	@Override

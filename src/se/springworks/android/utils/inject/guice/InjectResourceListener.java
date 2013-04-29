@@ -8,6 +8,7 @@ import se.springworks.android.utils.inject.annotation.InjectResource;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 
 public class InjectResourceListener extends CustomInjectionListener {
@@ -28,6 +29,12 @@ public class InjectResourceListener extends CustomInjectionListener {
         if (type == String.class) {
         	field.set(o, resources.getString(id));
         }
+        else if (type == Boolean.class) {
+        	field.set(o, resources.getBoolean(id));
+        }
+        else if (Movie.class.isAssignableFrom(type)) {
+        	field.set(o, resources.getMovie(id));
+        }
         else if (Drawable.class.isAssignableFrom(type)) {
         	field.set(o, resources.getDrawable(id));
         }
@@ -36,8 +43,6 @@ public class InjectResourceListener extends CustomInjectionListener {
         }
         else {
             throw new IllegalArgumentException("Cannot inject for type " + type + " (field " + field.getName() + ")");
-        }
-		
+        }	
 	}
-
 }
