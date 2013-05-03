@@ -38,7 +38,6 @@ import android.text.TextUtils;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 
 /**
  * Provides convenience methods for in-app billing. You can create one instance

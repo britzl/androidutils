@@ -33,15 +33,6 @@ public abstract class AbstractFileHandler implements IFileHandler {
 		catch (IOException e) {
 		}
 		return false;
-		
-//		byte[] data = new byte[0];//{ (byte)1 };
-//		try {
-//			save(filename, data);
-//		} catch (Exception e) {
-//			logger.error("createEmptyFile()", e);
-//			return false;
-//		}
-//		return true;
 	}
 	
 	@Override
@@ -59,24 +50,6 @@ public abstract class AbstractFileHandler implements IFileHandler {
 		logger.debug("exists() " + name);
 		File file = getFile(name);
 		return file.exists();
-//		String path = "";
-//		int index = name.lastIndexOf(File.separator);
-//		if(index != -1) {
-//			path = name.substring(0, index);
-//			name = name.substring(index + 1);
-//		}
-//		logger.debug("exists() name = " + name + " path = " + path);
-//
-//		String files[] = getFileList(path);
-//		if(files == null) {
-//			return false;
-//		}
-//		for(int i = 0; i < files.length; i++) {
-//			if(files[i].equals(name)) {
-//				return true;
-//			}
-//		}
-//		return false;
 	}
 
 	@Override

@@ -6,7 +6,8 @@ public abstract class SimpleAsyncTask<Param, Result> extends AsyncTask<Param, Vo
 
 	@Override
 	protected Result doInBackground(Param... params) {
-		return performTask(params != null ? params[0] : null);
+		final boolean validParams = ((params != null) && (params.length > 0));
+		return performTask(validParams ? params[0] : null);
 	}
 	
 	@Override

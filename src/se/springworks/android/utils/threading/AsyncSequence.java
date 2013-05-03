@@ -14,7 +14,17 @@ public class AsyncSequence {
 	public static abstract class AsyncEvent implements ICallback {
 		
 		private AsyncSequence sequence;
+		
+		private boolean ignoreErrors = false;
 
+		public AsyncEvent() {
+			
+		}
+		
+		public AsyncEvent(boolean ignoreErrors) {
+			this.ignoreErrors = ignoreErrors;
+		}
+		
 		public abstract void execute();
 		
 		@Override
@@ -24,7 +34,12 @@ public class AsyncSequence {
 		
 		@Override
 		public final void onError(Throwable t) {
-			sequence.onTaskError(t);
+			if(ignoreErrors) {
+				sequence.executeNextTask();
+			}
+			else {
+				sequence.onTaskError(t);				
+			}
 		}
 	}
 	

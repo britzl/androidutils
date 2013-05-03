@@ -5,7 +5,9 @@ import se.springworks.android.utils.auth.IAuthentication;
 import se.springworks.android.utils.eventbus.IEventBus;
 import se.springworks.android.utils.eventbus.OttoBus;
 import se.springworks.android.utils.file.AssetFileHandler;
+import se.springworks.android.utils.file.FileDownloader;
 import se.springworks.android.utils.file.IAssetFileHandler;
+import se.springworks.android.utils.file.IFileDownloader;
 import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
@@ -30,6 +32,7 @@ import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayerFactory;
+import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -65,6 +68,8 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(NotificationManager.class).toInstance((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE));
 		
+		bind(DownloadManager.class).toInstance((DownloadManager)context.getSystemService(Context.DOWNLOAD_SERVICE));
+		
 		bind(INotificationManager.class).to(AndroidNotificationManager.class);
 		
 		bind(Context.class).toInstance(context.getApplicationContext());
@@ -80,6 +85,8 @@ public class LiveModule extends AbstractModule  {
 		bind(IRestClient.class).to(RestClient.class).in(Singleton.class);
 
 		bind(IFileHandler.class).to(StorageFileHandler.class);
+		
+		bind(IFileDownloader.class).to(FileDownloader.class).in(Singleton.class);
 		
 		bind(IAssetFileHandler.class).to(AssetFileHandler.class).in(Singleton.class);
 		
