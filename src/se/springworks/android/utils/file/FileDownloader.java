@@ -42,6 +42,7 @@ public class FileDownloader implements IFileDownloader {
 
 		@Override
 		protected void onPostExecute() {
+			activeTasks.remove(uri);
 			for(WeakReference<OnFileDownloadListener> ref : listeners) {
 				OnFileDownloadListener listener = ref.get();
 				if(listener != null) {
@@ -52,7 +53,6 @@ public class FileDownloader implements IFileDownloader {
 						listener.onDownloaded(uri);
 					}
 				}
-				
 			}
 		}
 
@@ -105,7 +105,6 @@ public class FileDownloader implements IFileDownloader {
 			if(task != null) {
 				logger.debug("download() task already exist for this uri. adding listener");
 				task.addListener(listener);
-				return;
 			}
 			else {
 				logger.debug("download() creating task and downloading %s", uri);
@@ -116,6 +115,18 @@ public class FileDownloader implements IFileDownloader {
 				task.execute();
 				logger.debug("execute called");				
 			}
+		}
+	}
+
+	@Override
+	public void cancel(String uri) {
+		if(!isDownloading(uri)) {
+			return;
+		}
+		synchronized (activeTasks) {
+			DownloadTask task = activeTasks.get(uri);
+			task.cancel(true);
+			activeTasks.remove(uri);
 		}
 	}
 }

@@ -24,6 +24,13 @@ public class SectionedFragmentPagerAdapter<T extends Fragment> extends FragmentP
 	public Fragment getItem(int position) {
 		return fragments.get(position).first;
 	}
+	
+	//http://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view/7287121#7287121
+	@Override
+	public int getItemPosition(Object object) {
+		return POSITION_NONE;
+	}
+
 
 	@Override
 	public int getCount() {

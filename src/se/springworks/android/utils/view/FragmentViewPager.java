@@ -61,7 +61,7 @@ public class FragmentViewPager extends ViewPager implements TabListener {
 		adapter.add(fragment, title);
 		actionBar.addTab(actionBar.newTab().setText(title).setTabListener(this));
 	}
-
+	
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		setCurrentItem(tab.getPosition());

@@ -16,5 +16,7 @@ public interface IFileDownloader {
 	
 	void download(String uri, String destination, IFileHandler fileHandler, OnFileDownloadListener listener);
 	
+	void cancel(String uri);
+	
 	boolean isDownloading(String uri);
 }
