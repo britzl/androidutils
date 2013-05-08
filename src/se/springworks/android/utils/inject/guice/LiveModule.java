@@ -32,6 +32,8 @@ import se.springworks.android.utils.rest.RestClient;
 import se.springworks.android.utils.sound.ISoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayer;
 import se.springworks.android.utils.sound.SoundPlayerFactory;
+import se.springworks.android.utils.system.ISystemSettings;
+import se.springworks.android.utils.system.SystemSettings;
 import android.app.DownloadManager;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -93,6 +95,8 @@ public class LiveModule extends AbstractModule  {
 		bind(ISimpleHttpClient.class).to(SimpleHttpClient.class);
 		
 		bind(IImageLoader.class).to(ImageLoader.class);
+		
+		bind(ISystemSettings.class).to(SystemSettings.class);
 		
 		bind(AsyncImageLoader.class);
 		

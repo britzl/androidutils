@@ -3,6 +3,13 @@ package se.springworks.android.utils.threading;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Utility to execute a series of async tasks in sequence and trigger a callback
+ * once all of the async tasks have completed  
+ * @author bjornritzl
+ *
+ */
 public class AsyncSequence {
 	
 	private enum State {
@@ -11,54 +18,59 @@ public class AsyncSequence {
 		COMPLETED
 	}
 
-	public static abstract class AsyncEvent implements ICallback {
+	/**
+	 * Wrapper for a single async method
+	 * @author bjornritzl
+	 *
+	 */
+	public static abstract class AsyncCall {
 		
 		private AsyncSequence sequence;
 		
 		private boolean ignoreErrors = false;
 
-		public AsyncEvent() {
+		public AsyncCall() {
 			
 		}
 		
-		public AsyncEvent(boolean ignoreErrors) {
+		public AsyncCall(boolean ignoreErrors) {
 			this.ignoreErrors = ignoreErrors;
 		}
 		
-		public abstract void execute();
-		
-		@Override
-		public final void onDone() {
-			sequence.executeNextTask();
-		}
-		
-		@Override
-		public final void onError(Throwable t) {
-			if(ignoreErrors) {
-				sequence.executeNextTask();
-			}
-			else {
-				sequence.onTaskError(t);				
-			}
-		}
+		/**
+		 * Perform the async task here
+		 * @param executionCallback Call this once the async task has completed
+		 */
+		public abstract void execute(ICallback executionCallback);
 	}
 	
 	private State state = State.WAITING;
 	
-	private List<AsyncEvent> asyncEvents = new ArrayList<AsyncEvent>();
+	private List<AsyncCall> asyncCalls = new ArrayList<AsyncCall>();
 	
 	private ICallback callback;
 	
-	public void addAsyncEvent(AsyncEvent event) {
+	/**
+	 * Add an async call. The async calls will be made in the order that they are added
+	 * @param event
+	 */
+	public void add(AsyncCall event) {
 		event.sequence = this;
-		asyncEvents.add(event);
+		asyncCalls.add(event);
 	}
 	
+	/**
+	 * Stops the sequence and removes all calls
+	 */
 	public void stop() {
-		asyncEvents.clear();
+		asyncCalls.clear();
 		state = State.COMPLETED;
 	}
 	
+	/**
+	 * Start the sequence of async calls
+	 * @param callback Called once the sequence has completed and every time an error has occurred
+	 */
 	public void start(final ICallback callback) {
 		this.callback = callback;
 		if(state == State.STARTED) {
@@ -69,22 +81,37 @@ public class AsyncSequence {
 			return;
 		}
 		state = State.STARTED;
-		executeNextTask();
+		executeNext();
 	}
-	
-	private void onTaskError(Throwable t) {
-		callback.onError(t);
-		executeNextTask();
-	}
-	
-	private void executeNextTask() {
-		if(asyncEvents.isEmpty()) {
+
+	/**
+	 * Executes the next async call in the sequence
+	 */
+	private void executeNext() {
+		if(asyncCalls.isEmpty()) {
 			state = State.COMPLETED;
 			callback.onDone();
 			return;
 		}
 		
-		AsyncEvent event = asyncEvents.remove(0);
-		event.execute();
+		final AsyncCall event = asyncCalls.remove(0);
+		event.execute(new ICallback() {
+			
+			@Override
+			public void onError(Throwable t) {
+				if(event.ignoreErrors) {
+					executeNext();
+				}
+				else {
+					callback.onError(t);
+					executeNext();
+				}
+			}
+			
+			@Override
+			public void onDone() {
+				executeNext();
+			}
+		});
 	}
 }

@@ -63,6 +63,9 @@ public class FileDownloader implements IFileDownloader {
 				if(in != null) {
 					fileHandler.save(destination, in);
 				}
+				else {
+					exception = new RuntimeException("No inputstream");
+				}
 			}
 			catch(IOException e) {
 				exception = e;

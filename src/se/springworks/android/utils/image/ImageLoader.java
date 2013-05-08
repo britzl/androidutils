@@ -51,6 +51,9 @@ public class ImageLoader implements IImageLoader {
 		while(bitmap == null && options.inSampleSize <= maxDownsampling) {
 			try {
 				bitmap = BitmapFactory.decodeStream(in, null, options);
+				if(bitmap == null) {
+					options.inSampleSize *= 2;
+				}
 			}
 			catch(Exception e) {
 				break;
