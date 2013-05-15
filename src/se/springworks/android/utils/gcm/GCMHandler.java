@@ -34,8 +34,8 @@ public class GCMHandler implements IPushHandler {
 
 	@Override
 	public void register() {
-		GCMRegistrar.checkDevice(context);
-		GCMRegistrar.checkManifest(context);
+//		GCMRegistrar.checkDevice(context);
+//		GCMRegistrar.checkManifest(context);
 		if (!GCMRegistrar.isRegisteredOnServer(context)) {
 			final String senderId = getSenderId();
 			logger.debug("register() registering gcm using sender id = %s", senderId);
