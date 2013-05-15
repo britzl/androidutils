@@ -52,7 +52,7 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static void write(File file, InputStream stream) throws IOException {
-		if(file == null) {
+		if(file == null || stream == null) {
 			return;
 		}
 		file.getParentFile().mkdirs();

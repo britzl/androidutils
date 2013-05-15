@@ -36,11 +36,34 @@ public class IabResult {
             mMessage = message + " (response: " + IabHelper.getResponseDesc(response) + ")";
         }
     }
-    public int getResponse() { return mResponse; }
-    public String getMessage() { return mMessage; }
-    public boolean isSuccess() { return mResponse == IabHelper.BILLING_RESPONSE_RESULT_OK; }
-    public boolean isFailure() { return !isSuccess(); }
+    
+    public int getResponse() {
+    	return mResponse;
+    }
+    
+    public String getMessage() {
+    	return mMessage;
+    }
+    
+    public boolean isItemAlreadyOwned() {
+    	return mResponse == IabHelper.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED;
+    }
+    
+    public boolean isCancelled() {
+    	return mResponse == IabHelper.BILLING_RESPONSE_RESULT_USER_CANCELED;
+    }
+    
+    public boolean isSuccess() {
+    	return mResponse == IabHelper.BILLING_RESPONSE_RESULT_OK;
+    }
+    
+    public boolean isFailure() {
+    	return !isSuccess(); 
+    }
+    
     @Override
-	public String toString() { return "IabResult: " + getMessage(); }
+	public String toString() {
+    	return "IabResult: " + getMessage();
+    }
 }
 

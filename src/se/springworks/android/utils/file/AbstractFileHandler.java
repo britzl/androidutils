@@ -68,7 +68,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	@Override
 	public long getSize(String name) {
 		File file = getFile(name);
-		if(file == null) {
+		if(!file.exists()) {
 			return -1;
 		}
 		return file.length();
@@ -93,7 +93,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	@Override
 	public Date getFileModifiedDate(String name) {
 		File file = getFile(name);
-		if(file == null) {
+		if(!file.exists()) {
 			return null;
 		}
 		return new Date(file.lastModified());

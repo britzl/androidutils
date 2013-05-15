@@ -127,14 +127,16 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		defaultFinishActivityExitAnimationId = exitId;
 	}
 
-	protected final void switchActivity(Class<? extends Activity> c) {
+	public final void switchActivity(Class<? extends Activity> c) {
 		Intent i = new Intent(this, c);
 		startActivity(i);
 	}
 
-	protected final void switchActivity(Class<? extends Activity> c, Bundle extras) {
+	public final void switchActivity(Class<? extends Activity> c, Bundle extras) {
 		Intent i = new Intent(this, c);
-		i.putExtras(extras);
+		if(extras != null) {
+			i.putExtras(extras);
+		}
 		startActivity(i);
 	}
 	

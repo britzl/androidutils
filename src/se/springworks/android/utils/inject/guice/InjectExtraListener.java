@@ -26,8 +26,16 @@ public class InjectExtraListener extends CustomInjectionListener {
 		Activity a = (Activity)o;
 		Bundle extras = a.getIntent().getExtras();
 		if(extras != null) {
-			Object value = extras.get(((InjectExtra)annotation).key());
-			field.set(o, value);
+			final String key = ((InjectExtra)annotation).key();
+			Object value = extras.get(key);
+			try {
+				if(value != null) {
+					field.set(o, value);
+				}
+			}
+			catch(IllegalArgumentException e) {
+				throw new IllegalArgumentException(e.getMessage() + " field = " + field + " key = " + key + " value = " + value);
+			}
 		}
 	}
 

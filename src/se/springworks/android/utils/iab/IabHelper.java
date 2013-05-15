@@ -355,6 +355,13 @@ public class IabHelper implements IIabHelper {
 				listener.onIabPurchaseFinished(new IabResult(IABHELPER_REMOTE_EXCEPTION, "Remote exception while starting purchase flow"), null);
 			}
 		}
+		catch(Exception e) {
+			logError("Exception while starting purchase flow for sku " + sku);
+			e.printStackTrace();
+			if (listener != null) {
+				listener.onIabPurchaseFinished(new IabResult(IABHELPER_UNKNOWN_ERROR, "Exception while starting purchase flow"), null);
+			}
+		}
 	}
 
 	@Override
@@ -718,6 +725,7 @@ public class IabHelper implements IIabHelper {
 				String purchaseData = purchaseDataList.get(i);
 				String signature = signatureList.get(i);
 				String sku = ownedSkus.get(i);
+				logDebug("verifyPurchase() base64 = " + mSignatureBase64 + " data = " + purchaseData + " signature = " + signature); 
 				if (Security.verifyPurchase(mSignatureBase64, purchaseData, signature)) {
 					logDebug("Sku is owned: " + sku);
 					Purchase purchase = new Purchase(itemType, purchaseData, signature);
