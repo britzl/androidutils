@@ -1,5 +1,6 @@
 package se.springworks.android.utils.bundle;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 public class BundleUtil {
@@ -23,5 +24,19 @@ public class BundleUtil {
 			}
 		}
 		return b.getInt(key);
+	}
+	
+	public static void clearExtras(Intent i) {
+		i.putExtras(new Bundle());
+	}
+	
+	public static Bundle copyExtras(Intent i) {
+		Bundle copy = new Bundle();
+		Bundle original = i.getExtras();
+		if(original != null) {
+			copy.putAll(original);
+		}
+		return copy;
+		
 	}
 }
