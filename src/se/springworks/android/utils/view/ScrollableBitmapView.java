@@ -1,7 +1,5 @@
 package se.springworks.android.utils.view;
 
-import se.springworks.android.utils.logging.Logger;
-import se.springworks.android.utils.logging.LoggerFactory;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,8 +16,6 @@ import android.view.View;
 public class ScrollableBitmapView extends View {
 
 	private static final float CLICKTHRESHOLD = 10;
-
-	private static Logger logger = LoggerFactory.getLogger(ScrollableBitmapView.class);
 
 	private enum State {
 		NONE, DRAG, ZOOM
@@ -42,9 +38,6 @@ public class ScrollableBitmapView extends View {
 	private final Matrix matrix = new Matrix();
 	private final float[] m = new float[9];
 
-	// debugtext
-	private Paint textpaint = new Paint();
-	
 	private Paint bitmapPaint = new Paint();
 
 	public ScrollableBitmapView(Context context) {
@@ -58,9 +51,6 @@ public class ScrollableBitmapView extends View {
 	}
 
 	private void init(Context context) {
-		textpaint.setTextSize(15);
-		textpaint.setColor(0xFFFF0000);
-		
 		bitmapPaint.setFilterBitmap(true);
 		
 		scaleGestureDetector = new ScaleGestureDetector(context,
@@ -69,7 +59,6 @@ public class ScrollableBitmapView extends View {
 
 				@Override
 				public boolean onScaleBegin(ScaleGestureDetector detector) {
-					logger.debug("onScaleBegin()");
 					zoomCenter.set(detector.getFocusX(), detector.getFocusY());
 					state = State.ZOOM;
 					previousScaleFactor = detector.getScaleFactor();
@@ -79,7 +68,6 @@ public class ScrollableBitmapView extends View {
 
 				@Override
 				public void onScaleEnd(ScaleGestureDetector detector) {
-					logger.debug("onScaleEnd()");
 					state = State.NONE;
 					limitOffset();
 					invalidate();
@@ -108,16 +96,13 @@ public class ScrollableBitmapView extends View {
 		gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
 			@Override
 			public boolean onSingleTapUp(MotionEvent e) {
-				logger.debug("up");
 				state = State.NONE;
 				invalidate();
-//				onSingleTap(e.getX(), e.getY());
 				return true;
 			}
 			
 			@Override
 			public boolean onDown(MotionEvent e) {
-				logger.debug("down");
 				final float x = e.getX();
 				final float y = e.getY();
 				state = State.NONE;
@@ -128,7 +113,6 @@ public class ScrollableBitmapView extends View {
 			
 			@Override
 			public boolean onScroll(MotionEvent initial, MotionEvent current, float dx, float dy) {
-//				logger.debug("move");
 				final float x = current.getX();
 				final float y = current.getY();
 				boolean distanceAboveThreshold = Math.abs(x - touchDown.x) > CLICKTHRESHOLD || Math.abs(y - touchDown.y) > CLICKTHRESHOLD;
@@ -144,11 +128,6 @@ public class ScrollableBitmapView extends View {
 				}
 				return true;
 			}
-			
-//			@Override
-//			public void onLongPress(MotionEvent e) {
-//				ScrollableBitmapView.this.onLongPress(e.getX(), e.getY());
-//			}
 		}); 
 	}
 
@@ -168,7 +147,6 @@ public class ScrollableBitmapView extends View {
 	}
 	
 	public void destroy() {
-		logger.debug("destroy()");
 		if(image != null) {
 			image.recycle();
 			image = null;
@@ -220,11 +198,9 @@ public class ScrollableBitmapView extends View {
 		final float leftedge = getPaddingLeft();
 		final float rightedge = -(bmpw + getPaddingRight() - scrw);
 		if(ox > leftedge) {
-			logger.debug("left edge");
 			dx = ox - leftedge;
 		}
 		else if(ox < rightedge) {
-			logger.debug("right edge");
 			dx = ox - rightedge;
 		}
 		
@@ -232,11 +208,9 @@ public class ScrollableBitmapView extends View {
 		final float topedge = getPaddingTop();
 		final float bottomedge = -(bmph + getPaddingBottom() - scrh);
 		if(oy > topedge) {
-			logger.debug("top edge");
 			dy = oy - topedge; 
 		}
 		else if(oy < bottomedge) {
-			logger.debug("bottom edge");
 			dy = oy - bottomedge;
 		}
 		
@@ -253,14 +227,6 @@ public class ScrollableBitmapView extends View {
 		
 		matrix.postTranslate(-dx, -dy);
 	}
-
-//	protected void onSingleTap(float x, float y) {
-//		// override
-//	}
-//	
-//	protected void onLongPress(float x, float y) {
-//		// override
-//	}
 
 	public float getMaxScale() {
 		return maxScale;
@@ -301,10 +267,6 @@ public class ScrollableBitmapView extends View {
 			return;
 		}
 		canvas.drawBitmap(image, matrix, bitmapPaint);
-//		canvas.drawText("zox = " + zoomCenter.x + " hox = " + getHorizontalOffset(), 10, 30, textpaint);
-//		canvas.drawText("zoy = " + zoomCenter.y + " hoy = " + getVerticalOffset(), 10, 50, textpaint);
-//		canvas.drawText("scale = " + getScale() + " w = " + getWidth() + " h = " + getHeight(), 10, 70, textpaint);
-//		canvas.drawText("padding = " + getPaddingLeft() + "," + getPaddingTop() + "," + getPaddingRight() + "," + getPaddingBottom(), 10, 90, textpaint);
 	}
 
 	public void zoomTo(float zoom, float x, float y) {
@@ -340,7 +302,6 @@ public class ScrollableBitmapView extends View {
 		float w = getWidth();
 		float h = getHeight();
 		float zoom = Math.min(w / iw, h / ih);
-		logger.debug("zoomToFit() zoom = " + zoom);
 		zoomTo(zoom, iw / 2, ih / 2);
 	}
 }
