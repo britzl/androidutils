@@ -5,6 +5,8 @@ import java.io.InputStream;
 
 import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
+import se.springworks.android.utils.inject.annotation.InjectLogger;
+import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.stream.StreamUtils.FlushedInputStream;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -13,6 +15,8 @@ import android.graphics.BitmapFactory;
 import com.google.inject.Inject;
 
 public class ImageLoader implements IImageLoader {
+	@InjectLogger
+	private Logger logger;
 	
 	@Inject
 	private ISimpleHttpClient client;
@@ -42,13 +46,21 @@ public class ImageLoader implements IImageLoader {
 		return getAsBitmap(in);
 	}
 	
+	/**
+	 * Load a bitmap from a stream using a specific pixel configuration. If the image is too
+	 * large (ie causes an OutOfMemoryError situation) the method will iteratively try to
+	 * increase sample size up to a defined maximum sample size. The sample size will be doubled
+	 * each try since this it is recommended that the sample size should be a factor of two
+	 */
 	@Override
 	public Bitmap getAsBitmap(InputStream in) {
+		logger.debug("getAsBitmap()");
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inSampleSize = 1;	
 		options.inPreferredConfig = config;
 		Bitmap bitmap = null;
 		while(bitmap == null && options.inSampleSize <= maxDownsampling) {
+			logger.debug("trying to load using sample size %d", options.inSampleSize);
 			try {
 				bitmap = BitmapFactory.decodeStream(in, null, options);
 				if(bitmap == null) {
@@ -56,12 +68,16 @@ public class ImageLoader implements IImageLoader {
 				}
 			}
 			catch(Exception e) {
+				e.printStackTrace();
+				logger.debug("exception %s", e.getMessage());
 				break;
 			}
 			catch(OutOfMemoryError error) {
+				logger.debug("out of memory, doubling sample size");
 				options.inSampleSize *= 2;
 			}
 		}
+		logger.debug("load done %s", bitmap);
 		return bitmap;
 	}
 

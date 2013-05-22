@@ -25,8 +25,6 @@ public class AsyncSequence {
 	 */
 	public static abstract class AsyncCall {
 		
-		private AsyncSequence sequence;
-		
 		private boolean ignoreErrors = false;
 
 		public AsyncCall() {
@@ -55,7 +53,6 @@ public class AsyncSequence {
 	 * @param event
 	 */
 	public void add(AsyncCall event) {
-		event.sequence = this;
 		asyncCalls.add(event);
 	}
 	

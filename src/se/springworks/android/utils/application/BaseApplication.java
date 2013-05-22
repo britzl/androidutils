@@ -9,6 +9,8 @@ public class BaseApplication extends Application {
 
 	private BaseActivity current;
 	
+	private Class<?> mostRecentActivityClass;
+	
 	private static BaseApplication instance;
 	
 	public BaseApplication() {
@@ -19,6 +21,14 @@ public class BaseApplication extends Application {
 		LoggerFactory.addTarget(target);
 	}
 	
+	public boolean hasCreatedAnyActivities() {
+		return mostRecentActivityClass != null;
+	}
+	
+	public Class<?> getMostRecentActivityClass() {
+		return mostRecentActivityClass;
+	}
+
 	public static BaseApplication getInstance() {
 		return instance;
 	}
@@ -29,6 +39,7 @@ public class BaseApplication extends Application {
 	
 	public void onActivityCreated(BaseActivity a) {
 		this.current = a;
+		mostRecentActivityClass = a.getClass();
 	}
 	
 	public void onActivityDestroyed(BaseActivity a) {
@@ -45,7 +56,9 @@ public class BaseApplication extends Application {
 	
 	public void onActivityResumed(BaseActivity a) {
 		this.current = a;
+		mostRecentActivityClass = a.getClass();
 	}
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

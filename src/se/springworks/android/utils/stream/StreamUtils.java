@@ -22,8 +22,7 @@ public class StreamUtils {
 	}
 
 	/**
-	 * http://stackoverflow.com/questions/2787015/skia-decoder-fails-to-decode-
-	 * remote-stream
+	 * http://stackoverflow.com/questions/2787015/skia-decoder-fails-to-decode-remote-stream
 	 * 
 	 * @author bjorn.ritzl
 	 */
