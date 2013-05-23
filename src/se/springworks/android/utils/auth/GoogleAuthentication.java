@@ -22,11 +22,24 @@ import com.google.android.gms.common.AccountPicker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+/**
+ * Authentication class for Google identities using oAuth2.
+ * 
+ * Specify the API key in a resource XML using the key specified in
+ * {@link GoogleAuthentication#KEY_APIKEY}
+ * 
+ * If there's more than one account to chose from the AccountPicker will be used. You
+ * can override the standard message by adding a string with the key specified in
+ * {@link GoogleAuthentication#KEY_ACCOUNTPICKERMESSAGE} 
+ * @author bjornritzl
+ *
+ */
 public class GoogleAuthentication implements IAuthentication, OnActivityResultListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(GoogleAuthentication.class);
 
 	public static final String KEY_APIKEY = "googleauth_clientid";
+	public static final String KEY_ACCOUNTPICKERMESSAGE = "googleauth_accountpickermessage";
 	
 	private enum State {
 		IDLE,
@@ -41,8 +54,12 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 	
 	private Context context;
 	
+	private ParameterLoader paramLoader;
+
+	
 	public GoogleAuthentication(Context appContext) {
 		this.context = appContext;
+		paramLoader = new ParameterLoader(appContext);
 	}
 	
 	
@@ -77,7 +94,8 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 			logger.debug("getToken() More than one account");
 			state = State.WAITINGFORACCOUNTPICKER;
 			this.callback = callback;
-			Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"}, false, null, null, null, null);
+			String customMessage = paramLoader.getString(KEY_ACCOUNTPICKERMESSAGE);
+			Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"}, false, customMessage, null, null, null);
 			BaseApplication.getInstance().getCurrentActivity().startActivityForResult(intent, 0, this);
 		}
 	}
@@ -85,7 +103,6 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 	@Override
 	public void getToken(final String accountName, final OnTokenCallback callback) {
 		logger.debug("getToken() account name = " + accountName);
-		ParameterLoader paramLoader = new ParameterLoader(context);
 		final String apiKey = paramLoader.getString(KEY_APIKEY);
 		if(apiKey == null) {
 			logger.warn("getToken() no api key");
