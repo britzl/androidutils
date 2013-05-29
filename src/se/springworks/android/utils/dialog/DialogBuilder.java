@@ -68,17 +68,17 @@ public class DialogBuilder {
 	
 	
 	
-	public DialogBuilder addPositiveButton(int cancelId) {
-		return addPositiveButton(context.getString(cancelId), null);
+	public DialogBuilder addPositiveButton(int confirmId) {
+		return addPositiveButton(context.getString(confirmId), null);
 	}
-	public DialogBuilder addPositiveButton(int cancelId, DialogInterface.OnClickListener listener) {
-		return addPositiveButton(context.getString(cancelId), listener);
+	public DialogBuilder addPositiveButton(int confirmId, DialogInterface.OnClickListener listener) {
+		return addPositiveButton(context.getString(confirmId), listener);
 	}
-	public DialogBuilder addPositiveButton(String cancel) {
-		return addPositiveButton(cancel, null);
+	public DialogBuilder addPositiveButton(String confirm) {
+		return addPositiveButton(confirm, null);
 	}	
-	public DialogBuilder addPositiveButton(String cancel, DialogInterface.OnClickListener listener) {
-		builder.setPositiveButton(cancel, listener);
+	public DialogBuilder addPositiveButton(String confirm, DialogInterface.OnClickListener listener) {
+		builder.setPositiveButton(confirm, listener);
 		return this;
 	}
 	
