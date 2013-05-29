@@ -44,7 +44,7 @@ public class RestClient implements IRestClient {
 	
 	@Override
 	public String get(final String url, Map<String, String> params) {
-		logger.debug("get() " + url);
+		logger.debug("get() %s", url);
 		final String absoluteUrl = getAbsoluteUrl(url, params);
 		if(!cachingEnabled) {
 			return syncClient.getAsString(absoluteUrl);
@@ -67,7 +67,7 @@ public class RestClient implements IRestClient {
 	@Override
 	public void get(final String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
 		final String absoluteUrl = getAbsoluteUrl(url, params);
-		logger.debug("get() " + absoluteUrl);
+		logger.debug("get() %s", absoluteUrl);
 		if(!cachingEnabled) {
 			asyncClient.get(absoluteUrl, new AsyncHttpResponseHandler() {
 				@Override
@@ -106,7 +106,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void post(String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
-		logger.debug("post() " + url);
+		logger.debug("post() %s", url);
 		RequestParams rp = (params != null) ? new RequestParams(params) : null;
 		asyncClient.post(getAbsoluteUrl(url), rp, new AsyncHttpResponseHandler() {
 			@Override
@@ -123,7 +123,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void post(String url, String json, final OnHttpResponseHandler responseHandler) {
-		logger.debug("post() " + url);
+		logger.debug("post() %s", url);
 		try {
 			StringEntity se = new StringEntity(json);
 			asyncClient.post(context, getAbsoluteUrl(url), se, "application/json", new AsyncHttpResponseHandler() {
@@ -171,5 +171,21 @@ public class RestClient implements IRestClient {
 	@Override
 	public void cancelRequests() {
 		asyncClient.cancelRequests(context, true);
+	}
+
+	@Override
+	public void delete(String url, final OnHttpResponseHandler responseHandler) {
+		logger.debug("delete() %s", url);
+		asyncClient.delete(context, url, new AsyncHttpResponseHandler() {
+			@Override
+			public final void onSuccess(String response) {
+				responseHandler.onSuccess(response);
+			}
+
+			@Override
+			public void onFailure(Throwable e, String response) {
+				responseHandler.onFailure(e, response);
+			}				
+		});
 	}
 }

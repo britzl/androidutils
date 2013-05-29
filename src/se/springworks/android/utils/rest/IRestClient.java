@@ -46,6 +46,13 @@ public interface IRestClient {
 	void post(String url, String json, OnHttpResponseHandler responseHandler);
 	
 	/**
+	 * Perform an asynchronous DELETE
+	 * @param url
+	 * @param responseHandler
+	 */
+	void delete(String url, OnHttpResponseHandler responseHandler);
+	
+	/**
 	 * Set base url to use for all requests
 	 * @param baseUrl
 	 */
