@@ -31,6 +31,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
  * If there's more than one account to chose from the AccountPicker will be used. You
  * can override the standard message by adding a string with the key specified in
  * {@link GoogleAuthentication#KEY_ACCOUNTPICKERMESSAGE} 
+ * 
+ * http://android-developers.blogspot.se/2013/01/verifying-back-end-calls-from-android.html
  * @author bjornritzl
  *
  */
