@@ -1,9 +1,9 @@
 package se.springworks.android.utils.analytics;
 
-import com.crittercism.app.Crittercism;
-
 import se.springworks.android.utils.resource.ParameterLoader;
 import android.content.Context;
+
+import com.crittercism.app.Crittercism;
 
 /**
  * 

@@ -1,9 +1,9 @@
 package se.springworks.android.utils.file;
 
-import com.google.inject.Inject;
-
 import android.content.Context;
 import android.os.Environment;
+
+import com.google.inject.Inject;
 
 /**
  * Handles reading and writing to internal and external file storage

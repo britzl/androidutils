@@ -2,10 +2,10 @@ package se.springworks.android.utils.image;
 
 import java.io.InputStream;
 
-import com.google.inject.Inject;
-
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+
+import com.google.inject.Inject;
 
 public class AsyncImageLoader {
 

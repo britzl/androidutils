@@ -1,9 +1,9 @@
 package se.springworks.android.utils.analytics;
 
-import com.bugsense.trace.BugSenseHandler;
-
 import se.springworks.android.utils.resource.ParameterLoader;
 import android.content.Context;
+
+import com.bugsense.trace.BugSenseHandler;
 
 /**
  * IMPORTANT: If you use ProGuard you need to add the following line to your

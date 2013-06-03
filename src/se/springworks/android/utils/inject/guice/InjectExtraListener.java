@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import se.springworks.android.utils.inject.annotation.InjectExtra;
-
 import android.app.Activity;
 import android.os.Bundle;
 

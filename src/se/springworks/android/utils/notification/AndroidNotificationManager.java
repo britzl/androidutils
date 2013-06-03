@@ -1,9 +1,9 @@
 package se.springworks.android.utils.notification;
 
-import com.google.inject.Inject;
-
 import android.app.Notification;
 import android.app.NotificationManager;
+
+import com.google.inject.Inject;
 
 public class AndroidNotificationManager implements INotificationManager {
 

@@ -1,7 +1,7 @@
 package se.springworks.android.utils.analytics;
 
-import se.springworks.android.utils.resource.ParameterLoader;
 import ly.count.android.api.Countly;
+import se.springworks.android.utils.resource.ParameterLoader;
 import android.app.Activity;
 import android.content.Context;
 

@@ -1,11 +1,10 @@
 package se.springworks.android.utils.analytics;
 
 import se.springworks.android.utils.resource.ParameterLoader;
-
-import com.mixpanel.android.mpmetrics.MixpanelAPI;
-
 import android.app.Activity;
 import android.content.Context;
+
+import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class MixpanelTracker implements IAnalyticsTracker {
 
