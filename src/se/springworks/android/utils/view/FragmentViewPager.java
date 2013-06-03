@@ -58,8 +58,9 @@ public class FragmentViewPager extends ViewPager implements TabListener {
 	}
 	
 	public void addFragment(Fragment fragment, String title) {
-		adapter.add(fragment, title);
 		actionBar.addTab(actionBar.newTab().setText(title).setTabListener(this));
+		adapter.add(fragment, title);
+		adapter.notifyDataSetChanged();
 	}
 	
 	@Override
