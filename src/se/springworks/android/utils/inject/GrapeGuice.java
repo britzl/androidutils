@@ -7,6 +7,7 @@ import java.util.WeakHashMap;
 
 import se.springworks.android.utils.inject.annotation.InjectView;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -29,7 +30,7 @@ import com.google.inject.Injector;
  */
 public class GrapeGuice {
 
-	private static WeakHashMap<Context, GrapeGuice> injectors = new WeakHashMap<Context, GrapeGuice>();
+	private static WeakHashMap<Application, GrapeGuice> injectors = new WeakHashMap<Application, GrapeGuice>();
 	
 	private Injector injector;
 
@@ -46,7 +47,7 @@ public class GrapeGuice {
 	}
 	
 	public static GrapeGuice getInjector(Context context) {
-		final Context application = context.getApplicationContext();
+		final Application application = (Application)context.getApplicationContext();
 		GrapeGuice injector = injectors.get(application);
 		if (injector == null) {
 			final int id = application.getResources().getIdentifier("guice_modules", "array",
