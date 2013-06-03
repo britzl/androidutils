@@ -110,6 +110,7 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	}
 
 	protected void handleError(Exception e) {
+		e.printStackTrace();
 	}
 	
 	/**
