@@ -72,6 +72,15 @@ public interface IFileHandler {
 	 * @return The modification date or null if the file doesn't exist
 	 */
 	public Date getFileModifiedDate(String name);
+	
+	
+	/**
+	 * Sets the modification time of a file
+	 * @param name
+	 * @param time
+	 * @return true if successful, otherwise false
+	 */
+	public boolean setFileModifiedTime(String name, long time);
 
 	/**
 	 * Loads a file

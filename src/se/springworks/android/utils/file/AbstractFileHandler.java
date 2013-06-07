@@ -98,6 +98,15 @@ public abstract class AbstractFileHandler implements IFileHandler {
 		}
 		return new Date(file.lastModified());
 	}
+	
+	@Override
+	public boolean setFileModifiedTime(String name, long time) {
+		File file = getFile(name);
+		if(!file.exists()) {
+			return false;
+		}
+		return file.setLastModified(time);
+	}
 
 	@Override
 	public byte[] load(String name) throws IOException {
