@@ -1,14 +1,20 @@
 package se.springworks.android.utils.dialog;
 
+import se.springworks.android.utils.view.LinkifyUtil;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
+/**
+ * Helper, similar to the native Dialog.Builder class, but with added functionality to
+ * linkify and set movement mode to the message
+ * @author bjornritzl
+ *
+ */
 public class DialogBuilder {
 	
 	private Builder builder;
@@ -21,6 +27,10 @@ public class DialogBuilder {
 	
 	public static DialogBuilder create(Context context, int titleId, int messageId) {
 		return create(context, context.getString(titleId), context.getString(messageId));
+	}
+	
+	public static DialogBuilder create(Context context, int titleId, String message) {
+		return create(context, context.getString(titleId), message);
 	}
 	
 	public static DialogBuilder create(Context context, int titleId, SpannableString message) {
@@ -87,11 +97,11 @@ public class DialogBuilder {
 		dialog.show();
 		TextView message = (TextView)dialog.findViewById(android.R.id.message);
 		if(message != null) {
-			message.setMovementMethod(LinkMovementMethod.getInstance());
+			LinkifyUtil.linkify(message);
 		}
 		return dialog;
 	}
-
+	
 	public static Dialog showConfirmCancel(Context context, int titleId, int messageId, int confirmId, int cancelId, DialogInterface.OnClickListener confirmListener) {
 		return DialogBuilder.create(context, titleId, messageId)
 				.addPositiveButton(confirmId, confirmListener)

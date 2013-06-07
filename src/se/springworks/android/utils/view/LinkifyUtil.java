@@ -1,6 +1,7 @@
 package se.springworks.android.utils.view;
 
 import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,7 @@ public class LinkifyUtil {
 		for(int i = 0; i < childCount; i++) {
 			View v = vg.getChildAt(i);
 			if(v instanceof TextView) {
-				TextView tv = (TextView)v;
-				Linkify.addLinks(tv, mask);
+				linkify((TextView)v, mask);
 			}
 			
 			if(v instanceof ViewGroup) {
@@ -26,12 +26,20 @@ public class LinkifyUtil {
 	
 	public static void linkifyAllTextViews(View v, int mask) {
 		if(v instanceof TextView) {
-			TextView tv = (TextView)v;
-			Linkify.addLinks(tv, mask);
+			linkify((TextView)v, mask);
 		}
 		if(v instanceof ViewGroup) {
 			linkifyAllTextViews((ViewGroup)v, mask);
 		}
+	}
+
+	public static void linkify(TextView tv) {
+		LinkifyUtil.linkify(tv, Linkify.ALL);
+	}
+	
+	public static void linkify(TextView tv, int mask) {
+		Linkify.addLinks(tv, mask);
+		tv.setMovementMethod(LinkMovementMethod.getInstance());
 	}
 	
 	public static SpannableString linkifyAll(String text) {
