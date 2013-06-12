@@ -50,7 +50,7 @@ public class IabResult {
     }
     
     public boolean isCancelled() {
-    	return mResponse == IabHelper.BILLING_RESPONSE_RESULT_USER_CANCELED;
+    	return (mResponse == IabHelper.BILLING_RESPONSE_RESULT_USER_CANCELED) || (mResponse == IabHelper.IABHELPER_USER_CANCELLED);
     }
     
     public boolean isSuccess() {
