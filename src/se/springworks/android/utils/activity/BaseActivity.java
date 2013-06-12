@@ -192,13 +192,6 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 		overridePendingTransition(defaultFinishActivityEnterAnimationId, defaultFinishActivityExitAnimationId);
 	}
 
-	protected TextView createTextView(String text, int styleId) {
-		TextView tv = new TextView(this);
-		tv.setTextAppearance(this, styleId);
-		tv.setText(text);
-		return tv;
-	}
-
 	abstract protected void createActivity(Bundle savedInstanceState);
 
 	protected void destroyActivity() {
