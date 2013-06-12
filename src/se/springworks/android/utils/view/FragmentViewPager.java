@@ -63,6 +63,10 @@ public class FragmentViewPager extends ViewPager implements TabListener {
 		adapter.notifyDataSetChanged();
 	}
 	
+	public boolean isEmpty() {
+		return adapter.getCount() == 0;
+	}
+	
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		setCurrentItem(tab.getPosition());
