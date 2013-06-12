@@ -5,7 +5,6 @@ import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -17,7 +16,7 @@ import com.google.inject.Inject;
  * @author bjornritzl
  *
  */
-public abstract class GCMService extends GCMBaseIntentService {
+public class GCMService extends GCMBaseIntentService {
 
 	@InjectLogger
 	private Logger logger;
@@ -29,33 +28,32 @@ public abstract class GCMService extends GCMBaseIntentService {
 	public void onCreate() {
 		super.onCreate();
 		GrapeGuice.getInjector(this).injectMembers(this);
-		create();
 	}
 
 	// http://developer.android.com/google/gcm/gs.html
 	@Override
 	public void onRegistered(Context context, String regId) {
 		logger.debug("onRegistered() %s", regId);
-		registerPushId(regId);
+		pushHandler.onRegistered(regId);
 		GCMRegistrar.setRegisteredOnServer(context, true);
 	}
 
 	@Override
 	protected void onError(Context context, String errorId) {
 		logger.debug("onError() %s", errorId);
-		handleError(errorId);
+		pushHandler.onError(errorId);
 	}
 
 	@Override
 	protected void onMessage(Context context, Intent intent) {
 		logger.debug("onMessage()");
-		handleMessage(intent.getExtras());
+		pushHandler.onMessage(intent.getExtras());
 	}
 
 	@Override
 	protected void onUnregistered(Context context, String regId) {
 		logger.debug("onUnregistered() %s", regId);
-		unregisterPushId(regId);
+		pushHandler.onUnregistered(regId);
 		GCMRegistrar.setRegisteredOnServer(context, false);
 	}
 	
@@ -63,16 +61,5 @@ public abstract class GCMService extends GCMBaseIntentService {
 	protected String[] getSenderIds(Context context) {
 		String senderId = pushHandler.getSenderId();
 		return new String[] { senderId };
-	}
-	
-	abstract protected void create();
-	
-	abstract protected void registerPushId(String regId);
-	
-	abstract protected void unregisterPushId(String regId);
-	
-	abstract protected void handleMessage(Bundle extras);
-	
-	abstract protected void handleError(String errorId);
-
+	}	
 }

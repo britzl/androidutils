@@ -2,14 +2,13 @@ package se.springworks.android.utils.gcm;
 
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
-import se.springworks.android.utils.notification.INotificationManager;
 import se.springworks.android.utils.resource.ParameterLoader;
 import android.content.Context;
 
 import com.google.android.gcm.GCMRegistrar;
 import com.google.inject.Inject;
 
-public class GCMHandler implements IPushHandler {
+public abstract class GCMHandler implements IPushHandler {
 
 	public static final String KEY_SENDERID = "gcm_senderid";
 
@@ -18,9 +17,6 @@ public class GCMHandler implements IPushHandler {
 	
 	@Inject
 	private Context context;
-	
-	@Inject
-	private INotificationManager notificationManager;
 	
 	@Inject
 	private ParameterLoader parameterLoader;
