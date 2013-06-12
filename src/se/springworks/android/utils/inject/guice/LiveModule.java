@@ -110,8 +110,6 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(IIabHelper.class).to(IabHelper.class).in(Singleton.class);
 		
-		bind(IPushHandler.class).to(GCMHandler.class);
-		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder().implement(ISoundPlayer.class, SoundPlayer.class).build(SoundPlayerFactory.class));
