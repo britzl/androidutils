@@ -25,24 +25,29 @@ public class AssetFileHandler implements IAssetFileHandler {
 	@Override
 	public boolean exists(final String name) {
 		logger.debug("exists() " + name);
+		if(name == null || name.isEmpty()) {
+			return false;
+		}
 		// file lookups on Assets is slow, cache results
 		if(fileExistsLookup.containsKey(name)) {
 			return fileExistsLookup.get(name);
 		}
 		
-		String path = "";
-		String filename = name;
-		int index = name.lastIndexOf(File.separator);
-		if (index != -1) {
-			path = name.substring(0, index);
-			filename = name.substring(index + 1);
+		final File file = new File(name);
+		final String filename = file.getName();
+		final String path;
+		if(filename.length() == 0) {
+			path = name;
 		}
-		logger.debug("exists() name = " + filename + " path = " + path);
+		else {
+			path = file.getParent();
+		}
+//		logger.debug("exists() name = " + filename + " path = " + path);
 
 		boolean exists = false;
 		String files[] = getFileList(path);
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].equals(filename)) {
+		for (String f : files) {
+			if (f.equals(filename)) {
 				exists = true;
 				break;
 			}
