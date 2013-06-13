@@ -9,17 +9,29 @@ import android.support.v4.app.FragmentTransaction;
 public class FragmentUtil {
 
 	
-	public static void showSingle(FragmentActivity a, DialogFragment dialog) {
+	
+	public static void showSingle(FragmentActivity a, DialogFragment dialog, boolean addToBackStack) {
 		FragmentManager fm = a.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment prev = fm.findFragmentByTag(dialog.getClass().getName());
 		if(prev != null) {
 			ft.remove(prev);
 		}
-		ft.addToBackStack(null);
+		if(addToBackStack) {
+			ft.addToBackStack(null);
+		}
 		ft.commit();
 		
 		dialog.show(fm, dialog.getClass().getName());
+	}
+	
+	
+	public static void showSingle(FragmentActivity a, DialogFragment dialog) {
+		showSingle(a, dialog, true);
+	}
+	
+	public static void showSingleNoBack(FragmentActivity a, DialogFragment dialog) {
+		showSingle(a, dialog, false);
 	}
 	
 	
