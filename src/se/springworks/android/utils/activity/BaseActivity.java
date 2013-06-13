@@ -4,7 +4,6 @@ import se.springworks.android.utils.application.BaseApplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
