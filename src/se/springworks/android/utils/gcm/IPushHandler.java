@@ -22,6 +22,12 @@ public interface IPushHandler {
 	String getSenderId();
 	
 	/**
+	 * Get the current registration id
+	 * @return Registration id or null if not registered
+	 */
+	String getRegistrationId();
+	
+	/**
 	 * Callback when registration with GCM has completed.
 	 * The registration id should be sent to your server.
 	 * @param regId

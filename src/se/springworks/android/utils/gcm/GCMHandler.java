@@ -46,4 +46,10 @@ public abstract class GCMHandler implements IPushHandler {
 	public String getSenderId() {
 		return parameterLoader.getString(KEY_SENDERID);
 	}
+	
+	@Override
+	public String getRegistrationId() {
+		return GCMRegistrar.getRegistrationId(context);
+	}
+
 }
