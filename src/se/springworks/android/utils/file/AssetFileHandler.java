@@ -21,6 +21,7 @@ public class AssetFileHandler implements IAssetFileHandler {
 	
 	private Hashtable<String, Boolean> fileExistsLookup = new Hashtable<String, Boolean>();
 
+	
 
 	@Override
 	public boolean exists(final String name) {
@@ -28,32 +29,49 @@ public class AssetFileHandler implements IAssetFileHandler {
 		if(name == null || name.isEmpty()) {
 			return false;
 		}
-		// file lookups on Assets is slow, cache results
-		if(fileExistsLookup.containsKey(name)) {
-			return fileExistsLookup.get(name);
-		}
-		
-		final File file = new File(name);
-		final String filename = file.getName();
+
+		// get path and file element
+		final File f = new File(name);
+		final String parent = f.getParent();
+		final String filename = f.getName();
 		final String path;
-		if(filename.length() == 0) {
-			path = name;
+		if(filename.isEmpty()) {
+			path = name + File.separator;
+		}
+		else if(parent != null) {
+			path = parent + File.separator;
 		}
 		else {
-			path = file.getParent();
+			path = "";
 		}
-//		logger.debug("exists() name = " + filename + " path = " + path);
 
-		boolean exists = false;
-		String files[] = getFileList(path);
-		for (String f : files) {
-			if (f.equals(filename)) {
-				exists = true;
-				break;
+		// has this path been checked before?
+		if(!fileExistsLookup.containsKey(path)) {
+			fileExistsLookup.put(path, true);
+			String[] allFiles = getFileList(path);
+			for(String file : allFiles) {
+				fileExistsLookup.put(path + file, true);
 			}
 		}
-		fileExistsLookup.put(name, exists);
-		return exists;
+		return fileExistsLookup.containsKey(name);
+//		
+//		// file lookups on Assets is slow, cache results
+//		if(fileExistsLookup.containsKey(name)) {
+//			return fileExistsLookup.get(name);
+//		}
+//		
+////		logger.debug("exists() name = " + filename + " path = " + path);
+//
+//		boolean exists = false;
+//		String files[] = getFileList(path);
+//		for (String f : files) {
+//			if (f.equals(filename)) {
+//				exists = true;
+//				break;
+//			}
+//		}
+//		fileExistsLookup.put(name, exists);
+//		return exists;
 	}
 
 	@Override
@@ -63,6 +81,9 @@ public class AssetFileHandler implements IAssetFileHandler {
 
 	@Override
 	public String[] getFileList(String path) {
+		if(path.endsWith(File.separator)) {
+			path = path.substring(0, path.length() - File.separator.length());
+		}
 		try {
 			return assetManager.list(path);
 		} catch (IOException e) {
