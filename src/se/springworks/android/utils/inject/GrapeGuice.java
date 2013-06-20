@@ -21,7 +21,7 @@ import com.google.inject.Injector;
  * The modules to load for Guice needs to be defined as a string-array resource with the name
  * "guice-modules".
  * 
- * If you obfuscate your keep remember to keep the module names unchanged:
+ * If you obfuscate your code remember to keep the module names unchanged:
  * 
  * -keep public class * extends com.google.inject.AbstractModule
  * 
@@ -47,11 +47,13 @@ public class GrapeGuice {
 	}
 	
 	public static GrapeGuice getInjector(Context context) {
+		if(context == null) {
+			return null;
+		}
 		final Application application = (Application)context.getApplicationContext();
 		GrapeGuice injector = injectors.get(application);
 		if (injector == null) {
-			final int id = application.getResources().getIdentifier("guice_modules", "array",
-					application.getPackageName());
+			final int id = application.getResources().getIdentifier("guice_modules", "array", application.getPackageName());
 			final String[] moduleNames = id > 0 ? application.getResources().getStringArray(id) : new String[] {};
 			final List<AbstractModule> modules = new ArrayList<AbstractModule>();
 
