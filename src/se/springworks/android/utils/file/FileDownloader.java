@@ -2,7 +2,6 @@ package se.springworks.android.utils.file;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class FileDownloader implements IFileDownloader {
 	
 	private class DownloadTask extends AsyncVoidTask {
 		
-		private List<WeakReference<OnFileDownloadListener>> listeners = new ArrayList<WeakReference<OnFileDownloadListener>>();
+		private List<OnFileDownloadListener> listeners = new ArrayList<OnFileDownloadListener>();
 		
 		private String uri;
 		
@@ -37,27 +36,26 @@ public class FileDownloader implements IFileDownloader {
 		}
 		
 		public void addListener(OnFileDownloadListener listener) {
-			listeners.add(new WeakReference<IFileDownloader.OnFileDownloadListener>(listener));
+			listeners.add(listener);
 		}
 
 		@Override
 		protected void onPostExecute() {
-			activeTasks.remove(uri);
-			for(WeakReference<OnFileDownloadListener> ref : listeners) {
-				OnFileDownloadListener listener = ref.get();
-				if(listener != null) {
-					if(exception != null) {
-						listener.onFailed(exception, uri);
-					}
-					else {
-						listener.onDownloaded(uri);
-					}
+			logger.debug("onPostExecute() downloaded %s", uri);
+			for(OnFileDownloadListener listener : listeners) {
+				if(exception != null) {
+					listener.onFailed(exception, uri);
+				}
+				else {
+					listener.onDownloaded(uri);
 				}
 			}
+			activeTasks.remove(uri);
 		}
 
 		@Override
 		protected void performTask() {
+			logger.debug("performTask() download %s", uri);
 			try {
 				InputStream in = httpClient.get(uri);
 				if(in != null) {
@@ -68,6 +66,7 @@ public class FileDownloader implements IFileDownloader {
 				}
 			}
 			catch(IOException e) {
+				logger.error("performTask() io exception", e);
 				exception = e;
 			}
 		}
@@ -81,11 +80,11 @@ public class FileDownloader implements IFileDownloader {
 	
 	private Map<String, DownloadTask> activeTasks = new HashMap<String, DownloadTask>();
 	
-	private WeakReference<OnFileDownloadListener> listenerReference;
+	private OnFileDownloadListener downloadListener;
 	
 	@Override
 	public void setOnFileDownloadListener(OnFileDownloadListener listener) {
-		this.listenerReference = new WeakReference<IFileDownloader.OnFileDownloadListener>(listener);
+		this.downloadListener = listener;
 	}
 
 	@Override
@@ -96,7 +95,7 @@ public class FileDownloader implements IFileDownloader {
 	
 	@Override
 	public void download(final String uri, final String destination, final IFileHandler fileHandler) {
-		download(uri, destination, fileHandler, listenerReference.get());
+		download(uri, destination, fileHandler, downloadListener);
 	}
 
 
@@ -114,9 +113,7 @@ public class FileDownloader implements IFileDownloader {
 				task = new DownloadTask(uri, destination, fileHandler);
 				task.addListener(listener);
 				activeTasks.put(uri, task);
-				logger.debug("executing");
 				task.execute();
-				logger.debug("execute called");				
 			}
 		}
 	}
@@ -130,6 +127,16 @@ public class FileDownloader implements IFileDownloader {
 			DownloadTask task = activeTasks.get(uri);
 			task.cancel(true);
 			activeTasks.remove(uri);
+		}
+	}
+
+	@Override
+	public void cancelAll() {
+		synchronized (activeTasks) {
+			for(DownloadTask task : activeTasks.values()) {
+				task.cancel(true);
+			}
+			activeTasks.clear();
 		}
 	}
 }

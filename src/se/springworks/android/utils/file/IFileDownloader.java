@@ -18,5 +18,7 @@ public interface IFileDownloader {
 	
 	void cancel(String uri);
 	
+	void cancelAll();
+	
 	boolean isDownloading(String uri);
 }
