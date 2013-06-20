@@ -216,26 +216,33 @@ public class AsyncSequence {
 		
 		final AsyncCall event = asyncCalls.remove(0);
 //		logger.debug("executeNext() executing %s for %s", event, name);
-		event.execute(new ICallback() {
-			
-			@Override
-			public void onError(Throwable t) {
-//				logger.debug("executeNext() onError() %s", name);
-				if(event.ignoreErrors) {
+		try {
+			event.execute(new ICallback() {
+				
+				@Override
+				public void onError(Throwable t) {
+	//				logger.debug("executeNext() onError() %s", name);
+					if(event.ignoreErrors) {
+						executeNext();
+					}
+					else {
+						notifySequenceError(t);
+						executeNext();
+					}
+				}
+				
+				@Override
+				public void onDone() {
+	//				logger.debug("executeNext() onDone() %s", name);
 					executeNext();
 				}
-				else {
-					notifySequenceError(t);
-					executeNext();
-				}
-			}
-			
-			@Override
-			public void onDone() {
-//				logger.debug("executeNext() onDone() %s", name);
-				executeNext();
-			}
-		});
+			});
+		}
+		catch(Exception e) {
+			logger.error("executeNext() error executing async call");
+			e.printStackTrace();
+			executeNext();
+		}
 	}
 	
 	private void notifySequenceCompleted() {
