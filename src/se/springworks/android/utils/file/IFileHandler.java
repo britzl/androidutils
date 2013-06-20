@@ -113,5 +113,17 @@ public interface IFileHandler {
 	 * @throws Exception
 	 */
 	public void save(String name, InputStream stream) throws IOException;
+	
+	/**
+	 * Get the amount of available memory in bytes
+	 * @return
+	 */
+	public long getAvailableMemory();
+	
+	/***
+	 * Get the total amount of memory in bytes (free and used)
+	 * @return
+	 */
+	public long getTotalMemory();
 
 }

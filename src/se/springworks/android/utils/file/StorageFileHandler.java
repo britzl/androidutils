@@ -2,6 +2,7 @@ package se.springworks.android.utils.file;
 
 import android.content.Context;
 import android.os.Environment;
+import android.os.StatFs;
 
 import com.google.inject.Inject;
 
@@ -77,6 +78,32 @@ public class StorageFileHandler extends AbstractFileHandler {
 			break;
 		}
 		return null;
+	}
+
+	@Override
+	public long getAvailableMemory() {
+		StatFs statFs = new StatFs(getAbsolutePathToStorage());
+		final int availableBlocks = statFs.getAvailableBlocks();
+		final int blockSize = statFs.getBlockSize();
+		return (long)availableBlocks * (long)blockSize;
+	}
+
+	@Override
+	public long getTotalMemory() {
+		StatFs statFs = new StatFs(getAbsolutePathToStorage());
+		final int blocks = statFs.getBlockCount();
+		final int blockSize = statFs.getBlockSize();
+		return (long)blocks * (long)blockSize;
+	}
+	
+	
+	private String getAbsolutePathToStorage() {
+		if(mode == StorageMode.INTERNALCACHE
+			|| mode == StorageMode.INTERNALFILES
+			|| !isExternalStorageAvailable()) {
+			return Environment.getRootDirectory().getAbsolutePath();
+		}
+		return Environment.getExternalStorageDirectory().getAbsolutePath();
 	}
 
 }
