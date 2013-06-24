@@ -31,16 +31,6 @@ public class AsyncSequence {
 	 */
 	public static abstract class AsyncCall {
 		
-		private boolean ignoreErrors = false;
-
-		public AsyncCall() {
-			
-		}
-		
-		public AsyncCall(boolean ignoreErrors) {
-			this.ignoreErrors = ignoreErrors;
-		}
-		
 		/**
 		 * Perform the async task here
 		 * @param executionCallback Call this once the async task has completed
@@ -105,14 +95,7 @@ public class AsyncSequence {
 	
 	private List<ICallback> listeners = new ArrayList<ICallback>();
 	
-	private String name;
-	
 	public AsyncSequence() {
-		this("");
-	}
-	
-	public AsyncSequence(String name) {
-		this.name = name;
 	}
 	
 	/**
@@ -174,17 +157,17 @@ public class AsyncSequence {
 	 * If the sequence is already started or completed nothing will happen.
 	 */
 	public synchronized void start() {
-		logger.debug("start() %s", name);
+		logger.debug("start()");
 		if(isStarted()) {
-			logger.debug("start() already started. %s", name);
+			logger.debug("start() already started");
 			return;
 		}
 		if(isCompleted()) {
-			logger.debug("start() already completed. %s", name);
+			logger.debug("start() already completed");
 			notifySequenceCompleted();
 			return;
 		}
-		logger.debug("start() starting. %s", name);
+		logger.debug("start() starting");
 		state = State.STARTED;
 		executeNext();
 	}
@@ -217,18 +200,12 @@ public class AsyncSequence {
 		final AsyncCall event = asyncCalls.remove(0);
 //		logger.debug("executeNext() executing %s for %s", event, name);
 		try {
-			event.execute(new ICallback() {
-				
+			event.execute(new ICallback() {				
 				@Override
 				public void onError(Throwable t) {
 	//				logger.debug("executeNext() onError() %s", name);
-					if(event.ignoreErrors) {
-						executeNext();
-					}
-					else {
-						notifySequenceError(t);
-						executeNext();
-					}
+					notifySequenceError(t);
+					executeNext();
 				}
 				
 				@Override
@@ -241,18 +218,26 @@ public class AsyncSequence {
 		catch(Exception e) {
 			logger.error("executeNext() error executing async call");
 			e.printStackTrace();
+			notifySequenceError(e);
 			executeNext();
 		}
 	}
 	
+	/**
+	 * Notifies listeners that the sequence is completed
+	 */
 	private void notifySequenceCompleted() {
-		logger.debug("notifySequenceCompleted() %s", name);
+		logger.debug("notifySequenceCompleted()");
 		for(ICallback callback : listeners) {
 			callback.onDone();
 		}
 		listeners.clear();
 	}
 	
+	/**
+	 * Notifies listeners of an error. The sequence will keep running until done
+	 * @param t
+	 */
 	private void notifySequenceError(Throwable t) {
 		for(ICallback callback : listeners) {
 			callback.onError(t);

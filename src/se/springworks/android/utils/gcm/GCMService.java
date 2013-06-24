@@ -3,6 +3,7 @@ package se.springworks.android.utils.gcm;
 import se.springworks.android.utils.inject.GrapeGuice;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.threading.ICallback;
 import android.content.Context;
 import android.content.Intent;
 
@@ -32,10 +33,9 @@ public class GCMService extends GCMBaseIntentService {
 
 	// http://developer.android.com/google/gcm/gs.html
 	@Override
-	public void onRegistered(Context context, String regId) {
+	public void onRegistered(final Context context, String regId) {
 		logger.debug("onRegistered() %s", regId);
 		pushHandler.onRegistered(regId);
-		GCMRegistrar.setRegisteredOnServer(context, true);
 	}
 
 	@Override
@@ -51,10 +51,9 @@ public class GCMService extends GCMBaseIntentService {
 	}
 
 	@Override
-	protected void onUnregistered(Context context, String regId) {
+	protected void onUnregistered(final Context context, String regId) {
 		logger.debug("onUnregistered() %s", regId);
 		pushHandler.onUnregistered(regId);
-		GCMRegistrar.setRegisteredOnServer(context, false);
 	}
 	
 	@Override
