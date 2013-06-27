@@ -108,6 +108,19 @@ public abstract class GCMHandler implements IPushHandler {
 	}
 
 	@Override
+	public void onError(String errorId) {
+		logger.error("error() %s", errorId);
+		GCMRegistrar.setRegisteredOnServer(context, false);
+		try {
+			registrationCallback.onError(new RuntimeException(errorId));
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		registrationCallback = null;
+	}
+
+	@Override
 	public String getSenderId() {
 		return parameterLoader.getString(KEY_SENDERID);
 	}

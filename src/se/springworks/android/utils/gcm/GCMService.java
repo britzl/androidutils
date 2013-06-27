@@ -3,12 +3,10 @@ package se.springworks.android.utils.gcm;
 import se.springworks.android.utils.inject.GrapeGuice;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
-import se.springworks.android.utils.threading.ICallback;
 import android.content.Context;
 import android.content.Intent;
 
 import com.google.android.gcm.GCMBaseIntentService;
-import com.google.android.gcm.GCMRegistrar;
 import com.google.inject.Inject;
 
 /**
@@ -40,7 +38,7 @@ public class GCMService extends GCMBaseIntentService {
 
 	@Override
 	protected void onError(Context context, String errorId) {
-		logger.debug("onError() %s", errorId);
+		logger.error("onError() %s", errorId);
 		pushHandler.onError(errorId);
 	}
 
