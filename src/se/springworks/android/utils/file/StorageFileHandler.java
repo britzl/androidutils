@@ -1,5 +1,7 @@
 package se.springworks.android.utils.file;
 
+import java.io.File;
+
 import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
@@ -54,28 +56,42 @@ public class StorageFileHandler extends AbstractFileHandler {
 	
 	@Override
 	public String getBaseFolder() {
-		
+		File folder = null;
 		switch(mode) {
 		case INTERNALCACHE:
-			return context.getCacheDir().getAbsolutePath();
+			folder = context.getCacheDir();
+			break;
 		case EXTERNALCACHE:
-			return context.getExternalCacheDir().getAbsolutePath();
+			folder = context.getExternalCacheDir();
+			break;
 		case EXTERNALFILES:
-			return context.getExternalFilesDir(null).getAbsolutePath();
+			folder = context.getExternalFilesDir(null);
+			break;
 		case INTERNALFILES:
-			return context.getFilesDir().getAbsolutePath();
+			folder = context.getFilesDir();
+			break;
 		case PREFEREXTERNALCACHE:
 			if(isExternalStorageAvailable()) {
-				return context.getExternalCacheDir().getAbsolutePath();
+				folder = context.getExternalCacheDir();
 			}
-			return context.getCacheDir().getAbsolutePath();
+			else {
+				folder = context.getCacheDir();				
+			}
+			break;
 		case PREFEREXTERNALFILES:
 			if(isExternalStorageAvailable()) {
-				return context.getExternalFilesDir(null).getAbsolutePath();
+				folder = context.getExternalFilesDir(null);
 			}
-			return context.getFilesDir().getAbsolutePath();
+			else {
+				folder = context.getFilesDir();
+			}
+			break;
 		default:
 			break;
+		}
+		
+		if(folder != null) {
+			return folder.getAbsolutePath();
 		}
 		return null;
 	}
