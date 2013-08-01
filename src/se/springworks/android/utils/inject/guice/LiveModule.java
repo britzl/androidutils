@@ -10,8 +10,6 @@ import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.file.IFileDownloader;
 import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
-import se.springworks.android.utils.gcm.GCMHandler;
-import se.springworks.android.utils.gcm.IPushHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.http.SimpleHttpClient;
 import se.springworks.android.utils.iab.IIabHelper;
@@ -43,6 +41,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -109,6 +108,8 @@ public class LiveModule extends AbstractModule  {
 		bind(IKeyValueStorage.class).to(SharedPreferencesStorage.class).in(Singleton.class);
 		
 		bind(IIabHelper.class).to(IabHelper.class).in(Singleton.class);
+		
+		bind(GoogleCloudMessaging.class).toInstance(GoogleCloudMessaging.getInstance(context));
 		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		

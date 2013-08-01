@@ -30,18 +30,6 @@ public interface IPushHandler {
 	String getRegistrationId();
 	
 	/**
-	 * Called when registered with GCM
-	 * @param regId
-	 */
-	void onRegistered(String regId);
-
-	/**
-	 * Called when unregistered from GCM
-	 * @param regId
-	 */
-	void onUnregistered(String regId);
-	
-	/**
 	 * Sends GCM registration to your own server
 	 * @param regId
 	 * @param callback Callback when registration has completed 
@@ -61,9 +49,5 @@ public interface IPushHandler {
 	 */
 	void onMessage(Bundle extras);
 	
-	/**
-	 * Called when an error occurs
-	 * @param errorId
-	 */
-	void onError(String errorId);
+	void onError(String message);
 }
