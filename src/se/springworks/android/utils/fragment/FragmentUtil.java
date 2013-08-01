@@ -20,7 +20,7 @@ public class FragmentUtil {
 		if(addToBackStack) {
 			ft.addToBackStack(null);
 		}
-		ft.commit();
+		ft.commitAllowingStateLoss();
 		
 		dialog.show(fm, dialog.getClass().getName());
 	}
