@@ -6,6 +6,7 @@ import java.util.List;
 import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.logging.LoggerFactory;
 import android.os.AsyncTask;
+import android.os.Handler;
 
 
 /**
@@ -30,6 +31,44 @@ public class AsyncSequence {
 	 *
 	 */
 	public static abstract class AsyncCall {
+
+		private Handler handler = new Handler();
+		private long timeoutMillis;
+		
+		public AsyncCall() {
+			this(0);
+		}
+		
+		public AsyncCall(long timeoutMillis) {
+			this.timeoutMillis = timeoutMillis;
+		}
+		
+		void call(final ICallback executionCallback) {
+			if(timeoutMillis <= 0) {
+				execute(executionCallback);
+			}
+			else {
+				execute(new ICallback() {
+					@Override
+					public void onError(Throwable t) {
+						handler.removeCallbacksAndMessages(null);
+						executionCallback.onError(t);
+					}
+					
+					@Override
+					public void onDone() {
+						handler.removeCallbacksAndMessages(null);
+						executionCallback.onDone();
+					}
+				});
+				handler.postDelayed(new Runnable() {				
+					@Override
+					public void run() {
+						executionCallback.onError(new RuntimeException("Async callback timeout"));
+					}
+				}, timeoutMillis);
+			}
+		}
 		
 		/**
 		 * Perform the async task here
@@ -37,6 +76,7 @@ public class AsyncSequence {
 		 */
 		public abstract void execute(ICallback executionCallback);
 	}
+	
 	
 	private static class AsyncTaskWrapper extends AsyncCall {
 		@SuppressWarnings("rawtypes")
@@ -65,29 +105,29 @@ public class AsyncSequence {
 	}
 	
 	
-	public static abstract class AsyncTaskCall extends AsyncCall {
-
-		private AsyncVoidTask task;
-		
-		@Override
-		public void execute(final ICallback executionCallback) {
-			task = new AsyncVoidTask() {
-				
-				@Override
-				protected void performTask() {
-					performAsyncTask();
-				}
-				
-				@Override
-				protected void onPostExecute() {
-					executionCallback.onDone();
-				}
-			};
-			task.execute();
-		}
-		
-		public abstract void performAsyncTask();
-	}
+//	public static abstract class AsyncTaskCall extends AsyncCall {
+//
+//		private AsyncVoidTask task;
+//		
+//		@Override
+//		public void execute(final ICallback executionCallback) {
+//			task = new AsyncVoidTask() {
+//				
+//				@Override
+//				protected void performTask() {
+//					performAsyncTask();
+//				}
+//				
+//				@Override
+//				protected void onPostExecute() {
+//					executionCallback.onDone();
+//				}
+//			};
+//			task.execute();
+//		}
+//		
+//		public abstract void performAsyncTask();
+//	}
 	
 	private State state = State.IDLE;
 	
@@ -200,7 +240,7 @@ public class AsyncSequence {
 		final AsyncCall event = asyncCalls.remove(0);
 //		logger.debug("executeNext() executing %s for %s", event, name);
 		try {
-			event.execute(new ICallback() {				
+			event.call(new ICallback() {				
 				@Override
 				public void onError(Throwable t) {
 	//				logger.debug("executeNext() onError() %s", name);
@@ -216,6 +256,12 @@ public class AsyncSequence {
 			});
 		}
 		catch(Exception e) {
+			logger.error("executeNext() error executing async call");
+			e.printStackTrace();
+			notifySequenceError(e);
+			executeNext();
+		}
+		catch(Error e) {
 			logger.error("executeNext() error executing async call");
 			e.printStackTrace();
 			notifySequenceError(e);
