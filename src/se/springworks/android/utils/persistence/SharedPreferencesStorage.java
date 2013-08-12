@@ -14,7 +14,7 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	
 	private void init() {
 		if(sp == null) {
-			sp = context.getSharedPreferences(context.getPackageName(), 0);
+			sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
 		}
 	}
 
@@ -50,8 +50,13 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public String getString(String key) {
+		return getString(key, null);
+	}
+
+	@Override
+	public String getString(String key, String defaultValue) {
 		init();
-		return sp.getString(key, null);
+		return sp.getString(key, defaultValue);
 	}
 
 	@Override

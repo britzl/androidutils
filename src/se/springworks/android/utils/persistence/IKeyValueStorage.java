@@ -19,6 +19,8 @@ public interface IKeyValueStorage {
 	 */
 	String getString(String key);
 	
+	String getString(String key, String defaultValue);
+	
 	/**
 	 * Get stored long for a specific key
 	 * @param key
