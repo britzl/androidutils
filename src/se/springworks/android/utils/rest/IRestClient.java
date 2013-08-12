@@ -11,6 +11,8 @@ public interface IRestClient {
 		public void onFailure(Throwable t, String response);
 	}
 	
+	void clearCookies();
+	
 	void cancelRequests();
 	
 	/**

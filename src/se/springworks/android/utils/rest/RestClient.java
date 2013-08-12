@@ -13,6 +13,7 @@ import android.content.Context;
 import com.google.inject.Inject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 
 public class RestClient implements IRestClient {
@@ -187,5 +188,12 @@ public class RestClient implements IRestClient {
 				responseHandler.onFailure(e, response);
 			}				
 		});
+	}
+
+	@Override
+	public void clearCookies() {
+		PersistentCookieStore cookieStore = new PersistentCookieStore(context);
+		cookieStore.clear();
+		asyncClient.setCookieStore(cookieStore);
 	}
 }
