@@ -34,14 +34,20 @@ import java.util.zip.GZIPInputStream;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpVersion;
+import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthState;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -57,6 +63,7 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -64,6 +71,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.SyncBasicHttpContext;
 
@@ -268,6 +276,35 @@ public class AsyncHttpClient {
     public void setBasicAuth( String user, String pass, AuthScope scope){
         UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user,pass);
         this.httpClient.getCredentialsProvider().setCredentials(scope, credentials);
+    }
+    
+    public void setPreemptiveBasicAuth(String user, String pass) {
+    	setBasicAuth(user, pass);
+    	httpContext.setAttribute("preemptive-auth", new BasicScheme());
+    	httpClient.addRequestInterceptor(new HttpRequestInterceptor() {
+			
+			@Override
+			public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+				AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
+
+				// If no auth scheme available yet, try to initialize it
+				// preemptively
+				if (authState.getAuthScheme() == null) {
+					AuthScheme authScheme = (AuthScheme) context.getAttribute("preemptive-auth");
+					CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(ClientContext.CREDS_PROVIDER);
+					HttpHost targetHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+					if (authScheme != null) {
+						AuthScope authScope = new AuthScope(targetHost.getHostName(), targetHost.getPort());
+						Credentials creds = credsProvider.getCredentials(authScope);
+						if (creds == null) {
+							throw new HttpException("No credentials for preemptive authentication");
+						}
+						authState.setAuthScheme(authScheme);
+						authState.setCredentials(creds);
+					}
+				}
+			}
+		}, 0);
     }
 
     /**
@@ -617,4 +654,8 @@ public class AsyncHttpClient {
             return -1;
         }
     }
+
+	public void addRequestInterceptor(HttpRequestInterceptor itcp) {
+		httpClient.addRequestInterceptor(itcp);
+	}
 }

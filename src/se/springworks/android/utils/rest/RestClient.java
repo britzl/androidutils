@@ -165,7 +165,7 @@ public class RestClient implements IRestClient {
 	public void setBasicAuth(final String username, final String password) {
 //		this.username = username;
 //		this.password = password;
-		asyncClient.setBasicAuth(username, password);
+		asyncClient.setPreemptiveBasicAuth(username, password);
 		syncClient.setBasicAuth(username, password);
 	}
 
@@ -196,4 +196,5 @@ public class RestClient implements IRestClient {
 		cookieStore.clear();
 		asyncClient.setCookieStore(cookieStore);
 	}
+	
 }
