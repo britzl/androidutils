@@ -75,6 +75,20 @@ public class DialogBuilder {
 		return this;
 	}
 	
+	public DialogBuilder addNeutralButton(int cancelId) {
+		return addNeutralButton(context.getString(cancelId), null);
+	}
+	public DialogBuilder addNeutralButton(int cancelId, DialogInterface.OnClickListener listener) {
+		return addNeutralButton(context.getString(cancelId), listener);
+	}
+	public DialogBuilder addNeutralButton(String cancel) {
+		return addNeutralButton(cancel, null);
+	}	
+	public DialogBuilder addNeutralButton(String cancel, DialogInterface.OnClickListener listener) {
+		builder.setNeutralButton(cancel, listener);
+		return this;
+	}
+	
 	
 	
 	public DialogBuilder addPositiveButton(int confirmId) {

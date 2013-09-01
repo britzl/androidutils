@@ -21,6 +21,11 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	private static int defaultFinishActivityEnterAnimationId = 0;
 	private static int defaultFinishActivityExitAnimationId = 0;
 
+	protected int startActivityEnterAnimationId = defaultStartActivityEnterAnimationId;
+	protected int startActivityExitAnimationId = defaultStartActivityExitAnimationId;
+	protected int finishActivityEnterAnimationId = defaultFinishActivityEnterAnimationId;
+	protected int finishActivityExitAnimationId = defaultFinishActivityExitAnimationId;
+
 	/** Called when the activity is first created. */
 	@Override
 	public final void onCreate(Bundle savedInstanceState) {
@@ -142,8 +147,12 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	
 	@Override
 	public void startActivity(Intent intent) {
+		startActivity(intent, startActivityEnterAnimationId, startActivityExitAnimationId);
+	}
+	
+	public void startActivity(Intent intent, int enterAnimationId, int exitAnimationId) {
 		super.startActivity(intent);
-		overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+		overridePendingTransition(enterAnimationId, exitAnimationId);
 	}
 	
 	
@@ -154,13 +163,17 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	
 	@Override
 	public void startActivityForResult(Intent intent, int requestCode) {
+		startActivityForResult(intent, requestCode, startActivityEnterAnimationId, startActivityExitAnimationId);
+	}
+	
+	public void startActivityForResult(Intent intent, int requestCode, int enterAnimationId, int exitAnimationId) {
 		if (getParent() != null) {
 			getParent().startActivityForResult(intent, requestCode);
-			overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+			overridePendingTransition(enterAnimationId, exitAnimationId);
 		}
 		else {
 			super.startActivityForResult(intent, requestCode);
-			overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+			overridePendingTransition(enterAnimationId, exitAnimationId);
 		}
 	}
 	
@@ -176,19 +189,32 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
 	@Override
 	public void startActivity(Intent intent, Bundle options) {
 		super.startActivity(intent, options);
-		overridePendingTransition(defaultStartActivityEnterAnimationId, defaultStartActivityExitAnimationId);
+		overridePendingTransition(startActivityEnterAnimationId, startActivityExitAnimationId);
+	}
+	
+	public void startActivity(Intent intent, Bundle options, int enterAnimationId, int exitAnimationId) {
+		super.startActivity(intent, options);
+		overridePendingTransition(enterAnimationId, exitAnimationId);
 	}
 	
 	@Override
 	public void finish() {
+		finish(finishActivityEnterAnimationId, finishActivityExitAnimationId);
+	}
+	
+	public void finish(int enterAnimationId, int exitAnimationId) {
 		super.finish();
-		overridePendingTransition(defaultFinishActivityEnterAnimationId, defaultFinishActivityExitAnimationId);
+		overridePendingTransition(enterAnimationId, exitAnimationId);
 	}
 	
 	@Override
 	public void finishActivity(int requestCode) {
+		finishActivity(requestCode, finishActivityEnterAnimationId, finishActivityExitAnimationId);
+	}
+
+	public void finishActivity(int requestCode, int enterAnimationId, int exitAnimationId) {
 		super.finishActivity(requestCode);
-		overridePendingTransition(defaultFinishActivityEnterAnimationId, defaultFinishActivityExitAnimationId);
+		overridePendingTransition(enterAnimationId, exitAnimationId);
 	}
 
 	abstract protected void createActivity(Bundle savedInstanceState);

@@ -41,6 +41,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -107,6 +108,8 @@ public class LiveModule extends AbstractModule  {
 		bind(IKeyValueStorage.class).to(SharedPreferencesStorage.class).in(Singleton.class);
 		
 		bind(IIabHelper.class).to(IabHelper.class).in(Singleton.class);
+		
+		bind(GoogleCloudMessaging.class).toInstance(GoogleCloudMessaging.getInstance(context));
 		
 //		bind(IAnalyticsTracker.class).to(GoogleTracker.class).in(Singleton.class);
 		

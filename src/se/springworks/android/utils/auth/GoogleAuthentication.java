@@ -104,7 +104,7 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 
 	@Override
 	public void getToken(final String accountName, final OnTokenCallback callback) {
-		logger.debug("getToken() account name = " + accountName);
+		logger.debug("getToken() account name = %s", accountName);
 		final String apiKey = paramLoader.getString(KEY_APIKEY);
 		if(apiKey == null) {
 			logger.warn("getToken() no api key");
@@ -118,7 +118,7 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 			public String performTask(String accountName) {
 				try {
 					final String scope = "audience:server:client_id:" + apiKey;
-					logger.debug("getToken() scope = " + scope);
+					logger.debug("getToken() scope = %s", scope);
 					return GoogleAuthUtil.getToken(context, accountName, scope);
 				}
 				catch (GooglePlayServicesAvailabilityException playEx) {
@@ -132,7 +132,11 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 					logger.error("getToken()", e);
 				}
 				catch (GoogleAuthException e) {
-					logger.error("getToken() " + e.getMessage(), e);
+					logger.error("getToken() %s", e.getMessage(), e);
+				}
+				// java.lang.IllegalArgumentException: Non existing account
+				catch(IllegalArgumentException e) {
+					logger.error("getToken() %s", e.getMessage(), e);				
 				}
 				return null;
 			}
@@ -174,5 +178,19 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 			}
 		}
 		state = State.IDLE;
+	}
+
+
+
+	@Override
+	public boolean isValidAccountName(String accountName) {
+		AccountManager manager = AccountManager.get(context);
+		Account[] accounts = manager.getAccountsByType(GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+		for(Account account : accounts) {
+			if(accountName.equals(account.name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

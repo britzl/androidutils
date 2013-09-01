@@ -14,7 +14,7 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	
 	private void init() {
 		if(sp == null) {
-			sp = context.getSharedPreferences(context.getPackageName(), 0);
+			sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
 		}
 	}
 
@@ -31,6 +31,12 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	}
 
 	@Override
+	public void put(String key, int value) {
+		init();
+		sp.edit().putInt(key, value).commit();
+	}
+
+	@Override
 	public void put(String key, long value) {
 		init();
 		sp.edit().putLong(key, value).commit();
@@ -44,20 +50,35 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public String getString(String key) {
+		return getString(key, null);
+	}
+
+	@Override
+	public String getString(String key, String defaultValue) {
 		init();
-		return sp.getString(key, null);
+		return sp.getString(key, defaultValue);
 	}
 
 	@Override
 	public long getLong(String key) {
+		return getLong(key, 0);
+	}
+
+	@Override
+	public long getLong(String key, long defaultValue) {
 		init();
-		return sp.getLong(key, 0);
+		return sp.getLong(key, defaultValue);
 	}
 
 	@Override
 	public boolean getBoolean(String key) {
+		return getBoolean(key, false);
+	}
+
+	@Override
+	public boolean getBoolean(String key, boolean defaultValue) {
 		init();
-		return sp.getBoolean(key, false);
+		return sp.getBoolean(key, defaultValue);
 	}
 
 	@Override
@@ -66,4 +87,14 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 		return sp.contains(key);
 	}
 
+	@Override
+	public int getInt(String key, int defaultValue) {
+		init();
+		return sp.getInt(key, defaultValue);
+	}
+
+	@Override
+	public int getInt(String key) {
+		return getInt(key, 0);
+	}
 }

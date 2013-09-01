@@ -47,6 +47,9 @@ public class LinkifyUtil {
 	}
 	
 	public static SpannableString linkify(String text, int mask) {
+		if(text == null || text.isEmpty()) {
+			return new SpannableString("");
+		}
 		SpannableString s = new SpannableString(text);
 		Linkify.addLinks(s, mask);
 		return s;

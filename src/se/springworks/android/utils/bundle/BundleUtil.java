@@ -51,7 +51,38 @@ public class BundleUtil {
 		return o != null;
 	}
 	
+	public static boolean getAsBoolean(Bundle b, String key) {
+		if(b == null) {
+			return false;
+		}
+		if(!b.containsKey(key)) {
+			return false;
+		}
+		boolean value = false;
+		String s = b.getString(key);
+		if(s == null) {
+			try {
+				value = b.getBoolean(key);
+			}
+			catch(ClassCastException e) {
+
+			}
+		}
+		else {
+			try {
+				value = Boolean.parseBoolean(s);
+			}
+			catch(NumberFormatException e) {
+
+			}
+		}
+		return value;
+	}
+
 	public static int getAsInt(Bundle b, String key) {
+		if(b == null) {
+			return 0;
+		}
 		if(!b.containsKey(key)) {
 			return 0;
 		}
@@ -62,7 +93,7 @@ public class BundleUtil {
 				value = b.getInt(key);
 			}
 			catch(ClassCastException e) {
-				
+
 			}
 		}
 		else {
@@ -70,7 +101,7 @@ public class BundleUtil {
 				value = Integer.parseInt(s);
 			}
 			catch(NumberFormatException e) {
-				
+
 			}
 		}
 		return value;
@@ -79,7 +110,7 @@ public class BundleUtil {
 	public static void clearExtras(Intent i) {
 		i.putExtras(new Bundle());
 	}
-	
+
 	public static Bundle copyExtras(Intent i) {
 		Bundle copy = new Bundle();
 		Bundle original = i.getExtras();
@@ -87,6 +118,20 @@ public class BundleUtil {
 			copy.putAll(original);
 		}
 		return copy;
+
+	}
+
+	public static String toString(Bundle b) {
+		if(b == null) {
+			return "";
+		}
 		
+		StringBuffer buff = new StringBuffer();
+		for(String key : b.keySet()) {
+			final Object value = b.get(key);
+			final String s = String.format("%s %s (%s)\n", key, value.toString(), value.getClass().getName());
+			buff.append(s);
+		}
+		return buff.toString();
 	}
 }

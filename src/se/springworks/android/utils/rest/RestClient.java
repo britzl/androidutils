@@ -13,6 +13,7 @@ import android.content.Context;
 import com.google.inject.Inject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
 
 public class RestClient implements IRestClient {
@@ -164,7 +165,7 @@ public class RestClient implements IRestClient {
 	public void setBasicAuth(final String username, final String password) {
 //		this.username = username;
 //		this.password = password;
-		asyncClient.setBasicAuth(username, password);
+		asyncClient.setPreemptiveBasicAuth(username, password);
 		syncClient.setBasicAuth(username, password);
 	}
 
@@ -188,4 +189,12 @@ public class RestClient implements IRestClient {
 			}				
 		});
 	}
+
+	@Override
+	public void clearCookies() {
+		PersistentCookieStore cookieStore = new PersistentCookieStore(context);
+		cookieStore.clear();
+		asyncClient.setCookieStore(cookieStore);
+	}
+	
 }
