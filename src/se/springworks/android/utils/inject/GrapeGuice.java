@@ -85,8 +85,9 @@ public class GrapeGuice {
 	 * @param o
 	 *            The object to inject dependencies into
 	 */
-	public void injectMembers(Object o) {
+	public GrapeGuice injectMembers(Object o) {
 		injector.injectMembers(o);
+		return this;
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class GrapeGuice {
 	 * @param o
 	 *            The object to inject views into
 	 */
-	public void injectViews(Activity a, Object o) {
+	public GrapeGuice injectViews(Activity a, Object o) {
 		Class<?> targetClass = o.getClass();
 		Field[] fields = targetClass.getDeclaredFields();
 		for (Field field : fields) {
@@ -118,6 +119,7 @@ public class GrapeGuice {
 				}
 			}
 		}
+		return this;
 	}
 
 	/**
@@ -127,8 +129,8 @@ public class GrapeGuice {
 	 * @param a
 	 *            The activity to get views from and fields to inject to
 	 */
-	public void injectViews(Activity a) {
-		injectViews(a, a);
+	public GrapeGuice injectViews(Activity a) {
+		return injectViews(a, a);
 	}
 
 	/**
@@ -137,8 +139,8 @@ public class GrapeGuice {
 	 * 
 	 * @param f
 	 */
-	public void injectViews(Fragment f) {
-		injectViews(f.getActivity(), f);
+	public GrapeGuice injectViews(Fragment f) {
+		return injectViews(f.getActivity(), f);
 	}
 
 	public <T> T getInstance(Class<T> t) {

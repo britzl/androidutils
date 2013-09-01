@@ -10,8 +10,6 @@ import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.file.IFileDownloader;
 import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
-import se.springworks.android.utils.gcm.GCMHandler;
-import se.springworks.android.utils.gcm.IPushHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.http.SimpleHttpClient;
 import se.springworks.android.utils.iab.IIabHelper;
