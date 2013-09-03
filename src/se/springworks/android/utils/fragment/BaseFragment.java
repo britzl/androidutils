@@ -15,7 +15,7 @@ public abstract class BaseFragment extends Fragment {
 	private Logger logger;
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public final View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
 		GrapeGuice.getInjector(this).injectMembers(this);
 		logger.debug("onCreateView()");
@@ -23,21 +23,37 @@ public abstract class BaseFragment extends Fragment {
 	}
 	
 	
-	protected abstract View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
-	
 	
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
+	public final void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		logger.debug("onActivityCreated()");
 		GrapeGuice.getInjector(this).injectViews(this);
 		fragmentReadyToUse(savedInstanceState);
 	}
+
+	/**
+	 * Creates the view used by this fragment
+	 * @param inflater
+	 * @param container
+	 * @param savedInstanceState
+	 * @return
+	 */
+	protected abstract View createView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
 	
+	/**
+	 * Called when the fragment is ready to use. This means that:
+	 * 
+	 * 1. The view has been created
+	 * 2. All injections have taken place
+	 * 3. The fragment's activity has been created
+	 * 
+	 * @param savedInstanceState
+	 */
 	protected abstract void fragmentReadyToUse(Bundle savedInstanceState);
 
 	@Override
-	public void onStart() {
+	public final void onStart() {
 		super.onStart();
 		logger.debug("onStart()");
 		try {
@@ -49,7 +65,7 @@ public abstract class BaseFragment extends Fragment {
 	}
 	
 	@Override
-	public void onStop() {
+	public final void onStop() {
 		super.onStop();
 		logger.debug("onStop()");
 		try {
@@ -61,7 +77,7 @@ public abstract class BaseFragment extends Fragment {
 	}
 	
 	@Override
-	public void onResume() {
+	public final void onResume() {
 		super.onResume();
 		logger.debug("onResume()");
 		try {
@@ -73,7 +89,7 @@ public abstract class BaseFragment extends Fragment {
 	}
 	
 	@Override
-	public void onPause() {
+	public final void onPause() {
 		super.onPause();
 		logger.debug("onPause()");
 		try {
@@ -85,9 +101,20 @@ public abstract class BaseFragment extends Fragment {
 	}
 
 	
-	protected abstract void startFragment();
-	protected abstract void stopFragment();
-	protected abstract void resumeFragment();
-	protected abstract void pauseFragment();
+	protected void startFragment() {
+		// override me
+	}
+
+	protected void stopFragment() {
+		// override me
+	}
+
+	protected void resumeFragment() {
+		// override me
+	}
+
+	protected void pauseFragment() {
+		// override me
+	}
 	
 }
