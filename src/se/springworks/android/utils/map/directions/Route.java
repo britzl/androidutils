@@ -59,6 +59,10 @@ public class Route {
 		return legs.get(0);
 	}
 	
+	public Leg getLastLeg() {
+		return legs.get(legs.size() - 1);
+	}
+	
 	public boolean hasLegs() {
 		return !legs.isEmpty();
 	}
@@ -90,5 +94,12 @@ public class Route {
 		return warnings;
 	}
 	
-	
+	public long getTotalTime() {
+		if(!hasLegs()) {
+			return -1;
+		}
+		Leg first = getFirstLeg();
+		Leg last = getLastLeg();
+		return last.getArrivalTime().getDate().getTime() - first.getDepartureTime().getDate().getTime();
+	}
 }

@@ -8,6 +8,7 @@ import java.util.WeakHashMap;
 import se.springworks.android.utils.inject.annotation.InjectView;
 import android.app.Activity;
 import android.app.Application;
+import android.app.Dialog;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -100,14 +101,36 @@ public class GrapeGuice {
 	 *            The object to inject views into
 	 */
 	public GrapeGuice injectViews(Activity a, Object o) {
-		Class<?> targetClass = o.getClass();
+		return injectViewsFromObject(a, o);
+	}
+	public GrapeGuice injectViews(Dialog d, Object o) {
+		return injectViewsFromObject(d, o);
+	}
+	public GrapeGuice injectViews(View v, Object o) {
+		return injectViewsFromObject(v, o);
+	}
+	
+	private GrapeGuice injectViewsFromObject(Object from, Object into) {
+		Class<?> targetClass = into.getClass();
 		Field[] fields = targetClass.getDeclaredFields();
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(InjectView.class)) {
 				InjectView injectView = (InjectView) field.getAnnotation(InjectView.class);
 				field.setAccessible(true);
 				try {
-					field.set(o, a.findViewById(injectView.id()));
+					View v = null;
+					if(from instanceof Activity) {
+						v = ((Activity)from).findViewById(injectView.id());
+					}
+					else if(from instanceof View) {
+						v = ((View)from).findViewById(injectView.id());
+					}
+					else if(from instanceof Dialog) {
+						v = ((Dialog)from).findViewById(injectView.id());
+					}
+					if(v != null) {
+						field.set(into, v);
+					}
 				}
 				catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
@@ -140,7 +163,7 @@ public class GrapeGuice {
 	 * @param f
 	 */
 	public GrapeGuice injectViews(Fragment f) {
-		return injectViews(f.getActivity(), f);
+		return injectViews(f.getView(), f);
 	}
 
 	public <T> T getInstance(Class<T> t) {

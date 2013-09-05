@@ -1,6 +1,7 @@
 package se.springworks.android.utils.map.directions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,7 @@ public class Directions {
 	private String status;
 	
 	
-	public Iterable<Route> getRoutes() {
+	public List<Route> getRoutes() {
 		return routes;
 	}
 	

@@ -1,6 +1,7 @@
 package se.springworks.android.utils.map.geocoding;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,7 @@ public class GeoCodeResults {
 	@JsonProperty("status")
 	private String status;
 	
-	public Iterable<GeoCodeResult> getResults() {
+	public List<GeoCodeResult> getResults() {
 		return results;
 	}
 	
