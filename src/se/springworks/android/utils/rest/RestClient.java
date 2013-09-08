@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.http.entity.StringEntity;
 
+import se.springworks.android.utils.cache.RestCache;
 import se.springworks.android.utils.http.SimpleHttpClient;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;

@@ -3,11 +3,11 @@ package se.springworks.android.utils.map.directions;
 import java.util.HashMap;
 import java.util.Map;
 
+import se.springworks.android.utils.cache.RestCache;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.json.IJsonParser;
 import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.rest.IRestClient;
-import se.springworks.android.utils.rest.RestCache;
 import se.springworks.android.utils.rest.IRestClient.OnHttpResponseHandler;
 
 import com.google.inject.Inject;

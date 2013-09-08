@@ -1,4 +1,4 @@
-package se.springworks.android.utils.rest;
+package se.springworks.android.utils.cache;
 
 import java.util.HashMap;
 import java.util.Iterator;
