@@ -4,10 +4,9 @@ import se.springworks.android.utils.application.BaseApplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
-public abstract class BaseActivity extends SherlockFragmentActivity {
+public abstract class BaseActivity extends ActionBarActivity {
 	
 	public interface OnActivityResultListener {
 		public void onActivityResult(int requestCode, int resultCode, Intent data); 
@@ -186,16 +185,16 @@ public abstract class BaseActivity extends SherlockFragmentActivity {
     	super.onActivityResult(requestCode, resultCode, data);
     }
 		
-	@Override
-	public void startActivity(Intent intent, Bundle options) {
-		super.startActivity(intent, options);
-		overridePendingTransition(startActivityEnterAnimationId, startActivityExitAnimationId);
-	}
-	
-	public void startActivity(Intent intent, Bundle options, int enterAnimationId, int exitAnimationId) {
-		super.startActivity(intent, options);
-		overridePendingTransition(enterAnimationId, exitAnimationId);
-	}
+//	@Override
+//	public void startActivity(Intent intent, Bundle options) {
+//		super.startActivity(intent, options);
+//		overridePendingTransition(startActivityEnterAnimationId, startActivityExitAnimationId);
+//	}
+//	
+//	public void startActivity(Intent intent, Bundle options, int enterAnimationId, int exitAnimationId) {
+//		super.startActivity(intent, options);
+//		overridePendingTransition(enterAnimationId, exitAnimationId);
+//	}
 	
 	@Override
 	public void finish() {
