@@ -26,7 +26,7 @@ public class RestClient implements IRestClient {
 //	private String username;
 //	private String password;
 
-	private RestCache cache = new RestCache();
+	private RestCache<String> cache = new RestCache<String>();
 	
 	@InjectLogger Logger logger;
 	
