@@ -3,7 +3,7 @@ package se.springworks.android.utils.cache;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class RestCache<T> {
+public class MemCache<T> {
 
 	private class CachedData {
 		

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.http.entity.StringEntity;
 
-import se.springworks.android.utils.cache.RestCache;
+import se.springworks.android.utils.cache.MemCache;
 import se.springworks.android.utils.http.SimpleHttpClient;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
@@ -27,7 +27,7 @@ public class RestClient implements IRestClient {
 //	private String username;
 //	private String password;
 
-	private RestCache<String> cache = new RestCache<String>();
+	private MemCache<String> cache = new MemCache<String>();
 	
 	@InjectLogger Logger logger;
 	
