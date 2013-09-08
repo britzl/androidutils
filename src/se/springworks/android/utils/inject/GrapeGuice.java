@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.WeakHashMap;
 
 import se.springworks.android.utils.inject.annotation.InjectView;
+import se.springworks.android.utils.logging.Logger;
+import se.springworks.android.utils.logging.LoggerFactory;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
@@ -32,6 +34,8 @@ import com.google.inject.Injector;
 public class GrapeGuice {
 
 	private static WeakHashMap<Application, GrapeGuice> injectors = new WeakHashMap<Application, GrapeGuice>();
+	
+	private Logger logger = LoggerFactory.getLogger(GrapeGuice.class);
 	
 	private Injector injector;
 
@@ -116,25 +120,26 @@ public class GrapeGuice {
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(InjectView.class)) {
 				InjectView injectView = (InjectView) field.getAnnotation(InjectView.class);
+				final int id = injectView.id();
 				field.setAccessible(true);
 				try {
 					View v = null;
 					if(from instanceof Activity) {
-						v = ((Activity)from).findViewById(injectView.id());
+						v = ((Activity)from).findViewById(id);
 					}
 					else if(from instanceof View) {
-						v = ((View)from).findViewById(injectView.id());
+						v = ((View)from).findViewById(id);
 					}
 					else if(from instanceof Dialog) {
-						v = ((Dialog)from).findViewById(injectView.id());
+						v = ((Dialog)from).findViewById(id);
 					}
 					if(v != null) {
 						field.set(into, v);
 					}
 				}
 				catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
+					logger.error("injectViewsFromObject() %d %s", id, e);
 				}
 				catch (IllegalAccessException e) {
 					// TODO Auto-generated catch block
