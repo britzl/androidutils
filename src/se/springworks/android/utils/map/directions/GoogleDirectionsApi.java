@@ -7,12 +7,13 @@ import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.json.IJsonParser;
 import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.rest.IRestClient;
+import se.springworks.android.utils.rest.RestCache;
 import se.springworks.android.utils.rest.IRestClient.OnHttpResponseHandler;
 
 import com.google.inject.Inject;
 
 public class GoogleDirectionsApi implements IDirectionsApi {
-	
+		
 	@InjectLogger
 	private Logger logger;
 	
@@ -22,8 +23,17 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 	@Inject
 	private IJsonParser json;
 
+	private RestCache<Directions> cache = new RestCache<Directions>();
+	
 	@Override
 	public void directions(String from, String to, TravelMode mode, int departureTimeSeconds, final OnDirectionsCallback callback) {
+		final String cacheKey = from + to;
+		final Directions cachedData = cache.get(cacheKey);
+		if(cachedData != null) {
+			callback.onDirections(cachedData);
+			return;
+		}
+		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("origin", from);
 		params.put("destination", to);
@@ -49,6 +59,7 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 			@Override
 			public void onSuccess(String response) {
 				Directions d = GoogleDirectionsApi.this.json.fromJson(response, Directions.class);
+				cache.cache(cacheKey, d, 30 * 1000);
 				callback.onDirections(d);
 			}
 			
