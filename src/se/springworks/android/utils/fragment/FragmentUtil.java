@@ -1,5 +1,6 @@
 package se.springworks.android.utils.fragment;
 
+import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,11 +22,15 @@ public class FragmentUtil {
 		return fm.findFragmentByTag(dialogClass.getName()) != null;
 	}
 	
-	public static void showSingle(FragmentActivity a, DialogFragment dialog, boolean addToBackStack) {
+	public static void showSingle(FragmentActivity a, DialogFragment dialog, boolean addToBackStack, Bundle args) {
 		if(contains(a, dialog.getClass())) {
 			return;
 		}
 
+		if(args != null) {
+			dialog.setArguments(args);			
+		}
+		
 		FragmentManager fm = a.getSupportFragmentManager();
 		FragmentTransaction ft = fm.beginTransaction();
 		Fragment prev = fm.findFragmentByTag(dialog.getClass().getName());
@@ -40,9 +45,16 @@ public class FragmentUtil {
 		dialog.show(fm, dialog.getClass().getName());
 	}
 	
-	
+	public static void showSingle(FragmentActivity a, DialogFragment dialog, boolean addToBackStack) {
+		showSingle(a, dialog, addToBackStack, null);
+	}
+		
 	public static void showSingle(FragmentActivity a, DialogFragment dialog) {
 		showSingle(a, dialog, true);
+	}
+	
+	public static void showSingle(FragmentActivity a, DialogFragment dialog, Bundle args) {
+		showSingle(a, dialog, true, args);
 	}
 	
 	public static void showSingleNoBack(FragmentActivity a, DialogFragment dialog) {

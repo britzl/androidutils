@@ -23,6 +23,7 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 	@Inject
 	private IJsonParser json;
 
+	// direction request need to be cached or else Google goes bananas 
 	private MemCache<Directions> cache = new MemCache<Directions>();
 	
 	@Override

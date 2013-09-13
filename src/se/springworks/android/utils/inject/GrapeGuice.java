@@ -142,8 +142,8 @@ public class GrapeGuice {
 					logger.error("injectViewsFromObject() %d %s", id, e);
 				}
 				catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
+					logger.error("injectViewsFromObject() %d %s", id, e);
 				}
 			}
 		}
