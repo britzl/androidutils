@@ -2,16 +2,21 @@ package se.springworks.android.utils.application;
 
 import se.springworks.android.utils.activity.BaseActivity;
 import se.springworks.android.utils.logging.AndroidLogTarget;
+import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.logging.LoggerFactory;
 import android.app.Application;
 
 public class BaseApplication extends Application {
 
+	private static final Logger logger = LoggerFactory.getLogger(BaseApplication.class);
+	
 	private BaseActivity current;
 	
 	private Class<?> mostRecentActivityClass;
 	
 	private static BaseApplication instance;
+	
+	private int activityCount = 0;
 	
 	public BaseApplication() {
 		super();
@@ -22,7 +27,8 @@ public class BaseApplication extends Application {
 	}
 	
 	public boolean hasCreatedAnyActivities() {
-		return mostRecentActivityClass != null;
+		return activityCount > 0;
+//		return mostRecentActivityClass != null;
 	}
 	
 	public Class<?> getMostRecentActivityClass() {
@@ -40,12 +46,14 @@ public class BaseApplication extends Application {
 	public void onActivityCreated(BaseActivity a) {
 		this.current = a;
 		mostRecentActivityClass = a.getClass();
+		activityCount++;
 	}
 	
 	public void onActivityDestroyed(BaseActivity a) {
 		if(this.current == a) {
 			this.current = null;
 		}
+		activityCount--;
 	}
 	
 	public void onActivityPaused(BaseActivity a) {
@@ -62,6 +70,5 @@ public class BaseApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-//		GrapeGuice.addModule(new LiveModule(this));
 	}
 }
