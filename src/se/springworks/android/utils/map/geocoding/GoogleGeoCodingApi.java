@@ -11,6 +11,12 @@ import se.springworks.android.utils.rest.IRestClient.OnHttpResponseHandler;
 
 import com.google.inject.Inject;
 
+/**
+ * https://developers.google.com/maps/documentation/geocoding/
+ * 
+ * @author bjornritzl
+ *
+ */
 public class GoogleGeoCodingApi implements IGeoCodingApi {
 
 	@InjectLogger

@@ -12,6 +12,16 @@ import se.springworks.android.utils.rest.IRestClient.OnHttpResponseHandler;
 
 import com.google.inject.Inject;
 
+/**
+ * https://developers.google.com/maps/documentation/directions
+ * 
+ * http://maps.googleapis.com/maps/api/directions/json?origin=Mickelsbergsv%C3%A4gen+354&destination=Sergels+torg&sensor=true&mode=transit&departure_time=1377897244
+ * 
+ * http://stackoverflow.com/questions/9340800/detect-the-nearest-transit-stop-from-the-given-location
+ * 
+ * @author bjornritzl
+ *
+ */
 public class GoogleDirectionsApi implements IDirectionsApi {
 		
 	@InjectLogger
