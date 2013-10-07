@@ -121,14 +121,24 @@ public abstract class GCMHandler implements IPushHandler {
 			}
 
 			@Override
-			public void handleResult(String regId) {
+			public void handleResult(final String regId) {
 				logger.debug("register() async gcm registration done, reg id = %s", regId);
 				if(regId == null || regId.length() == 0) {
 					callback.onError((exception != null) ? exception : new RuntimeException("Unable to register for gcm"));
 					return;
 				}
-				setRegistrationId(regId);		
-				registerOnServer(regId, callback);
+				registerOnServer(regId, new ICallback() {					
+					@Override
+					public void onError(Throwable t) {
+						callback.onError(t);
+					}
+					
+					@Override
+					public void onDone() {
+						setRegistrationId(regId);
+						callback.onDone();
+					}
+				});
 			}
 		};
 		task.execute(getSenderId());
