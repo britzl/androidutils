@@ -42,6 +42,7 @@ public class FileDownloader implements IFileDownloader {
 		@Override
 		protected void onPostExecute() {
 			logger.debug("onPostExecute() downloaded %s", uri);
+			activeTasks.remove(uri);
 			for(OnFileDownloadListener listener : listeners) {
 				if(exception != null) {
 					listener.onFailed(exception, uri);
@@ -50,7 +51,6 @@ public class FileDownloader implements IFileDownloader {
 					listener.onDownloaded(uri);
 				}
 			}
-			activeTasks.remove(uri);
 		}
 
 		@Override
