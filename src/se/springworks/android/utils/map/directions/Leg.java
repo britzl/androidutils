@@ -42,6 +42,10 @@ public class Leg {
 			return text;
 		}
 		
+		public long getTimeInSeconds() {
+			return value;
+		}
+		
 	}
 	
 	
