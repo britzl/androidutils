@@ -11,5 +11,5 @@ public interface IDirectionsApi {
 		public void onError(Throwable t, String error);
 	}
 	
-	void directions(String from, String to, TravelMode mode, int departureTimeSeconds, OnDirectionsCallback callback);
+	void directions(String from, String to, TravelMode mode, long departureTimeSeconds, OnDirectionsCallback callback);
 }

@@ -37,7 +37,7 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 	private MemCache<Directions> cache = new MemCache<Directions>();
 	
 	@Override
-	public void directions(String from, String to, TravelMode mode, int departureTimeSeconds, final OnDirectionsCallback callback) {
+	public void directions(String from, String to, TravelMode mode, long departureTimeSeconds, final OnDirectionsCallback callback) {
 		final String cacheKey = from + to;
 		final Directions cachedData = cache.get(cacheKey);
 		if(cachedData != null) {
@@ -49,7 +49,7 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 		params.put("origin", from);
 		params.put("destination", to);
 		params.put("sensor", "true");
-		params.put("departure_time", Integer.toString(departureTimeSeconds));
+		params.put("departure_time", Long.toString(departureTimeSeconds));
 		switch(mode) {
 		default:
 			logger.warn("unkown mode %s", mode);
