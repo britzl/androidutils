@@ -1,14 +1,26 @@
 package se.springworks.android.utils.persistence;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import se.springworks.android.utils.json.IJsonParser;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Base64;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.inject.Inject;
 
 public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Inject
 	private Context context;
+	
+	@Inject
+	private IJsonParser jsonParser;
 	
 	private SharedPreferences sp;
 	
@@ -96,5 +108,41 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	@Override
 	public int getInt(String key) {
 		return getInt(key, 0);
+	}
+
+	@Override
+	public void put(String key, Set<String> value) {
+		init();
+		List<String> list = new ArrayList<String>();
+		for(String v : value) {
+			list.add(String.valueOf(Base64.encode(v.getBytes(), Base64.NO_WRAP)));
+		}
+		
+		String json = jsonParser.toJson(list);
+		put(key, json);
+	}
+
+	@Override
+	public Set<String> getStrings(String key) {
+		String json = getString(key, "");
+		
+		Set<String> strings = new HashSet<String>();
+		List<String> list = jsonParser.fromJson(json, new TypeReference<ArrayList<String>>() {});
+		for(String s : list) {
+			strings.add(String.valueOf(Base64.decode(s, Base64.NO_WRAP)));
+		}
+		return strings;
+	}
+
+	@Override
+	public <T> void put(String key, T o) {
+		String json = jsonParser.toJson(o);
+		put(key, json);
+	}
+
+	@Override
+	public <T> T getObject(String key, Class<T> cls) {
+		String json = getString(key);
+		return jsonParser.fromJson(json, cls);
 	}
 }
