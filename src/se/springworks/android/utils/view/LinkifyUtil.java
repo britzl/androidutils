@@ -5,31 +5,34 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class LinkifyUtil {
 
-	
-	public static void linkifyAllTextViews(ViewGroup vg, int mask) {
-		int childCount = vg.getChildCount();
-		for(int i = 0; i < childCount; i++) {
-			View v = vg.getChildAt(i);
-			if(v instanceof TextView) {
-				linkify((TextView)v, mask);
-			}
-			
-			if(v instanceof ViewGroup) {
-				linkifyAllTextViews((ViewGroup)v, mask);
-			}
+	/**
+	 * Linkify a view.
+	 * If the view is a view group all children in the display tree will be linkified.
+	 * If the view is a single TextView it will be linkified.
+	 * If the view is an EditText nothing will happen since there's a bug in Linkify
+	 * on some platforms (tested on Samsung S3 but works on HTC One V)
+	 * @param v
+	 * @param mask
+	 */
+	public static void linkify(View v, int mask) {
+		if(v instanceof EditText) {
+			// do nothing
+			// linkifying an edittext causes a crash: https://groups.google.com/forum/#!msg/android-developers/fPW5KPasNtw/ZsAvk0Md5MgJ
 		}
-	}
-	
-	public static void linkifyAllTextViews(View v, int mask) {
-		if(v instanceof TextView) {
+		else if(v instanceof TextView) {
 			linkify((TextView)v, mask);
 		}
-		if(v instanceof ViewGroup) {
-			linkifyAllTextViews((ViewGroup)v, mask);
+		else if(v instanceof ViewGroup) {
+			ViewGroup vg = (ViewGroup)v;
+			int childCount = vg.getChildCount();
+			for(int i = 0; i < childCount; i++) {
+				linkify(vg.getChildAt(i), mask);
+			}
 		}
 	}
 
