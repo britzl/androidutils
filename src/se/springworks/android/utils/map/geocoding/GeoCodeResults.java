@@ -35,4 +35,9 @@ public class GeoCodeResults {
 	public GeoCodeResult get(int index) {
 		return results.get(index);
 	}
+	
+	@Override
+	public String toString() {
+		return super.toString() + " " + status;
+	}
 }
