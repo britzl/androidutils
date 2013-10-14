@@ -1,10 +1,14 @@
 package se.springworks.android.utils.activity;
 
 import se.springworks.android.utils.application.BaseApplication;
+import se.springworks.android.utils.inject.GrapeGuice;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
+import android.view.Window;
 
 public abstract class BaseActivity extends ActionBarActivity {
 	
@@ -25,6 +29,33 @@ public abstract class BaseActivity extends ActionBarActivity {
 	protected int finishActivityEnterAnimationId = defaultFinishActivityEnterAnimationId;
 	protected int finishActivityExitAnimationId = defaultFinishActivityExitAnimationId;
 
+	private boolean titleBarHidden = false;
+	
+	protected void hideTitleBar() {
+		supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+	}
+	
+	@Override
+	public boolean supportRequestWindowFeature(int featureId) {
+		boolean success = super.supportRequestWindowFeature(featureId);
+		titleBarHidden = success && featureId == Window.FEATURE_NO_TITLE;
+		return success;
+	}
+	
+	@Override
+	public void setContentView(int layoutResId) {
+		super.setContentView(layoutResId);
+		try {
+			ActionBar ab = getSupportActionBar();
+			if(ab != null && titleBarHidden) {
+				ab.hide();
+			}
+		}
+		catch(NullPointerException npe) {
+			// do nothing
+		}
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public final void onCreate(Bundle savedInstanceState) {
@@ -111,6 +142,19 @@ public abstract class BaseActivity extends ActionBarActivity {
 			handleError(e);
 		}
 	}
+
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// there's currently a bug in ActionBarCompat causing an activity
+		// with FEATURE_NO_TITLE to crash when the menu button is
+		// pressed and onCreateOptionsMenu() is called
+		// refer to: http://stackoverflow.com/questions/19275447/oncreateoptionsmenu-causing-error-in-an-activity-with-no-actionbar
+	    if(keyCode == KeyEvent.KEYCODE_MENU) {
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}	
 
 	protected void handleError(Exception e) {
 		e.printStackTrace();
