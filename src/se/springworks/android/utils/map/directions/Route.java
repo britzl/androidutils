@@ -102,4 +102,26 @@ public class Route {
 		Leg last = getLastLeg();
 		return last.getArrivalTime().getDate().getTime() - first.getDepartureTime().getDate().getTime();
 	}
+	
+	public Step getFirstStepWithTransitDetails() {
+		for(Leg leg : legs) {
+			for(Step step : leg.getSteps()) {
+				if(step.hasTransitDetails()) {
+					return step;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public Step getFirstNonWalkingStep() {
+		for(Leg leg : legs) {
+			for(Step step : leg.getSteps()) {
+				if(step.getTravelMode() != TravelMode.WALKING) {
+					return step;
+				}
+			}
+		}
+		return null;
+	}
 }
