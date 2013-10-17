@@ -1,7 +1,6 @@
 package se.springworks.android.utils.activity;
 
 import se.springworks.android.utils.application.BaseApplication;
-import se.springworks.android.utils.inject.GrapeGuice;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
