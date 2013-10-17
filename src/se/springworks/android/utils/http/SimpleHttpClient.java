@@ -13,19 +13,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 public class SimpleHttpClient implements ISimpleHttpClient {
-
+	
 	private DefaultHttpClient client = new DefaultHttpClient();
 	
 	@Override
 	public InputStream get(String url) {
 		try {
-			HttpResponse response = client.execute(new HttpGet(url));
+			HttpResponse response = client.execute(new HttpGet(url.trim()));
 			HttpEntity entity = response.getEntity();
 			if(entity != null) {
 				return entity.getContent();
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -33,13 +34,14 @@ public class SimpleHttpClient implements ISimpleHttpClient {
 	@Override
 	public String getAsString(String url) {
 		try {
-			HttpResponse response = client.execute(new HttpGet(url));
+			HttpResponse response = client.execute(new HttpGet(url.trim()));
 			HttpEntity entity = response.getEntity();
 			if(entity != null) {
 				return EntityUtils.toString(entity, "UTF-8");
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
