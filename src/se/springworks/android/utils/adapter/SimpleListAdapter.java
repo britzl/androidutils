@@ -22,7 +22,9 @@ public abstract class SimpleListAdapter<T> extends BaseAdapter {
 	}
 	
 	public synchronized void updateListData(List<T> listData) {
-		this.listData = listData;
+		this.listData.clear();
+		this.listData.addAll(listData);
+//		this.listData = listData;
 		notifyDataSetChanged();
 	}
 	
