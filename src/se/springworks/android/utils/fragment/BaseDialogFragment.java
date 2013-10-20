@@ -1,9 +1,9 @@
 package se.springworks.android.utils.fragment;
 
-import se.springworks.android.utils.R;
 import se.springworks.android.utils.inject.GrapeGuice;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -37,9 +37,27 @@ public abstract class BaseDialogFragment extends DialogFragment {
 		GrapeGuice.getInjector(this).injectViews(this);
 		fragmentReadyToUse(savedInstanceState);
 	}
-	
+
 	abstract protected void fragmentReadyToUse(Bundle savedInstanceState);
 
 	public abstract View createView(LayoutInflater inflater, ViewGroup container);
 
+	public void setTitle(String title) {
+		Dialog d = getDialog();
+		if(d != null) {
+			d.setTitle(title);
+		}
+	}
+	
+	public void setTitle(int titleId) {
+		setTitle(getString(titleId));
+	}
+	
+	@Override
+	public void dismissAllowingStateLoss() {
+		if(getDialog() == null) {
+			return;
+		}
+		super.dismissAllowingStateLoss();
+	}
 }
