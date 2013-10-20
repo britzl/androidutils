@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.http.entity.StringEntity;
 
 import se.springworks.android.utils.cache.MemCache;
-import se.springworks.android.utils.http.SimpleHttpClient;
+import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
 import android.content.Context;
@@ -20,7 +20,9 @@ import com.loopj.android.http.RequestParams;
 public class RestClient implements IRestClient {
 
 	private AsyncHttpClient asyncClient = new AsyncHttpClient();
-	private SimpleHttpClient syncClient = new SimpleHttpClient();
+	
+	@Inject
+	private ISimpleHttpClient syncClient;
 
 	private String baseUrl = "";
 	private boolean cachingEnabled = true;

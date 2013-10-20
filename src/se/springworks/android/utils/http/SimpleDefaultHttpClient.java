@@ -12,7 +12,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-public class SimpleHttpClient implements ISimpleHttpClient {
+public class SimpleDefaultHttpClient implements ISimpleHttpClient {
 	
 	private DefaultHttpClient client = new DefaultHttpClient();
 	

@@ -11,7 +11,7 @@ import se.springworks.android.utils.file.IFileDownloader;
 import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
-import se.springworks.android.utils.http.SimpleHttpClient;
+import se.springworks.android.utils.http.SimpleDefaultHttpClient;
 import se.springworks.android.utils.iab.IIabHelper;
 import se.springworks.android.utils.iab.IabHelper;
 import se.springworks.android.utils.iab.IabHelperFactory;
@@ -93,7 +93,7 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(IAssetFileHandler.class).to(AssetFileHandler.class).in(Singleton.class);
 		
-		bind(ISimpleHttpClient.class).to(SimpleHttpClient.class);
+		bind(ISimpleHttpClient.class).to(SimpleDefaultHttpClient.class);
 		
 		bind(IImageLoader.class).to(ImageLoader.class);
 		
