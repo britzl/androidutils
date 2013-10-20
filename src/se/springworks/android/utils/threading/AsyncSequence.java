@@ -149,6 +149,13 @@ public class AsyncSequence {
 	}
 
 	@SuppressWarnings("rawtypes")
+	public void add(AsyncTask task) {
+		if(isIdle()) {
+			asyncCalls.add(new AsyncTaskWrapper(task, (Object[])null));
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
 	public void add(AsyncTask task, Object... params) {
 		if(isIdle()) {
 			asyncCalls.add(new AsyncTaskWrapper(task, params));
