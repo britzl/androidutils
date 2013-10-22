@@ -193,10 +193,17 @@ public class ScrollableBitmapView extends View {
 		final float scrh = getHeight();
 		final float bmpw = image.getWidth() * scale;
 		final float bmph = image.getHeight() * scale;
+		final boolean screenIsWider = scrw >= bmpw;
+		final boolean screenIsHigher = scrh >= bmph;
 		
 		float dx = 0;
-		final float leftedge = getPaddingLeft();
-		final float rightedge = -(bmpw + getPaddingRight() - scrw);
+		float leftedge = getPaddingLeft();
+		float rightedge = -(bmpw + getPaddingRight() - scrw);
+		// center horizontally if screen is wider than bitmap
+		if(screenIsWider) {
+			leftedge += (scrw - bmpw) / 2;
+			rightedge -= (scrw - bmpw) / 2;
+		}
 		if(ox > leftedge) {
 			dx = ox - leftedge;
 		}
@@ -205,26 +212,20 @@ public class ScrollableBitmapView extends View {
 		}
 		
 		float dy = 0;
-		final float topedge = getPaddingTop();
-		final float bottomedge = -(bmph + getPaddingBottom() - scrh);
+		float topedge = getPaddingTop();
+		float bottomedge = -(bmph + getPaddingBottom() - scrh);
+		// center vertically if screen is higher than bitmap
+		if(screenIsHigher) {
+			topedge += (scrh - bmph) / 2;
+			bottomedge -= (scrh - bmph) / 2;
+		}
 		if(oy > topedge) {
 			dy = oy - topedge; 
 		}
 		else if(oy < bottomedge) {
 			dy = oy - bottomedge;
 		}
-		
-		// image is smaller than the screen is wide
-		if(bmpw < scrw) {
-			float diffx = scrw - bmpw;
-			dx = ox - leftedge - diffx / 2 + leftedge;
-		}
-		// image is smaller than the screen is high
-		if(bmph < scrh) {
-			float diffy = scrh - bmph;
-			dy = oy - topedge - diffy / 2 + topedge;
-		}
-		
+
 		matrix.postTranslate(-dx, -dy);
 	}
 
