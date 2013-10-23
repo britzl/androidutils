@@ -76,6 +76,11 @@ public interface IFileHandler {
 	
 	/**
 	 * Sets the modification time of a file
+	 * IMPORTANT NOTE: If the implementation of this interface operates
+	 * on the filesystem using {@link java.io.File#setLastModified(long)} there's a risk that
+	 * the call will fail due to insufficient permissions. Read more here:
+	 * https://code.google.com/p/android/issues/detail?id=25460. In such a case as lack
+	 * of permissions the method will return false to indicate failure.
 	 * @param name
 	 * @param time
 	 * @return true if successful, otherwise false
