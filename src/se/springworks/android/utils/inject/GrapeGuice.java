@@ -13,6 +13,7 @@ import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.test.AndroidTestCase;
 import android.view.View;
 
 import com.google.inject.AbstractModule;
@@ -51,6 +52,10 @@ public class GrapeGuice {
 		return getInjector(view.getContext());
 	}
 	
+	public static GrapeGuice getInjector(AndroidTestCase testCase) {
+		return getInjector(testCase.getContext());
+	}
+	
 	public static GrapeGuice getInjector(Context context) {
 		if(context == null) {
 			return null;
@@ -77,6 +82,24 @@ public class GrapeGuice {
 				e.printStackTrace();
 			}
 
+			injector = new GrapeGuice(Guice.createInjector(modules));
+			injectors.put(application, injector);
+		}
+		return injector;
+	}
+
+	public void rebind(AbstractModule ...modules) {
+		this.injector = Guice.createInjector(modules);
+	}
+	
+	
+	public static GrapeGuice getInjector(Context context, AbstractModule ...modules) {
+		if(context == null) {
+			return null;
+		}
+		final Application application = (Application)context.getApplicationContext();
+		GrapeGuice injector = injectors.get(application);
+		if (injector == null) {
 			injector = new GrapeGuice(Guice.createInjector(modules));
 			injectors.put(application, injector);
 		}
