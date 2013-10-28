@@ -2,14 +2,11 @@ package se.springworks.android.utils.application;
 
 import se.springworks.android.utils.activity.BaseActivity;
 import se.springworks.android.utils.logging.AndroidLogTarget;
-import se.springworks.android.utils.logging.Logger;
 import se.springworks.android.utils.logging.LoggerFactory;
 import android.app.Application;
 
 public class BaseApplication extends Application {
 
-	private static final Logger logger = LoggerFactory.getLogger(BaseApplication.class);
-	
 	private BaseActivity current;
 	
 	private Class<?> mostRecentActivityClass;
