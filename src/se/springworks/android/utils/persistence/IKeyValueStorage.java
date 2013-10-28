@@ -49,4 +49,6 @@ public interface IKeyValueStorage {
 	<T> T getObject(String key, Class<T> cls);
 	
 	void remove(String key);
+	
+	void removeAll();
 }

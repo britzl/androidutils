@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import se.springworks.android.utils.json.IJsonParser;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
@@ -17,46 +16,37 @@ import com.google.inject.Inject;
 public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Inject
-	private Context context;
-	
-	@Inject
 	private IJsonParser jsonParser;
 	
 	private SharedPreferences sp;
-	
-	private void init() {
-		if(sp == null) {
-			sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
-		}
+
+	@Inject
+	public SharedPreferencesStorage(Context context) {
+		sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
 	}
 
 	@Override
 	public void remove(String key) {
-		init();
 		sp.edit().remove(key).commit();
 	}
 	
 	@Override
 	public void put(String key, String value) {
-		init();
 		sp.edit().putString(key, value).commit();
 	}
 
 	@Override
 	public void put(String key, int value) {
-		init();
 		sp.edit().putInt(key, value).commit();
 	}
 
 	@Override
 	public void put(String key, long value) {
-		init();
 		sp.edit().putLong(key, value).commit();
 	}
 
 	@Override
 	public void put(String key, boolean value) {
-		init();
 		sp.edit().putBoolean(key, value).commit();
 	}
 
@@ -67,7 +57,6 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public String getString(String key, String defaultValue) {
-		init();
 		return sp.getString(key, defaultValue);
 	}
 
@@ -78,7 +67,6 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public long getLong(String key, long defaultValue) {
-		init();
 		return sp.getLong(key, defaultValue);
 	}
 
@@ -89,19 +77,16 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public boolean getBoolean(String key, boolean defaultValue) {
-		init();
 		return sp.getBoolean(key, defaultValue);
 	}
 
 	@Override
 	public boolean contains(String key) {
-		init();
 		return sp.contains(key);
 	}
 
 	@Override
 	public int getInt(String key, int defaultValue) {
-		init();
 		return sp.getInt(key, defaultValue);
 	}
 
@@ -112,7 +97,6 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public void put(String key, Set<String> value) {
-		init();
 		List<String> list = new ArrayList<String>();
 		for(String v : value) {
 			list.add(String.valueOf(Base64.encode(v.getBytes(), Base64.NO_WRAP)));
@@ -144,5 +128,10 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	public <T> T getObject(String key, Class<T> cls) {
 		String json = getString(key);
 		return jsonParser.fromJson(json, cls);
+	}
+
+	@Override
+	public void removeAll() {
+		sp.edit().clear().commit();
 	}
 }
