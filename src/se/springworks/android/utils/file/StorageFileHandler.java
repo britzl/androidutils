@@ -96,6 +96,7 @@ public class StorageFileHandler extends AbstractFileHandler {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public long getAvailableMemory() {
 		StatFs statFs = new StatFs(getAbsolutePathToStorage());
@@ -104,6 +105,7 @@ public class StorageFileHandler extends AbstractFileHandler {
 		return (long)availableBlocks * (long)blockSize;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public long getTotalMemory() {
 		StatFs statFs = new StatFs(getAbsolutePathToStorage());
