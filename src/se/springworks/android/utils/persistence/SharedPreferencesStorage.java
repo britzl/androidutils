@@ -8,7 +8,6 @@ import java.util.Set;
 import se.springworks.android.utils.json.IJsonParser;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Base64;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.inject.Inject;
@@ -97,11 +96,7 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public void put(String key, Set<String> value) {
-		List<String> list = new ArrayList<String>();
-		for(String v : value) {
-			list.add(String.valueOf(Base64.encode(v.getBytes(), Base64.NO_WRAP)));
-		}
-		
+		List<String> list = new ArrayList<String>(value);
 		String json = jsonParser.toJson(list);
 		put(key, json);
 	}
@@ -110,12 +105,8 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	public Set<String> getStrings(String key) {
 		String json = getString(key, "");
 		
-		Set<String> strings = new HashSet<String>();
 		List<String> list = jsonParser.fromJson(json, new TypeReference<ArrayList<String>>() {});
-		for(String s : list) {
-			strings.add(String.valueOf(Base64.decode(s, Base64.NO_WRAP)));
-		}
-		return strings;
+		return new HashSet<String>(list);
 	}
 
 	@Override
