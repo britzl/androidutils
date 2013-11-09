@@ -11,8 +11,14 @@ public interface IRestClient {
 		public void onFailure(Throwable t, String response);
 	}
 	
+	/**
+	 * Clears any stored cookies
+	 */
 	void clearCookies();
 	
+	/**
+	 * Cancels any active requests
+	 */
 	void cancelRequests();
 	
 	/**
@@ -67,7 +73,13 @@ public interface IRestClient {
 	 */
 	void setBasicAuth(final String username, final String password);
 	
+	/**
+	 * Enables response caching
+	 */
 	void enableCaching();
 	
+	/**
+	 * Disables response caching
+	 */
 	void disableCaching();
 }
