@@ -92,4 +92,8 @@ public class TransitDetails {
 		return line;
 	}
 	
+	public boolean hasLine() {
+		return line != null;
+	}
+	
 }

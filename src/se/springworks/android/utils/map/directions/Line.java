@@ -107,4 +107,8 @@ public class Line {
 		return vehicle;
 	}
 	
+	public boolean hasVehicle() {
+		return vehicle != null;
+	}
+	
 }
