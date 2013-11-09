@@ -12,7 +12,7 @@ import android.text.TextWatcher;
  *
  */
 public abstract class DelayedTextWatcher implements TextWatcher, Runnable {
-
+	
 	private Handler handler = new Handler();
 	
 	private int minimumAcceptedLength;
