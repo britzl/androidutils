@@ -6,6 +6,7 @@ import java.util.Date;
 import se.springworks.android.utils.map.LatLng;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.android.gms.internal.en;
 
 /**
  * Each element in the legs array specifies a single leg of the journey from the origin
@@ -141,6 +142,14 @@ public class Leg {
 		return endAddress;
 	}
 	
+	public String getEndAddressShort() {
+		int index = endAddress.indexOf(",");
+		if(index == -1) {
+			return endAddress;
+		}
+		return endAddress.substring(0, index);
+	}
+	
 	/**
 	 * Get the latitude/longitude coordinates of the given destination of this
 	 * leg. Because the Directions API calculates directions between locations
@@ -161,6 +170,14 @@ public class Leg {
 	 */
 	public String getStartAddress() {
 		return startAddress;
+	}
+	
+	public String getStartAddressShort() {
+		int index = startAddress.indexOf(",");
+		if(index == -1) {
+			return startAddress;
+		}
+		return startAddress.substring(0, index);
 	}
 	
 	/**
