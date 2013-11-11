@@ -6,7 +6,6 @@ import java.util.Date;
 import se.springworks.android.utils.map.LatLng;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.android.gms.internal.en;
 
 /**
  * Each element in the legs array specifies a single leg of the journey from the origin
