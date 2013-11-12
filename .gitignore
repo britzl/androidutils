@@ -18,3 +18,5 @@ local.properties
 .settings/org.eclipse.jdt.core.prefs
 
 test/.settings/org.eclipse.jdt.core.prefs
+
+test/build.xml
