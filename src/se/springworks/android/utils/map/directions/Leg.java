@@ -31,7 +31,7 @@ public class Leg {
 		private long value;
 		
 		public Date getDate() {
-			return new Date(value * 1000);
+			return new Date(getTimeInMilliseconds());
 		}
 		
 		public String getTimeZone() {
@@ -44,6 +44,10 @@ public class Leg {
 		
 		public long getTimeInSeconds() {
 			return value;
+		}
+		
+		public long getTimeInMilliseconds() {
+			return value * 1000;
 		}
 		
 	}
