@@ -1,6 +1,7 @@
 package se.springworks.android.utils.map.directions;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import se.springworks.android.utils.cache.MemCache;
@@ -38,7 +39,8 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 	
 	@Override
 	public void directions(String from, String to, TravelMode mode, long departureTimeSeconds, final OnDirectionsCallback callback) {
-		final String cacheKey = from + to;
+		final String cacheKey = from + to + (int)(departureTimeSeconds / 60);
+		logger.debug("directions() cache key = %s", cacheKey);
 		final Directions cachedData = cache.get(cacheKey);
 		if(cachedData != null) {
 			callback.onDirections(cachedData);
@@ -50,6 +52,7 @@ public class GoogleDirectionsApi implements IDirectionsApi {
 		params.put("destination", to);
 		params.put("sensor", "true");
 		params.put("departure_time", Long.toString(departureTimeSeconds));
+		params.put("language", Locale.getDefault().getLanguage());
 		switch(mode) {
 		default:
 			logger.warn("unkown mode %s", mode);
