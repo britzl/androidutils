@@ -2,6 +2,7 @@ package se.springworks.android.utils.auth;
 
 import java.io.IOException;
 
+import se.springworks.android.utils.activity.BaseActivity;
 import se.springworks.android.utils.activity.BaseActivity.OnActivityResultListener;
 import se.springworks.android.utils.application.BaseApplication;
 import se.springworks.android.utils.logging.Logger;
@@ -126,7 +127,13 @@ public class GoogleAuthentication implements IAuthentication, OnActivityResultLi
 				}
 				catch (UserRecoverableAuthException e) {
 					state = State.WAITINGFORRECOVERY;
-					BaseApplication.getInstance().getCurrentActivity().startActivityForResult(e.getIntent(), 0, GoogleAuthentication.this);
+					BaseActivity current = BaseApplication.getInstance().getCurrentActivity();
+					if(current != null) {
+						current.startActivityForResult(e.getIntent(), 0, GoogleAuthentication.this);
+					}
+					else {
+						callback.onError(AuthenticationError.UNRECOVERABLE);
+					}
 				}
 				catch (IOException e) {
 					logger.error("getToken()", e);
