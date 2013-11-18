@@ -21,6 +21,7 @@ before_install:
   - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
   - set
+  - ls -la
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/tools
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/platform-tools
@@ -46,7 +47,7 @@ before_script:
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
 
-  - wait_for_emulator
+  - bash wait_for_emulator.sh
 
 script:
   - cd test
