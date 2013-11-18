@@ -8,10 +8,12 @@ notifications:
 before_install:
   #- sudo apt-get update -qq
   #- sudo apt-get install -qq libstdc++6:i386 lib32z1
+  - cd ..
   - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
   - tar -zxf android-sdk_r22.2.1-linux.tgz
-  - export ANDROID_HOME=$TRAVIS_BUILD_DIR/android-sdk-linux
+  - export ANDROID_HOME=$TRAVIS_BUILD_DIR/../android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools
+  - cd $TRAVIS_BUILD_DIR
 
   # update android sdk
   - echo y | android update sdk --no-ui
@@ -28,9 +30,14 @@ before_install:
   - ls -la ..
   - ls -la ../..
   - ls -la ../../..
-
+  
   # create and start emulator
   - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - ls -la ../../../.android
+  - ls -la ../../../.android/avd
+  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a -p ..
+  - ls -la ..
   - emulator -avd test -no-skin -no-audio -no-window &
 
 before_script:
