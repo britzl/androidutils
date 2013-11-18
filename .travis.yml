@@ -47,7 +47,7 @@ before_script:
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
 
-  - bash wait_for_emulator.sh
+  #- bash wait_for_emulator.sh
 
 script:
   - cd test
