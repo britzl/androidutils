@@ -13,21 +13,16 @@ before_install:
   - export ANDROID_HOME=$TRAVIS_BUILD_DIR/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools
   - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
+  #- set
 
 install:
   # update android sdk
-  - echo y | android update sdk --filter android-18 --no-ui -a
+  - echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8 --no-ui -a
+  - echo y | android update sdk --filter platform-tools,build-tools-19.0.0 --no-ui -a
   - echo y | android update sdk --filter sysimg-18 --no-ui -a
-  - echo y | android update sdk --filter android-16 --no-ui -a
-  - echo y | android update sdk --filter android-14 --no-ui -a
-  - echo y | android update sdk --filter android-10 --no-ui -a
-  - echo y | android update sdk --filter android-8 --no-ui -a
   - echo y | android update sdk --filter extra-android-support --no-ui -a
   - echo y | android update sdk --filter extra-google-google_play_services --no-ui -a
-  - echo y | android update sdk --filter platform-tools --no-ui -a
-  - echo y | android update sdk --filter build-tools-19.0.0 --no-ui -a
 
-  - set
   - ls -la
   - ls -la $ANDROID_HOME/
   - ls -la $ANDROID_HOME/tools
@@ -56,12 +51,13 @@ install:
   # create and start emulator
   - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window &
-  - ls -la ../../../.android
-  - ls -la ../../../.android/avd
+  #- ls -la ../../../.android
+  #- ls -la ../../../.android/avd
 
 before_script:
-
-  #- bash wait_for_emulator.sh
+  # wait for emulator to make sure it's started before tests are run
+  - chmod +x wait_for_emulator.sh
+  - bash wait_for_emulator.sh
 
 script:
   - cd test
