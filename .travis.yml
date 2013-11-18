@@ -25,6 +25,9 @@ before_install:
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/tools
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/platform-tools
+  - ls -la ..
+  - ls -la ../..
+  - ls -la ../../..
 
   # create and start emulator
   - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
