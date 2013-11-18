@@ -6,21 +6,18 @@ notifications:
   email: true
 
 before_install:
-  #- sudo apt-get update -qq
-  #- sudo apt-get install -qq libstdc++6:i386 lib32z1
-  - cd ..
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libstdc++6:i386 lib32z1
   - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
   - tar -zxf android-sdk_r22.2.1-linux.tgz
-  - export ANDROID_HOME=$TRAVIS_BUILD_DIR/../android-sdk-linux
+  - export ANDROID_HOME=$TRAVIS_BUILD_DIR/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools
-  - cd $TRAVIS_BUILD_DIR
+  - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
+install:
   # update android sdk
   - echo y | android update sdk --no-ui
   - echo y | android update sdk --filter android-18,sysimg-18,android-16,android-14,android-10,android-8,extra-android-support,extra-google-google_play_services,platform-tools,build-tools-19.0.0 --no-ui -a
-
-  # make sure path is set to platform-tools (not included in the basic android sdk downloaded above)
-  - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
   - set
   - ls -la
@@ -31,16 +28,6 @@ before_install:
   - ls -la ../..
   - ls -la ../../..
   
-  # create and start emulator
-  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - ls -la ../../../.android
-  - ls -la ../../../.android/avd
-  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a -p ..
-  - ls -la ..
-  - emulator -avd test -no-skin -no-audio -no-window &
-
-before_script:
   # setup of appcompat library
   - cp -r $ANDROID_HOME/extras/android/support/v7/appcompat ..
   - ls -la ..
@@ -56,6 +43,18 @@ before_script:
   # setup main and testproject
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
+
+
+  # create and start emulator
+  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - ls -la ../../../.android
+  - ls -la ../../../.android/avd
+  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a -p ..
+  - ls -la ..
+  - emulator -avd test -no-skin -no-audio -no-window &
+
+before_script:
 
   #- bash wait_for_emulator.sh
 
