@@ -10,11 +10,11 @@ before_install:
   #- sudo apt-get install -qq libstdc++6:i386 lib32z1
   - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
   - tar -zxf android-sdk_r22.2.1-linux.tgz
-  - export ANDROID_HOME=$HOME/android-sdk-linux
+  - export ANDROID_HOME=$TRAVIS_BUILD_DIR/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
   - ls -la
   - set
-  - ls -la $HOME/android-sdk-linux
+  - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux
   - echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8,extra-android-support,platform-tools --no-ui -a
 
   # Create and start emulator
