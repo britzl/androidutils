@@ -15,21 +15,21 @@ before_install:
 
   # update android sdk
   - echo y | android update sdk --no-ui
-  - echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8,extra-android-support,extra-google-google_play_services,platform-tools --no-ui -a
-  
+  - echo y | android update sdk --filter android-18,sysimg-18,android-16,android-14,android-10,android-8,extra-android-support,extra-google-google_play_services,platform-tools,build-tools-19.0.0 --no-ui -a
+
   # make sure path is set to platform-tools (not included in the basic android sdk downloaded above)
   - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
+  - set
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/tools
   - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/platform-tools
 
-  # Create and start emulator
-  - echo no | android create avd --force -n test -t android-16 --abi armeabi-v7a
+  # create and start emulator
+  - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window &
 
 before_script:
-  #- wait_for_emulator
   # setup of appcompat library
   - cp -r $ANDROID_HOME/extras/android/support/v7/appcompat ..
   - ls -la ..
@@ -46,6 +46,7 @@ before_script:
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
 
+  - wait_for_emulator
 
 script:
   - cd test
