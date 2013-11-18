@@ -6,20 +6,20 @@ notifications:
   email: true
 
 before_install:
-	- sudo apt-get update -qq
-	- sudo apt-get install -qq libstdc++6:i386 lib32z1
-	- wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
-	- tar -zxf android-sdk_r22.2.1-linux.tgz
-	- export ANDROID_HOME=$HOME/android-sdk-linux
-	- export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
-	- ls -la
-	- echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8,extra-android-support,platform-tools --no-ui -a
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libstdc++6:i386 lib32z1
+  - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
+  - tar -zxf android-sdk_r22.2.1-linux.tgz
+  - export ANDROID_HOME=$HOME/android-sdk-linux
+  - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
+  - ls -la
+  - echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8,extra-android-support,platform-tools --no-ui -a
 
-	# Create and start emulator
-	- echo no | android create avd --force -n test -t android-16 --abi armeabi-v7a
-	- emulator -avd test -no-skin -no-audio -no-window &
+  # Create and start emulator
+  - echo no | android create avd --force -n test -t android-16 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
 
 before_script:
-	#- wait_for_emulator
+  #- wait_for_emulator
 
 script: ant clean test
