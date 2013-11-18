@@ -34,17 +34,21 @@ before_script:
   - cp -r $ANDROID_HOME/extras/android/support/v7/appcompat ..
   - ls -la ..
   - ls -la ../appcompat
-  - android update project -p ../appcompat --target android-18
+  - android update lib-project -p ../appcompat --target android-18
 
   # setup of google play services library
   - cp -r $ANDROID_HOME/extras/google/google_play_services/libproject/google-play-services_lib ..
   - ls -la ..
   - ls -la ../google-play-services_lib
-  - android update project -p ../google-play-services_lib --target android-18
+  - android update lib-project -p ../google-play-services_lib --target android-18
 
-  # setup main project
+  # setup main and testproject
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
 
 
-script: ant clean test
+script:
+  - cd test
+  - ant clean test
+  - cd ..
+  - ant release
