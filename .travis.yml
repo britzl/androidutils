@@ -24,9 +24,9 @@ before_install:
 
   - set
   - ls -la
-  - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux
-  - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/tools
-  - ls -la $TRAVIS_BUILD_DIR/android-sdk-linux/platform-tools
+  - ls -la $ANDROID_HOME/android-sdk-linux
+  - ls -la $ANDROID_HOME/android-sdk-linux/tools
+  - ls -la $ANDROID_HOME/android-sdk-linux/platform-tools
   - ls -la ..
   - ls -la ../..
   - ls -la ../../..
