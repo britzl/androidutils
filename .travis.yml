@@ -45,4 +45,6 @@ before_script:
 
 script:
   - cd test
-  - ant clean instrument test
+  - ant clean instrument
+  - adb install bin/test-instrumented.apk
+  - ant test
