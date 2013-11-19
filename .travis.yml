@@ -13,7 +13,6 @@ before_install:
   - export ANDROID_HOME=$TRAVIS_BUILD_DIR/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools
   - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
-  #- set
 
 install:
   # update android sdk
@@ -23,36 +22,21 @@ install:
   - echo y | android update sdk --filter extra-android-support --no-ui -a
   - echo y | android update sdk --filter extra-google-google_play_services --no-ui -a
 
-  - ls -la
-  - ls -la $ANDROID_HOME/
-  - ls -la $ANDROID_HOME/tools
-  - ls -la $ANDROID_HOME/platform-tools
-  - ls -la ..
-  - ls -la ../..
-  - ls -la ../../..
-  
   # setup of appcompat library
   - cp -r $ANDROID_HOME/extras/android/support/v7/appcompat ..
-  - ls -la ..
-  - ls -la ../appcompat
   - android update lib-project -p ../appcompat --target android-18
 
   # setup of google play services library
   - cp -r $ANDROID_HOME/extras/google/google_play_services/libproject/google-play-services_lib ..
-  - ls -la ..
-  - ls -la ../google-play-services_lib
   - android update lib-project -p ../google-play-services_lib --target android-18
 
   # setup main and testproject
   - android update project --subprojects -p . --target android-18
   - cp ../appcompat/libs/android-support-v4.jar ./libs
 
-
   # create and start emulator
   - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
   - emulator -avd test -no-skin -no-audio -no-window &
-  #- ls -la ../../../.android
-  #- ls -la ../../../.android/avd
 
 before_script:
   # wait for emulator to make sure it's started before tests are run
@@ -61,6 +45,4 @@ before_script:
 
 script:
   - cd test
-  - ant clean test
-  - cd ..
-  - ant release
+  - ant clean instrument test
