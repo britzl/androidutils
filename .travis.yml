@@ -31,8 +31,9 @@ install:
   - android update lib-project -p ../google-play-services_lib --target android-18
 
   # setup main and testproject
-  - android update project --subprojects -p . --target android-18
-  - cp ../appcompat/libs/android-support-v4.jar ./libs
+  - android update lib-project -p androidutils-lib --target android-18
+  - android update test-project -p androidutils-tests -m androidutils-lib
+  #- cp ../appcompat/libs/android-support-v4.jar ./libs
 
   # create and start emulator
   - echo no | android create avd --force -n test -t android-18 --abi armeabi-v7a
@@ -44,7 +45,7 @@ before_script:
   - bash wait_for_emulator.sh
 
 script:
-  - cd test
+  - cd androidutils-tests
   - ant clean instrument
   - adb install bin/test-instrumented.apk
   - ant test
