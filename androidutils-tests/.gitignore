@@ -12,5 +12,8 @@
 bin/
 gen/
 
+#code coverage reports
+coverage/
+
 # Local configuration file (sdk path, etc)
 local.properties
