@@ -8,7 +8,7 @@ public interface IRestClient {
 		
 		public void onSuccess(String response);
 		
-		public void onFailure(Throwable t, String response);
+		public void onFailure(Throwable t, String response, int code);
 	}
 	
 	/**

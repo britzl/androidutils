@@ -50,7 +50,7 @@ public class GoogleGeoCodingApi implements IGeoCodingApi {
 			}
 			
 			@Override
-			public void onFailure(Throwable t, String response) {
+			public void onFailure(Throwable t, String response, int code) {
 				callback.onError(t, response);
 			}
 		});

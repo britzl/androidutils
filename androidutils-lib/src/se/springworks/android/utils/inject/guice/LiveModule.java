@@ -10,6 +10,8 @@ import se.springworks.android.utils.file.IAssetFileHandler;
 import se.springworks.android.utils.file.IFileDownloader;
 import se.springworks.android.utils.file.IFileHandler;
 import se.springworks.android.utils.file.StorageFileHandler;
+import se.springworks.android.utils.http.LoopjAsyncHttpClient;
+import se.springworks.android.utils.http.IAsyncHttpClient;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.http.SimpleDefaultHttpClient;
 import se.springworks.android.utils.iab.IIabHelper;
@@ -93,6 +95,7 @@ public class LiveModule extends AbstractModule  {
 		
 		bind(IAssetFileHandler.class).to(AssetFileHandler.class).in(Singleton.class);
 		
+		bind(IAsyncHttpClient.class).to(LoopjAsyncHttpClient.class).in(Singleton.class);
 		bind(ISimpleHttpClient.class).to(SimpleDefaultHttpClient.class);
 		
 		bind(IImageLoader.class).to(ImageLoader.class);

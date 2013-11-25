@@ -1,33 +1,30 @@
 package se.springworks.android.utils.rest;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.http.entity.StringEntity;
-
 import se.springworks.android.utils.cache.MemCache;
+import se.springworks.android.utils.http.IAsyncHttpClient;
+import se.springworks.android.utils.http.IAsyncHttpClient.IAsyncHttpResponseHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
 import se.springworks.android.utils.inject.annotation.InjectLogger;
 import se.springworks.android.utils.logging.Logger;
 import android.content.Context;
 
 import com.google.inject.Inject;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.PersistentCookieStore;
-import com.loopj.android.http.RequestParams;
 
 public class RestClient implements IRestClient {
 
-	private AsyncHttpClient asyncClient = new AsyncHttpClient();
+	@Inject
+	private IAsyncHttpClient asyncClient;
 	
 	@Inject
 	private ISimpleHttpClient syncClient;
 
 	private String baseUrl = "";
 	private boolean cachingEnabled = true;
-//	private String username;
-//	private String password;
 
 	private MemCache<String> cache = new MemCache<String>();
 	
@@ -49,21 +46,16 @@ public class RestClient implements IRestClient {
 	@Override
 	public String get(final String url, Map<String, String> params) {
 		logger.debug("get() %s", url);
+		final String result;
 		final String absoluteUrl = getAbsoluteUrl(url, params);
-		if(!cachingEnabled) {
-			return syncClient.getAsString(absoluteUrl);
+		if(cachingEnabled && cache.contains(absoluteUrl)) {
+			result = cache.get(absoluteUrl);
 		}
-		
-		// do we have it cached?
-		final String cachedData = cache.get(absoluteUrl);
-		if (cachedData != null) {
-			return cachedData;
-		}
-
-		// get new value and cache it
-		final String result = syncClient.getAsString(absoluteUrl);
-		if(result != null) {
-			cache.cache(absoluteUrl, result);
+		else {
+			result = syncClient.getAsString(absoluteUrl);
+			if(result != null && cachingEnabled) {
+				cache.cache(absoluteUrl, result);
+			}
 		}
 		return result;
 	}
@@ -72,37 +64,23 @@ public class RestClient implements IRestClient {
 	public void get(final String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
 		final String absoluteUrl = getAbsoluteUrl(url, params);
 		logger.debug("get() %s", absoluteUrl);
-		if(!cachingEnabled) {
-			asyncClient.get(absoluteUrl, new AsyncHttpResponseHandler() {
-				@Override
-				public final void onSuccess(String response) {
-					responseHandler.onSuccess(response);
-				}
 
-				@Override
-				public void onFailure(Throwable e, String response) {
-					responseHandler.onFailure(e, response);
-				}				
-			});
-			return;
-		}
-		
-		String cachedData = cache.get(absoluteUrl);
-		if (cachedData != null) {
-			responseHandler.onSuccess(cachedData);
+		if(cachingEnabled && cache.contains(absoluteUrl)) {
+			responseHandler.onSuccess(cache.get(absoluteUrl));
 		}
 		else {
-//			asyncClient.setBasicAuth(username, password);
-			asyncClient.get(getAbsoluteUrl(url, params), new AsyncHttpResponseHandler() {
+			asyncClient.get(absoluteUrl, new IAsyncHttpResponseHandler() {				
 				@Override
 				public final void onSuccess(String response) {
-					cache.cache(absoluteUrl, response);
+					if(cachingEnabled) {
+						cache.cache(absoluteUrl, response);
+					}
 					responseHandler.onSuccess(response);
 				}
 
 				@Override
-				public void onFailure(Throwable e, String response) {
-					responseHandler.onFailure(e, response);
+				public void onFailure(Throwable e, String response, int code) {
+					responseHandler.onFailure(e, response, code);
 				}
 			});
 		}
@@ -111,16 +89,15 @@ public class RestClient implements IRestClient {
 	@Override
 	public void post(String url, Map<String, String> params, final OnHttpResponseHandler responseHandler) {
 		logger.debug("post() %s", url);
-		RequestParams rp = (params != null) ? new RequestParams(params) : null;
-		asyncClient.post(getAbsoluteUrl(url), rp, new AsyncHttpResponseHandler() {
+		asyncClient.post(getAbsoluteUrl(url), params, new IAsyncHttpResponseHandler() {
 			@Override
 			public final void onSuccess(String response) {
 				responseHandler.onSuccess(response);
 			}
 
 			@Override
-			public void onFailure(Throwable e, String response) {
-				responseHandler.onFailure(e, response);
+			public void onFailure(Throwable e, String response, int code) {
+				responseHandler.onFailure(e, response, code);
 			}				
 		});
 	}
@@ -128,29 +105,46 @@ public class RestClient implements IRestClient {
 	@Override
 	public void post(String url, String json, final OnHttpResponseHandler responseHandler) {
 		logger.debug("post() %s", url);
-		try {
-			StringEntity se = new StringEntity(json);
-			asyncClient.post(context, getAbsoluteUrl(url), se, "application/json", new AsyncHttpResponseHandler() {
-				@Override
-				public final void onSuccess(String response) {
-					responseHandler.onSuccess(response);
-				}
+		asyncClient.post(getAbsoluteUrl(url), json, "application/json", new IAsyncHttpResponseHandler() {
+			@Override
+			public final void onSuccess(String response) {
+				responseHandler.onSuccess(response);
+			}
 
-				@Override
-				public void onFailure(Throwable e, String response) {
-					responseHandler.onFailure(e, response);
-				}				
-			});
-		}
-		catch (UnsupportedEncodingException e) {
-			responseHandler.onFailure(e, null);
-		}
+			@Override
+			public void onFailure(Throwable e, String response, int code) {
+				responseHandler.onFailure(e, response, code);
+			}				
+		});
 	}
 
 	private String getAbsoluteUrl(String relativeUrl, Map<String, String> params) {
 		String absoluteUrl = baseUrl + relativeUrl;
-		if(params != null) {
-			absoluteUrl = AsyncHttpClient.getUrlWithQueryString(absoluteUrl, new RequestParams(params));
+		if(params != null && !params.isEmpty()) {
+			
+            StringBuffer buffer = new StringBuffer();
+            Iterator<String> keys = params.keySet().iterator();
+            while(keys.hasNext()) {
+            	String key = keys.next();
+            	String value = params.get(key);
+            	buffer.append(key);
+            	buffer.append('=');
+            	try {
+					buffer.append(URLEncoder.encode(value, "UTF-8"));
+				}
+            	catch (UnsupportedEncodingException e) {
+					buffer.append(value);
+				}
+            	if(keys.hasNext()) {
+            		buffer.append('&');
+            	}
+            }
+            if (absoluteUrl.indexOf("?") == -1) {
+            	absoluteUrl += "?" + buffer.toString();
+            }
+            else {
+            	absoluteUrl += "&" + buffer.toString();
+            }
 		}
 		return absoluteUrl;
 	}
@@ -166,38 +160,33 @@ public class RestClient implements IRestClient {
 	
 	@Override
 	public void setBasicAuth(final String username, final String password) {
-//		this.username = username;
-//		this.password = password;
 		asyncClient.setPreemptiveBasicAuth(username, password);
 		syncClient.setBasicAuth(username, password);
 	}
 
 	@Override
 	public void cancelRequests() {
-		asyncClient.cancelRequests(context, true);
+		asyncClient.cancelRequests(true);
 	}
 
 	@Override
 	public void delete(String url, final OnHttpResponseHandler responseHandler) {
 		logger.debug("delete() %s", url);
-		asyncClient.delete(context, url, new AsyncHttpResponseHandler() {
+		asyncClient.delete(url, new IAsyncHttpResponseHandler() {
 			@Override
 			public final void onSuccess(String response) {
 				responseHandler.onSuccess(response);
 			}
 
 			@Override
-			public void onFailure(Throwable e, String response) {
-				responseHandler.onFailure(e, response);
+			public void onFailure(Throwable e, String response, int code) {
+				responseHandler.onFailure(e, response, code);
 			}				
 		});
 	}
 
 	@Override
 	public void clearCookies() {
-		PersistentCookieStore cookieStore = new PersistentCookieStore(context);
-		cookieStore.clear();
-		asyncClient.setCookieStore(cookieStore);
+		asyncClient.clearCookies();
 	}
-	
 }

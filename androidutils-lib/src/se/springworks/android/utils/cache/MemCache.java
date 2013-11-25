@@ -79,7 +79,7 @@ public class MemCache<T> {
 	}
 	
 	/**
-	 * Get a cached resource
+	 * Get a cached resource. The cache will be pruned before retrieving the resource
 	 * @param resourceKey The resource to get
 	 * @return Cached data or null if it doesn't exist or has expired
 	 */
@@ -89,5 +89,15 @@ public class MemCache<T> {
 			return cache.get(resourceKey).data;
 		}
 		return null;
+	}
+	
+	/**
+	 * Check if a resource exists in the cache. The cache will be pruned before checking
+	 * @param resourceKey
+	 * @return
+	 */
+	public boolean contains(String resourceKey) {
+		prune();
+		return cache.containsKey(resourceKey);
 	}
 }

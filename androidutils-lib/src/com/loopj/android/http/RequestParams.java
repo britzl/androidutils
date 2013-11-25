@@ -18,28 +18,30 @@
 
 package com.loopj.android.http;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A collection of string request parameters or files to send along with
- * requests made from an {@link AsyncHttpClient} instance.
- * <p>
- * For example:
- * <p>
+ * A collection of string request parameters or files to send along with requests made from an
+ * {@link AsyncHttpClient} instance. <p>&nbsp;</p> For example: <p>&nbsp;</p>
  * <pre>
  * RequestParams params = new RequestParams();
  * params.put("username", "james");
@@ -49,102 +51,143 @@ import org.apache.http.message.BasicNameValuePair;
  * params.put("profile_picture2", someInputStream); // Upload an InputStream
  * params.put("profile_picture3", new ByteArrayInputStream(someBytes)); // Upload some bytes
  *
+ * Map&lt;String, String&gt; map = new HashMap&lt;String, String&gt;();
+ * map.put("first_name", "James");
+ * map.put("last_name", "Smith");
+ * params.put("user", map); // url params: "user[first_name]=James&amp;user[last_name]=Smith"
+ *
+ * Set&lt;String&gt; set = new HashSet&lt;String&gt;(); // unordered collection
+ * set.add("music");
+ * set.add("art");
+ * params.put("like", set); // url params: "like=music&amp;like=art"
+ *
+ * List&lt;String&gt; list = new ArrayList&lt;String&gt;(); // Ordered collection
+ * list.add("Java");
+ * list.add("C");
+ * params.put("languages", list); // url params: "languages[]=Java&amp;languages[]=C"
+ *
+ * String[] colors = { "blue", "yellow" }; // Ordered collection
+ * params.put("colors", colors); // url params: "colors[]=blue&amp;colors[]=yellow"
+ *
+ * List&lt;Map&lt;String, String&gt;&gt; listOfMaps = new ArrayList&lt;Map&lt;String, String&gt;&gt;();
+ * Map&lt;String, String&gt; user1 = new HashMap&lt;String, String&gt;();
+ * user1.put("age", "30");
+ * user1.put("gender", "male");
+ * Map&lt;String, String&gt; user2 = new HashMap&lt;String, String&gt;();
+ * user2.put("age", "25");
+ * user2.put("gender", "female");
+ * listOfMaps.add(user1);
+ * listOfMaps.add(user2);
+ * params.put("users", listOfMaps); // url params: "users[][age]=30&amp;users[][gender]=male&amp;users[][age]=25&amp;users[][gender]=female"
+ *
  * AsyncHttpClient client = new AsyncHttpClient();
  * client.post("http://myendpoint.com", params, responseHandler);
  * </pre>
  */
 public class RequestParams {
-    private static String ENCODING = "UTF-8";
 
+    protected boolean isRepeatable = false;
     protected ConcurrentHashMap<String, String> urlParams;
+    protected ConcurrentHashMap<String, StreamWrapper> streamParams;
     protected ConcurrentHashMap<String, FileWrapper> fileParams;
-    protected ConcurrentHashMap<String, ArrayList<String>> urlParamsWithArray;
+    protected ConcurrentHashMap<String, Object> urlParamsWithObjects;
 
     /**
-     * Constructs a new empty <code>RequestParams</code> instance.
+     * Constructs a new empty {@code RequestParams} instance.
      */
     public RequestParams() {
-        init();
+        this((Map<String, String>) null);
     }
 
     /**
-     * Constructs a new RequestParams instance containing the key/value
-     * string params from the specified map.
+     * Constructs a new RequestParams instance containing the key/value string params from the
+     * specified map.
+     *
      * @param source the source key/value string map to add.
      */
     public RequestParams(Map<String, String> source) {
         init();
-
-        for(Map.Entry<String, String> entry : source.entrySet()) {
-            put(entry.getKey(), entry.getValue());
+        if (source != null) {
+            for (Map.Entry<String, String> entry : source.entrySet()) {
+                put(entry.getKey(), entry.getValue());
+            }
         }
     }
 
     /**
-     * Constructs a new RequestParams instance and populate it with a single
-     * initial key/value string param.
-     * @param key the key name for the intial param.
+     * Constructs a new RequestParams instance and populate it with a single initial key/value
+     * string param.
+     *
+     * @param key   the key name for the intial param.
      * @param value the value string for the initial param.
      */
-    public RequestParams(String key, String value) {
-        init();
-
-        put(key, value);
+    public RequestParams(final String key, final String value) {
+        this(new HashMap<String, String>() {{
+            put(key, value);
+        }});
     }
 
     /**
-     * Constructs a new RequestParams instance and populate it with multiple
-     * initial key/value string param.
-     * @param keysAndValues a sequence of keys and values. Objects are
-     * automatically converted to Strings (including the value {@code null}).
+     * Constructs a new RequestParams instance and populate it with multiple initial key/value
+     * string param.
+     *
+     * @param keysAndValues a sequence of keys and values. Objects are automatically converted to
+     *                      Strings (including the value {@code null}).
      * @throws IllegalArgumentException if the number of arguments isn't even.
      */
     public RequestParams(Object... keysAndValues) {
-      init();
-      int len = keysAndValues.length;
-      if (len % 2 != 0)
-        throw new IllegalArgumentException("Supplied arguments must be even");
-      for (int i = 0; i < len; i += 2) {
-        String key = String.valueOf(keysAndValues[i]);
-        String val = String.valueOf(keysAndValues[i + 1]);
-        put(key, val);
-      }
+        init();
+        int len = keysAndValues.length;
+        if (len % 2 != 0)
+            throw new IllegalArgumentException("Supplied arguments must be even");
+        for (int i = 0; i < len; i += 2) {
+            String key = String.valueOf(keysAndValues[i]);
+            String val = String.valueOf(keysAndValues[i + 1]);
+            put(key, val);
+        }
     }
 
     /**
      * Adds a key/value string pair to the request.
-     * @param key the key name for the new param.
+     *
+     * @param key   the key name for the new param.
      * @param value the value string for the new param.
      */
-    public void put(String key, String value){
-        if(key != null && value != null) {
+    public void put(String key, String value) {
+        if (key != null && value != null) {
             urlParams.put(key, value);
         }
     }
 
     /**
      * Adds a file to the request.
-     * @param key the key name for the new param.
+     *
+     * @param key  the key name for the new param.
      * @param file the file to add.
+     * @throws java.io.FileNotFoundException throws if wrong File argument was passed
      */
     public void put(String key, File file) throws FileNotFoundException {
-        put(key, new FileInputStream(file), file.getName());
+        put(key, file, null);
     }
 
     /**
-     * Adds param with more than one value.
-     * @param key the key name for the new param.
-     * @param values is the ArrayList with values for the param.
+     * Adds a file to the request.
+     *
+     * @param key         the key name for the new param.
+     * @param file        the file to add.
+     * @param contentType the content type of the file, eg. application/json
+     * @throws java.io.FileNotFoundException throws if wrong File argument was passed
      */
-    public void put(String key, ArrayList<String> values)  {
-        if(key != null && values != null) {
-            urlParamsWithArray.put(key, values);
+    public void put(String key, File file, String contentType) throws FileNotFoundException {
+        if (key != null && file != null) {
+            fileParams.put(key, new FileWrapper(file, contentType));
         }
     }
 
     /**
      * Adds an input stream to the request.
-     * @param key the key name for the new param.
+     *
+     * @param key    the key name for the new param.
      * @param stream the input stream to add.
      */
     public void put(String key, InputStream stream) {
@@ -153,42 +196,80 @@ public class RequestParams {
 
     /**
      * Adds an input stream to the request.
-     * @param key the key name for the new param.
+     *
+     * @param key    the key name for the new param.
      * @param stream the input stream to add.
-     * @param fileName the name of the file.
+     * @param name   the name of the stream.
      */
-    public void put(String key, InputStream stream, String fileName) {
-        put(key, stream, fileName, null);
+    public void put(String key, InputStream stream, String name) {
+        put(key, stream, name, null);
     }
 
     /**
      * Adds an input stream to the request.
-     * @param key the key name for the new param.
-     * @param stream the input stream to add.
-     * @param fileName the name of the file.
+     *
+     * @param key         the key name for the new param.
+     * @param stream      the input stream to add.
+     * @param name        the name of the stream.
      * @param contentType the content type of the file, eg. application/json
      */
-    public void put(String key, InputStream stream, String fileName, String contentType) {
-        if(key != null && stream != null) {
-            fileParams.put(key, new FileWrapper(stream, fileName, contentType));
+    public void put(String key, InputStream stream, String name, String contentType) {
+        if (key != null && stream != null) {
+            streamParams.put(key, new StreamWrapper(stream, name, contentType));
+        }
+    }
+
+    /**
+     * Adds param with non-string value (e.g. Map, List, Set).
+     *
+     * @param key   the key name for the new param.
+     * @param value the non-string value object for the new param.
+     */
+    public void put(String key, Object value) {
+        if (key != null && value != null) {
+            urlParamsWithObjects.put(key, value);
+        }
+    }
+
+    /**
+     * Adds string value to param which can have more than one value.
+     *
+     * @param key   the key name for the param, either existing or new.
+     * @param value the value string for the new param.
+     */
+    public void add(String key, String value) {
+        if (key != null && value != null) {
+            Object params = urlParamsWithObjects.get(key);
+            if (params == null) {
+                // Backward compatible, which will result in "k=v1&k=v2&k=v3"
+                params = new HashSet<String>();
+                this.put(key, params);
+            }
+            if (params instanceof List) {
+                ((List<Object>) params).add(value);
+            } else if (params instanceof Set) {
+                ((Set<Object>) params).add(value);
+            }
         }
     }
 
     /**
      * Removes a parameter from the request.
+     *
      * @param key the key name for the parameter to remove.
      */
-    public void remove(String key){
+    public void remove(String key) {
         urlParams.remove(key);
+        streamParams.remove(key);
         fileParams.remove(key);
-        urlParamsWithArray.remove(key);
+        urlParamsWithObjects.remove(key);
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for(ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
-            if(result.length() > 0)
+        for (ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
+            if (result.length() > 0)
                 result.append("&");
 
             result.append(entry.getKey());
@@ -196,8 +277,17 @@ public class RequestParams {
             result.append(entry.getValue());
         }
 
-        for(ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
-            if(result.length() > 0)
+        for (ConcurrentHashMap.Entry<String, StreamWrapper> entry : streamParams.entrySet()) {
+            if (result.length() > 0)
+                result.append("&");
+
+            result.append(entry.getKey());
+            result.append("=");
+            result.append("STREAM");
+        }
+
+        for (ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
+            if (result.length() > 0)
                 result.append("&");
 
             result.append(entry.getKey());
@@ -205,117 +295,157 @@ public class RequestParams {
             result.append("FILE");
         }
 
-        for(ConcurrentHashMap.Entry<String, ArrayList<String>> entry : urlParamsWithArray.entrySet()) {
-            if(result.length() > 0)
+        List<BasicNameValuePair> params = getParamsList(null, urlParamsWithObjects);
+        for (BasicNameValuePair kv : params) {
+            if (result.length() > 0)
                 result.append("&");
 
-            ArrayList<String> values = entry.getValue();
-            for (String value : values) {
-                if (values.indexOf(value) != 0)
-                    result.append("&");
-                result.append(entry.getKey());
-                result.append("=");
-                result.append(value);
-            }
+            result.append(kv.getName());
+            result.append("=");
+            result.append(kv.getValue());
         }
 
         return result.toString();
     }
 
-   /**
+    public void setHttpEntityIsRepeatable(boolean isRepeatable) {
+        this.isRepeatable = isRepeatable;
+    }
+
+    /**
      * Returns an HttpEntity containing all request parameters
+     *
+     * @param progressHandler HttpResponseHandler for reporting progress on entity submit
+     * @return HttpEntity resulting HttpEntity to be included along with {@link
+     * org.apache.http.client.methods.HttpEntityEnclosingRequestBase}
+     * @throws IOException if one of the streams cannot be read
      */
-    public HttpEntity getEntity() {
-        HttpEntity entity = null;
-
-        if(!fileParams.isEmpty()) {
-            SimpleMultipartEntity multipartEntity = new SimpleMultipartEntity();
-
-            // Add string params
-            for(ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
-                multipartEntity.addPart(entry.getKey(), entry.getValue());
-            }
-
-            // Add dupe params
-            for(ConcurrentHashMap.Entry<String, ArrayList<String>> entry : urlParamsWithArray.entrySet()) {
-                ArrayList<String> values = entry.getValue();
-                for (String value : values) {
-                    multipartEntity.addPart(entry.getKey(), value);
-                }
-            }
-
-            // Add file params
-            int currentIndex = 0;
-            int lastIndex = fileParams.entrySet().size() - 1;
-            for(ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
-                FileWrapper file = entry.getValue();
-                if(file.inputStream != null) {
-                    boolean isLast = currentIndex == lastIndex;
-                    if(file.contentType != null) {
-                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream, file.contentType, isLast);
-                    } else {
-                        multipartEntity.addPart(entry.getKey(), file.getFileName(), file.inputStream, isLast);
-                    }
-                }
-                currentIndex++;
-            }
-
-            entity = multipartEntity;
+    public HttpEntity getEntity(ResponseHandlerInterface progressHandler) throws IOException {
+        if (streamParams.isEmpty() && fileParams.isEmpty()) {
+            return createFormEntity();
         } else {
-            try {
-                entity = new UrlEncodedFormEntity(getParamsList(), ENCODING);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+            return createMultipartEntity(progressHandler);
+        }
+    }
+
+    private HttpEntity createFormEntity() {
+        try {
+            return new UrlEncodedFormEntity(getParamsList(), HTTP.UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            return null; // Actually cannot happen when using utf-8
+        }
+    }
+
+    private HttpEntity createMultipartEntity(ResponseHandlerInterface progressHandler) throws IOException {
+        SimpleMultipartEntity entity = new SimpleMultipartEntity(progressHandler);
+        entity.setIsRepeatable(isRepeatable);
+
+        // Add string params
+        for (ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
+            entity.addPart(entry.getKey(), entry.getValue());
+        }
+
+        // Add non-string params
+        List<BasicNameValuePair> params = getParamsList(null, urlParamsWithObjects);
+        for (BasicNameValuePair kv : params) {
+            entity.addPart(kv.getName(), kv.getValue());
+        }
+
+        // Add stream params
+        for (ConcurrentHashMap.Entry<String, StreamWrapper> entry : streamParams.entrySet()) {
+            StreamWrapper stream = entry.getValue();
+            if (stream.inputStream != null) {
+                entity.addPart(entry.getKey(), stream.name, stream.inputStream,
+                        stream.contentType);
             }
+        }
+
+        // Add file params
+        for (ConcurrentHashMap.Entry<String, FileWrapper> entry : fileParams.entrySet()) {
+            FileWrapper fileWrapper = entry.getValue();
+            entity.addPart(entry.getKey(), fileWrapper.file, fileWrapper.contentType);
         }
 
         return entity;
     }
 
-    private void init(){
+    private void init() {
         urlParams = new ConcurrentHashMap<String, String>();
+        streamParams = new ConcurrentHashMap<String, StreamWrapper>();
         fileParams = new ConcurrentHashMap<String, FileWrapper>();
-        urlParamsWithArray = new ConcurrentHashMap<String, ArrayList<String>>();
+        urlParamsWithObjects = new ConcurrentHashMap<String, Object>();
     }
 
     protected List<BasicNameValuePair> getParamsList() {
         List<BasicNameValuePair> lparams = new LinkedList<BasicNameValuePair>();
 
-        for(ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
+        for (ConcurrentHashMap.Entry<String, String> entry : urlParams.entrySet()) {
             lparams.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
 
-        for(ConcurrentHashMap.Entry<String, ArrayList<String>> entry : urlParamsWithArray.entrySet()) {
-            ArrayList<String> values = entry.getValue();
-            for (String value : values) {
-                lparams.add(new BasicNameValuePair(entry.getKey(), value));
-            }
-        }
+        lparams.addAll(getParamsList(null, urlParamsWithObjects));
 
         return lparams;
     }
 
+    private List<BasicNameValuePair> getParamsList(String key, Object value) {
+        List<BasicNameValuePair> params = new LinkedList<BasicNameValuePair>();
+        if (value instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) value;
+            List<String> list = new ArrayList<String>(map.keySet());
+            // Ensure consistent ordering in query string
+            Collections.sort(list);
+            for (String nestedKey : list) {
+                Object nestedValue = map.get(nestedKey);
+                if (nestedValue != null) {
+                    params.addAll(getParamsList(key == null ? nestedKey : String.format("%s[%s]", key, nestedKey),
+                            nestedValue));
+                }
+            }
+        } else if (value instanceof List) {
+            List<Object> list = (List<Object>) value;
+            for (Object nestedValue : list) {
+                params.addAll(getParamsList(String.format("%s[]", key), nestedValue));
+            }
+        } else if (value instanceof Object[]) {
+            Object[] array = (Object[]) value;
+            for (Object nestedValue : array) {
+                params.addAll(getParamsList(String.format("%s[]", key), nestedValue));
+            }
+        } else if (value instanceof Set) {
+            Set<Object> set = (Set<Object>) value;
+            for (Object nestedValue : set) {
+                params.addAll(getParamsList(key, nestedValue));
+            }
+        } else if (value instanceof String) {
+            params.add(new BasicNameValuePair(key, (String) value));
+        }
+        return params;
+    }
+
     protected String getParamString() {
-        return URLEncodedUtils.format(getParamsList(), ENCODING);
+        return URLEncodedUtils.format(getParamsList(), HTTP.UTF_8);
     }
 
     private static class FileWrapper {
-        public InputStream inputStream;
-        public String fileName;
+        public File file;
         public String contentType;
 
-        public FileWrapper(InputStream inputStream, String fileName, String contentType) {
-            this.inputStream = inputStream;
-            this.fileName = fileName;
+        public FileWrapper(File file, String contentType) {
+            this.file = file;
             this.contentType = contentType;
         }
+    }
 
-        public String getFileName() {
-            if(fileName != null) {
-                return fileName;
-            } else {
-                return "nofilename";
-            }
+    private static class StreamWrapper {
+        public InputStream inputStream;
+        public String name;
+        public String contentType;
+
+        public StreamWrapper(InputStream inputStream, String name, String contentType) {
+            this.inputStream = inputStream;
+            this.name = name;
+            this.contentType = contentType;
         }
     }
 }
