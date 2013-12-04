@@ -4,3 +4,5 @@ androidutils-tests/coverage.ec
 androidutils-tests/coverage.txt
 
 androidutils-tests/coverage.xml
+
+androidutils-tests/coverage.json

@@ -49,4 +49,6 @@ script:
   - adb install bin/test-instrumented.apk
   - adb shell am instrument -e coverage true -w se.springworks.android.utils.test/android.test.InstrumentationTestRunner
   - adb pull /data/data/se.springworks.android.utils.test/files/coverage.ec .
-  - java -cp $ANDROID_HOME/tools/lib/emma.jar emma report -r html -in bin/coverage.em,coverage.ec -sp ../androidutils-lib/src/
+  #- java -cp $ANDROID_HOME/tools/lib/emma.jar emma report -r html -in bin/coverage.em,coverage.ec -sp ../androidutils-lib/src/
+  - java -cp tools/emmacoveralls.jar emma report -r coveralls -in bin/coverage.em,coverage.ec -sp ../androidutils-lib/src/ -Dreport.coveralls.service.jobid=$TRAVIS_JOB_ID -Dreport.coveralls.service.name=travis-ci -Dreport.coveralls.repotoken=sNret2NmV3tPLLDumzGWGWPD8FRwiIu58
+  - curl --form json_file=@coverage.json https://coveralls.io/api/v1/jobs
