@@ -3,6 +3,7 @@ package se.springworks.android.utils.persistence;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import se.springworks.android.utils.json.IJsonParser;
@@ -17,11 +18,27 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	@Inject
 	private IJsonParser jsonParser;
 	
-	private SharedPreferences sp;
+	@Inject
+	private Context context;
+	
+	protected SharedPreferences sp;
+
 
 	@Inject
 	public SharedPreferencesStorage(Context context) {
-		sp = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+		this(context, context.getPackageName());
+	}
+		
+	public SharedPreferencesStorage(Context context, String name) {
+		sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+	}
+		
+	public void setStorageName(String name) {
+		sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
+	}
+	
+	public void setJsonParser(IJsonParser jsonParser) {
+		this.jsonParser = jsonParser;
 	}
 
 	@Override
@@ -124,5 +141,10 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	@Override
 	public void removeAll() {
 		sp.edit().clear().commit();
+	}
+
+	@Override
+	public Map<String, ?> getAll() {
+		return sp.getAll();
 	}
 }
