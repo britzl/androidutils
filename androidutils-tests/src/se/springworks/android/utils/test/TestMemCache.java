@@ -62,7 +62,7 @@ public class TestMemCache extends AndroidTestCase {
 	public void testOverwrite() {
 		cache.cache("KEY1", "SOME DATA");
 		cache.cache("KEY1", "SOME OTHER DATA");
-		assertEquals(cache.get("KEY1"), "SOME OTHER DATA");		
+		assertEquals("SOME OTHER DATA", cache.get("KEY1"));		
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class TestMemCache extends AndroidTestCase {
 		assertFalse(cache.contains("KEY1"));
 		cache.cache("KEY1", "SOME DATA");
 		assertTrue(cache.contains("KEY1"));
-		assertEquals(cache.get("KEY1"), "SOME DATA");
+		assertEquals("SOME DATA", cache.get("KEY1"));
 	}
 	
 }
