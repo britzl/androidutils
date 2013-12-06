@@ -1,8 +1,13 @@
 package se.springworks.android.utils.persistence;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface IKeyValueStorage {
+	
+	public interface NamedKeyValueStorageFactory {
+		IKeyValueStorage create(String name);
+	}
 
 	boolean contains(String key);
 	
@@ -17,6 +22,12 @@ public interface IKeyValueStorage {
 	void put(String key, boolean value);
 	
 	<T> void put(String key, T o);
+	
+	/**
+	 * Get all values in the storage
+	 * @return
+	 */
+	Map<String, ?> getAll();
 	
 	/**
 	 * Get stored string for a specific key
