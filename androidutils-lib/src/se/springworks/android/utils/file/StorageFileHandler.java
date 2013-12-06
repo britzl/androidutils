@@ -74,7 +74,9 @@ public class StorageFileHandler extends AbstractFileHandler {
 			if(isExternalStorageAvailable()) {
 				folder = context.getExternalCacheDir();
 			}
-			else {
+			// folder can be null even if external storage is available if 
+			// android.permission.WRITE_EXTERNAL_STORAGE isn't set
+			if(folder == null) {
 				folder = context.getCacheDir();				
 			}
 			break;
@@ -82,7 +84,9 @@ public class StorageFileHandler extends AbstractFileHandler {
 			if(isExternalStorageAvailable()) {
 				folder = context.getExternalFilesDir(null);
 			}
-			else {
+			// folder can be null even if external storage is available if 
+			// android.permission.WRITE_EXTERNAL_STORAGE isn't set
+			if(folder == null) {
 				folder = context.getFilesDir();
 			}
 			break;
