@@ -88,21 +88,31 @@ public class GrapeGuice {
 		return injector;
 	}
 
-	public void rebind(AbstractModule ...modules) {
+	/**
+	 * Rebinds all bindings for this injector based on the provided module(s)
+	 * @param modules
+	 * @return This instance rebound with bindings defined in the provided module(s)
+	 */
+	public GrapeGuice rebind(AbstractModule ...modules) {
 		this.injector = Guice.createInjector(modules);
+		return this;
 	}
 	
-	
+	/**
+	 * Get an injector for the specified context with the bindings defined in the provided modules
+	 * If an injector already exists for the specified context it will be rebound with bindings from
+	 * the specified module(s)
+	 * @param context
+	 * @param modules
+	 * @return
+	 */
 	public static GrapeGuice getInjector(Context context, AbstractModule ...modules) {
 		if(context == null) {
 			return null;
 		}
-		final Application application = (Application)context.getApplicationContext();
-		GrapeGuice injector = injectors.get(application);
-		if (injector == null) {
-			injector = new GrapeGuice(Guice.createInjector(modules));
-			injectors.put(application, injector);
-		}
+		
+		GrapeGuice injector = GrapeGuice.getInjector(context);
+		injector.rebind(modules);
 		return injector;
 	}
 
