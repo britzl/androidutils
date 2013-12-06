@@ -3,7 +3,7 @@ package se.springworks.android.utils.cache;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class MemCache<T> {
+public class MemCache<T> implements ICache<T> {
 
 	private class CachedData {
 		
@@ -48,28 +48,17 @@ public class MemCache<T> {
 		}
 	}
 	
-	/**
-	 * Clears the entire cache
-	 */
+	@Override
 	public void clear() {
 		cache.clear();
 	}
 	
-	/**
-	 * Cache data indefinitely
-	 * @param resource
-	 * @param data
-	 */
+	@Override
 	public void cache(final String resourceKey, final T data) {
 		cache(resourceKey, new CachedData(data));
 	}
-	
-	/**
-	 * Cache data for a specific amount of time
-	 * @param resourceKey
-	 * @param data
-	 * @param maxAge
-	 */
+
+	@Override
 	public void cache(final String resourceKey, final T data, long maxAge) {
 		cache(resourceKey, new CachedData(data, System.currentTimeMillis() + maxAge));
 	}
@@ -78,11 +67,7 @@ public class MemCache<T> {
 		cache.put(resourceKey, data);
 	}
 	
-	/**
-	 * Get a cached resource. The cache will be pruned before retrieving the resource
-	 * @param resourceKey The resource to get
-	 * @return Cached data or null if it doesn't exist or has expired
-	 */
+	@Override
 	public T get(String resourceKey) {
 		prune();
 		if(cache.containsKey(resourceKey)) {
@@ -91,11 +76,7 @@ public class MemCache<T> {
 		return null;
 	}
 	
-	/**
-	 * Check if a resource exists in the cache. The cache will be pruned before checking
-	 * @param resourceKey
-	 * @return
-	 */
+	@Override
 	public boolean contains(String resourceKey) {
 		prune();
 		return cache.containsKey(resourceKey);
