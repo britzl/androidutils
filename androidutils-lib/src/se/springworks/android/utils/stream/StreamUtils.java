@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class StreamUtils {
 
@@ -46,6 +47,21 @@ public class StreamUtils {
 				totalBytesSkipped += bytesSkipped;
 			}
 			return totalBytesSkipped;
+		}
+	}
+	
+	/**
+	 * Closes a stream without throwing any exceptions
+	 * @param out The stream to close. Can be null
+	 */
+	public static void closeSilently(OutputStream out) {
+		if(out == null) {
+			return;
+		}
+		try {
+			out.close();
+		} catch (IOException e) {
+			// do nothing
 		}
 	}
 
