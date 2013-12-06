@@ -1,4 +1,4 @@
-package se.springworks.android.utils.rest;
+package se.springworks.android.utils.http;
 
 import java.util.Collection;
 
