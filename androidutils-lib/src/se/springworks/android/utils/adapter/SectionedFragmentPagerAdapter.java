@@ -1,4 +1,4 @@
-package se.springworks.android.utils.view;
+package se.springworks.android.utils.adapter;
 
 import java.util.ArrayList;
 import java.util.List;

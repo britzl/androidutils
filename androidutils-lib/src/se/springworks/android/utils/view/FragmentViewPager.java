@@ -1,5 +1,6 @@
 package se.springworks.android.utils.view;
 
+import se.springworks.android.utils.adapter.SectionedFragmentPagerAdapter;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
