@@ -32,7 +32,7 @@ public class TestSharedPreferencesStorage extends AndroidTestCase {
 	@Override
 	@Before
 	public void setUp() throws Exception {
-		GrapeGuice.getInjector(getContext(), new MockModule(getContext())).injectMembers(this);
+		GrapeGuice.getInjector(getContext()).rebind(new MockModule(getContext())).injectMembers(this);
 	}
 
 	@Override
