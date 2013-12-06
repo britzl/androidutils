@@ -9,8 +9,6 @@ import java.io.Serializable;
 
 import se.springworks.android.utils.file.FileUtils;
 import se.springworks.android.utils.file.IFileHandler;
-import se.springworks.android.utils.file.StorageFileHandler;
-import se.springworks.android.utils.file.StorageFileHandler.StorageMode;
 import se.springworks.android.utils.persistence.IKeyValueStorage;
 import se.springworks.android.utils.stream.StreamUtils;
 import android.content.Context;
@@ -73,7 +71,6 @@ public class DiskCache<T extends Serializable> implements ICache<T> {
 	 */
 	private void prune() {
 		for(String key : fileIndex.getAll().keySet()) {
-			@SuppressWarnings("unchecked")
 			CachedData cachedData = fileIndex.getObject(key, CachedData.class);
 			if(cachedData != null && cachedData.hasExpired()) {
 				fileIndex.remove(key);
@@ -89,7 +86,6 @@ public class DiskCache<T extends Serializable> implements ICache<T> {
 	@Override
 	public void clear() {
 		for(String key : fileIndex.getAll().keySet()) {
-			@SuppressWarnings("unchecked")
 			CachedData cachedData = fileIndex.getObject(key, CachedData.class);
 			if(cachedData != null) {
 				String filename = cachedData.getFilename();
