@@ -5,7 +5,8 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 
-import se.springworks.android.utils.cache.MemCache;
+import se.springworks.android.utils.cache.ICache;
+import se.springworks.android.utils.cache.ICache.CacheException;
 import se.springworks.android.utils.http.IAsyncHttpClient;
 import se.springworks.android.utils.http.IAsyncHttpClient.IAsyncHttpResponseHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
@@ -14,6 +15,7 @@ import se.springworks.android.utils.logging.Logger;
 import android.content.Context;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class RestClient implements IRestClient {
 
@@ -26,7 +28,9 @@ public class RestClient implements IRestClient {
 	private String baseUrl = "";
 	private boolean cachingEnabled = true;
 
-	private MemCache<String> cache = new MemCache<String>();
+	@Inject
+	@Named("disk")
+	private ICache<String> cache;
 	
 	@InjectLogger Logger logger;
 	
@@ -35,7 +39,7 @@ public class RestClient implements IRestClient {
 
 	@Override
 	public void enableCaching() {
-		cachingEnabled = true;
+		cachingEnabled = true && cache != null;
 	}
 
 	@Override
@@ -54,7 +58,12 @@ public class RestClient implements IRestClient {
 		else {
 			result = syncClient.getAsString(absoluteUrl);
 			if(result != null && cachingEnabled) {
-				cache.cache(absoluteUrl, result);
+				try {
+					cache.cache(absoluteUrl, result);
+				}
+				catch (CacheException e) {
+					logger.warn("get() %s unable to cache result %s", absoluteUrl, e.getMessage());
+				}
 			}
 		}
 		return result;
@@ -73,7 +82,12 @@ public class RestClient implements IRestClient {
 				@Override
 				public final void onSuccess(String response) {
 					if(cachingEnabled) {
-						cache.cache(absoluteUrl, response);
+						try {
+							cache.cache(absoluteUrl, response);
+						}
+						catch (CacheException e) {
+							logger.warn("get() %s unable to cache result %s", absoluteUrl, e.getMessage());
+						}
 					}
 					responseHandler.onSuccess(response);
 				}
@@ -188,5 +202,12 @@ public class RestClient implements IRestClient {
 	@Override
 	public void clearCookies() {
 		asyncClient.clearCookies();
+	}
+
+	@Override
+	public void clearCache() {
+		if(cache != null) {
+			cache.clear();
+		}
 	}
 }

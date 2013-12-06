@@ -17,6 +17,11 @@ public interface IRestClient {
 	void clearCookies();
 	
 	/**
+	 * Clears all cached responses
+	 */
+	void clearCache();
+	
+	/**
 	 * Cancels any active requests
 	 */
 	void cancelRequests();
