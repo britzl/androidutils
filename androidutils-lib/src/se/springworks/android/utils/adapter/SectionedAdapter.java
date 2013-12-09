@@ -122,7 +122,6 @@ public abstract class SectionedAdapter<S, I> extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		Object o = getItem(position);
-		logger.debug("getView() " + o);
 		if(isSection(position)) {
 			convertView = getSectionView((S)o, convertView, parent);
 		}
