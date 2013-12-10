@@ -28,8 +28,8 @@ public class RestClient implements IRestClient {
 	private String baseUrl = "";
 	private boolean cachingEnabled = true;
 
-	@Inject
-	@Named("disk")
+	@Inject(optional=true)
+	@Named("restclient")
 	private ICache<String> cache;
 	
 	@InjectLogger Logger logger;
