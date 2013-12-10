@@ -1,12 +1,10 @@
 package se.springworks.android.utils.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.Map;
 
 import se.springworks.android.utils.cache.ICache;
 import se.springworks.android.utils.cache.ICache.CacheException;
+import se.springworks.android.utils.http.HttpUtils;
 import se.springworks.android.utils.http.IAsyncHttpClient;
 import se.springworks.android.utils.http.IAsyncHttpClient.IAsyncHttpResponseHandler;
 import se.springworks.android.utils.http.ISimpleHttpClient;
@@ -133,34 +131,7 @@ public class RestClient implements IRestClient {
 	}
 
 	private String getAbsoluteUrl(String relativeUrl, Map<String, String> params) {
-		String absoluteUrl = baseUrl + relativeUrl;
-		if(params != null && !params.isEmpty()) {
-			
-            StringBuffer buffer = new StringBuffer();
-            Iterator<String> keys = params.keySet().iterator();
-            while(keys.hasNext()) {
-            	String key = keys.next();
-            	String value = params.get(key);
-            	buffer.append(key);
-            	buffer.append('=');
-            	try {
-					buffer.append(URLEncoder.encode(value, "UTF-8"));
-				}
-            	catch (UnsupportedEncodingException e) {
-					buffer.append(value);
-				}
-            	if(keys.hasNext()) {
-            		buffer.append('&');
-            	}
-            }
-            if (absoluteUrl.indexOf("?") == -1) {
-            	absoluteUrl += "?" + buffer.toString();
-            }
-            else {
-            	absoluteUrl += "&" + buffer.toString();
-            }
-		}
-		return absoluteUrl;
+		return HttpUtils.createUrlWithQueryString(baseUrl + relativeUrl, params);
 	}
 
 	private String getAbsoluteUrl(String relativeUrl) {

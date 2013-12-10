@@ -102,9 +102,9 @@ public class TestSectionedAdapter extends AndroidTestCase {
 
 		
 		List<String> itemsInSection2 = new ArrayList<String>();
-		itemsInSection1.add("S2_1");
-		itemsInSection1.add("S2_2");
-		itemsInSection1.add("S2_3");
+		itemsInSection2.add("S2_1");
+		itemsInSection2.add("S2_2");
+		itemsInSection2.add("S2_3");
 		adapter.addItems("SECTION2", itemsInSection2);
 
 		assertEquals(8, adapter.getCount());
