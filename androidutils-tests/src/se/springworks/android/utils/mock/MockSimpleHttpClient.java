@@ -11,15 +11,17 @@ public class MockSimpleHttpClient implements ISimpleHttpClient {
 
 	private Map<String, String> responseMap = new HashMap<String, String>();
 	
-	public void setRespone(String url, String response) {
+	public void setResponse(String url, String response) {
 		responseMap.put(url, response);
 	}
 
-	
+	public void clear() {
+		responseMap.clear();
+	}
 	
 	@Override
 	public InputStream get(String url) {
-		if(responseMap.containsKey(url)) {
+		if(!responseMap.containsKey(url)) {
 			return null;
 		}
 		return new ByteArrayInputStream(responseMap.get(url).getBytes());
@@ -30,10 +32,12 @@ public class MockSimpleHttpClient implements ISimpleHttpClient {
 		return responseMap.get(url);
 	}
 
+	public String basicAuthUser;
+	public String basicAuthPass;
 	@Override
 	public void setBasicAuth(String username, String password) {
-		// TODO Auto-generated method stub
-		
+		basicAuthUser = username;
+		basicAuthPass = password;
 	}
 
 }

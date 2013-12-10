@@ -2,8 +2,6 @@ package se.springworks.android.utils.test;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -23,6 +21,8 @@ import se.springworks.android.utils.inject.guice.InjectLoggerListener;
 import se.springworks.android.utils.json.IJsonParser;
 import se.springworks.android.utils.json.JacksonParser;
 import se.springworks.android.utils.mock.MockAsyncHttpClient;
+import se.springworks.android.utils.mock.MockAsyncHttpResponseHandler;
+import se.springworks.android.utils.mock.MockHttpResponseHandler;
 import se.springworks.android.utils.mock.MockSimpleHttpClient;
 import se.springworks.android.utils.persistence.IKeyValueStorage;
 import se.springworks.android.utils.persistence.NamedSharedPreferencesStorage;
@@ -69,39 +69,14 @@ public class TestRestClient extends AndroidTestCase {
 		}
 	}
 	
-	private class MockHttpResponseHandler implements IRestClient.OnHttpResponseHandler {
-
-		private CountDownLatch latch;
-
-		public String respone;
-		public boolean success = false;
-		
-		public MockHttpResponseHandler() {
-			latch = new CountDownLatch(1);
-		}
-		
-		@Override
-		public void onSuccess(String response) {
-			this.respone = response;
-			success = true;
-		}
-
-		@Override
-		public void onFailure(Throwable t, String response, int code) {
-			// TODO Auto-generated method stub	
-		}
-		
-		public void await(int timeoutMillis) throws InterruptedException {
-			latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-		}
-	}
 	
 	@Inject
 	private IRestClient restClient;
 	
 	private MockAsyncHttpClient asyncHttp;
 	private MockSimpleHttpClient syncHttp;
-	private MockHttpResponseHandler responseHandler;
+	private MockHttpResponseHandler mockHttpResponseHandler;
+	private MockAsyncHttpResponseHandler mockAsyncHttpResponseHandler;
 
 	
 	@BeforeClass
@@ -117,7 +92,8 @@ public class TestRestClient extends AndroidTestCase {
 	public void setUp() throws Exception {
 		asyncHttp = new MockAsyncHttpClient();
 		syncHttp = new MockSimpleHttpClient();
-		responseHandler = new MockHttpResponseHandler();
+		mockHttpResponseHandler = new MockHttpResponseHandler();
+		mockAsyncHttpResponseHandler = new MockAsyncHttpResponseHandler();
 		GrapeGuice.getInjector(this).rebind(new TestRestClientModule(getContext(), asyncHttp, syncHttp)).injectMembers(this);
 	}
 
@@ -125,7 +101,47 @@ public class TestRestClient extends AndroidTestCase {
 	@After
 	public void tearDown() throws Exception {
 	}
+	
+	@Test
+	public void testMock() throws InterruptedException {
+		syncHttp.setResponse("url1", "response1");
+		syncHttp.setResponse("url2", "response2");
+		assertNull(syncHttp.get("someOtherUrl"));
+		assertEquals("response1", syncHttp.getAsString("url1"));
+		assertEquals("response2", syncHttp.getAsString("url2"));
+		syncHttp.clear();
+		assertNull(syncHttp.getAsString("url1"));
+		assertNull(syncHttp.getAsString("url2"));
+		
+		
+		asyncHttp.setResponse("url1", "response1");
+		asyncHttp.setResponse("url2", "response2");
+		asyncHttp.get("someOtherUrl", mockAsyncHttpResponseHandler);
+		mockAsyncHttpResponseHandler.await(500);
+		assertNull(mockAsyncHttpResponseHandler.response);
+		assertFalse(mockAsyncHttpResponseHandler.success);
+		
+		asyncHttp.get("url1", mockAsyncHttpResponseHandler);
+		mockAsyncHttpResponseHandler.await(500);
+		assertEquals("response1", mockAsyncHttpResponseHandler.response);
+		
+		asyncHttp.get("url2", mockAsyncHttpResponseHandler);
+		mockAsyncHttpResponseHandler.await(500);
+		assertEquals("response2", mockAsyncHttpResponseHandler.response);
 
+		asyncHttp.clear();
+		asyncHttp.get("url1", mockAsyncHttpResponseHandler);
+		mockAsyncHttpResponseHandler.await(500);
+		assertNull(mockAsyncHttpResponseHandler.response);
+		assertFalse(mockAsyncHttpResponseHandler.success);
+		
+		asyncHttp.get("url2", mockAsyncHttpResponseHandler);
+		mockAsyncHttpResponseHandler.await(500);
+		assertNull(mockAsyncHttpResponseHandler.response);
+		assertFalse(mockAsyncHttpResponseHandler.success);
+	}
+
+	
 	@Test
 	public void testSyncGet() {
 		final String expectedResponse = "RESPONSE1";
@@ -135,12 +151,61 @@ public class TestRestClient extends AndroidTestCase {
 		params.put("key2", "value2");
 		params.put("key3", "value3");
 		
-		syncHttp.setRespone(HttpUtils.createUrlWithQueryString(url, params), expectedResponse);
+		syncHttp.setResponse(HttpUtils.createUrlWithQueryString(url, params), expectedResponse);
 
-		final String actualResponse = restClient.get(url, params);
-		assertEquals(expectedResponse, actualResponse);
+		restClient.disableCaching();
+		assertEquals(expectedResponse, restClient.get(url, params));
+		assertNull(restClient.get(url + "/not/found", params));		
 	}
 
+	
+	@Test
+	public void testCaching() throws InterruptedException {
+		final String url = "http://www.acme.com";
+
+		
+		String expectedResponse = "RESPONSE1";
+		asyncHttp.setResponse(HttpUtils.createUrlWithQueryString(url, null), expectedResponse);
+
+		restClient.enableCaching();
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		assertEquals(expectedResponse, restClient.get(url, null));
+	
+		// make sure the http layer won't answer and check that we still get a response (eg cached)
+		asyncHttp.clear();
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		assertEquals(expectedResponse, restClient.get(url, null));
+		
+		// disable caching, make sure the server doesn't answer and check that we fail
+		asyncHttp.clear();
+		restClient.disableCaching();
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(null, mockHttpResponseHandler.await(500).response);
+		assertFalse(mockHttpResponseHandler.success);
+		assertEquals(null, restClient.get(url, null));
+
+		// enable caching again and make sure we get a response again
+		restClient.enableCaching();
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		assertEquals(expectedResponse, restClient.get(url, null));
+
+		// clear the cache, change the response from the server and make sure we get the new response
+		expectedResponse = "RESPONSE2";
+		restClient.clearCache();
+		asyncHttp.setResponse(HttpUtils.createUrlWithQueryString(url, null), expectedResponse);
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		assertEquals(expectedResponse, restClient.get(url, null));
+
+		// make sure the http layer won't answer and check that we still get the new response (eg cached)
+		asyncHttp.clear();
+		restClient.get(url, null, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		assertEquals(expectedResponse, restClient.get(url, null));		
+	}
 
 	@Test
 	public void testAsyncGet() throws InterruptedException {
@@ -151,11 +216,119 @@ public class TestRestClient extends AndroidTestCase {
 		params.put("key2", "value2");
 		params.put("key3", "value3");
 
-		asyncHttp.setRespone(HttpUtils.createUrlWithQueryString(url, params), expectedResponse);
+		asyncHttp.setResponse(HttpUtils.createUrlWithQueryString(url, params), expectedResponse);
 
-		restClient.get(url, params, responseHandler);
-		responseHandler.await(500);
-		assertEquals(expectedResponse, responseHandler.respone);
+		restClient.disableCaching();
+		restClient.get(url, params, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+
+		restClient.get(url + "/not/found", params, mockHttpResponseHandler);
+		assertNull(mockHttpResponseHandler.await(500).response);
+		assertFalse(mockHttpResponseHandler.success);
 	}
 	
+
+	@Test
+	public void testAsyncPostParams() throws InterruptedException {
+		final String expectedResponse = "RESPONSE1";
+		final String url = "http://www.acme.com";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("key1", "value1");
+		params.put("key2", "value2");
+		params.put("key3", "value3");
+		
+		restClient.disableCaching();
+		asyncHttp.setResponse(url, expectedResponse);
+		restClient.post(url, params, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+
+		restClient.post(url + "/not/found", params, mockHttpResponseHandler);
+		assertNull(mockHttpResponseHandler.await(500).response);
+		assertFalse(mockHttpResponseHandler.success);
+	}
+
+	@Test
+	public void testAsyncPostJson() throws InterruptedException {
+		final String expectedResponse = "RESPONSE1";
+		final String url = "http://www.acme.com";
+		final String json = "{ \"key\":1234 }";
+		
+		asyncHttp.setResponse(url, expectedResponse);
+		restClient.post(url, json, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		
+		restClient.post(url + "/not/found", json, mockHttpResponseHandler);
+		assertNull(mockHttpResponseHandler.await(500).response);
+		assertFalse(mockHttpResponseHandler.success);
+	}
+	
+	
+	
+
+	@Test
+	public void testAsyncDelete() throws InterruptedException {
+		final String expectedResponse = "RESPONSE1";
+		final String url = "http://www.acme.com";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("key1", "value1");
+		params.put("key2", "value2");
+		params.put("key3", "value3");
+		
+		asyncHttp.setResponse(url, expectedResponse);
+		restClient.delete(url, mockHttpResponseHandler);
+		assertTrue(mockHttpResponseHandler.await(500).success);
+
+		restClient.delete(url + "/not/found", mockHttpResponseHandler);
+		assertFalse(mockHttpResponseHandler.await(500).success);
+	}
+
+
+	@Test
+	public void testSetBaseUrl() throws InterruptedException {
+		final String expectedResponse = "RESPONSE1";
+		final String url = "http://www.acme.com";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("key1", "value1");
+		params.put("key2", "value2");
+		params.put("key3", "value3");
+
+		restClient.setBaseUrl(url);
+
+		asyncHttp.setResponse(HttpUtils.createUrlWithQueryString(url + "/some/path", params), expectedResponse);
+		
+		restClient.get("/some/path", params, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		restClient.get("/not/found", params, mockHttpResponseHandler);
+		assertFalse(mockHttpResponseHandler.await(500).success);
+		assertEquals(null, mockHttpResponseHandler.response);
+
+		
+		asyncHttp.setResponse(url + "/some/path", expectedResponse);
+		restClient.post("/some/path", params, mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		restClient.post("/not/found", params, mockHttpResponseHandler);
+		assertFalse(mockHttpResponseHandler.await(500).success);
+		assertEquals(null, mockHttpResponseHandler.response);
+
+		
+		restClient.post("/some/path", "{ \"key\":1234 }", mockHttpResponseHandler);
+		assertEquals(expectedResponse, mockHttpResponseHandler.await(500).response);
+		restClient.post("/not/found", "{ \"key\":1234 }", mockHttpResponseHandler);
+		assertFalse(mockHttpResponseHandler.await(500).success);
+		assertEquals(null, mockHttpResponseHandler.response);
+
+		
+		restClient.delete("/some/path", mockHttpResponseHandler);
+		assertTrue(mockHttpResponseHandler.await(500).success);		
+		restClient.delete("/not/found", mockHttpResponseHandler);
+		assertFalse(mockHttpResponseHandler.await(500).success);
+	}
+	
+	
+	@Test
+	public void testClearCookies() {
+		assertFalse(asyncHttp.cookiesCleared);
+		restClient.clearCookies();
+		assertTrue(asyncHttp.cookiesCleared);
+	}
 }

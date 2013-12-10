@@ -10,8 +10,12 @@ public class MockAsyncHttpClient implements IAsyncHttpClient {
 	private Map<String, String> responseMap = new HashMap<String, String>();
 	
 	
-	public void setRespone(String url, String response) {
+	public void setResponse(String url, String response) {
 		responseMap.put(url, response);
+	}
+	
+	public void clear() {
+		responseMap.clear();
 	}
 	
 
@@ -38,10 +42,14 @@ public class MockAsyncHttpClient implements IAsyncHttpClient {
 	}
 
 	@Override
-	public void post(String url, Map<String, String> params,
-			IAsyncHttpResponseHandler responseHandler) {
-		// TODO Auto-generated method stub
-		
+	public void post(String url, Map<String, String> params, IAsyncHttpResponseHandler responseHandler) {
+		String response = responseMap.get(url);
+		if(response != null) {
+			responseHandler.onSuccess(response);
+		}
+		else {
+			responseHandler.onFailure(null, null, 404);
+		}
 	}
 
 	@Override
@@ -56,22 +64,24 @@ public class MockAsyncHttpClient implements IAsyncHttpClient {
 		}
 	}
 
+	public boolean requestsCancelled = false;
 	@Override
 	public void cancelRequests(boolean mayInterruptIfRunning) {
-		// TODO Auto-generated method stub
-		
+		requestsCancelled = true;
 	}
 
+	public String basicAuthUser;
+	public String basicAuthPass;
 	@Override
 	public void setPreemptiveBasicAuth(String user, String pass) {
-		// TODO Auto-generated method stub
-		
+		basicAuthUser = user;
+		basicAuthPass = pass;
 	}
 
+	public boolean cookiesCleared = false;
 	@Override
 	public void clearCookies() {
-		// TODO Auto-generated method stub
-		
+		cookiesCleared = true;
 	}
 
 }
