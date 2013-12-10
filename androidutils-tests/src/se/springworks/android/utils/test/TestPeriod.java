@@ -36,6 +36,15 @@ public class TestPeriod extends AndroidTestCase {
 	}
 
 	@Test
+	public void testTimestampDifference() {
+		Period p = new Period(2 * DAY + 5 * HOUR + 30 * MINUTE + 20 * SECOND, 3 * DAY + 7 * HOUR + 50 * MINUTE + 35 * SECOND);
+		assertEquals(1, p.getDays());
+		assertEquals(2, p.getHours());
+		assertEquals(20, p.getMinutes());
+		assertEquals(15, p.getSeconds());
+	}
+
+	@Test
 	public void testDays() {
 		Period p = new Period(3 * DAY + 13 * HOUR + 33 * MINUTE + 44 * SECOND);
 		assertTrue(p.hasDays());
