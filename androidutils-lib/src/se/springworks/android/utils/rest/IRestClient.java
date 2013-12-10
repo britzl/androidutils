@@ -87,4 +87,10 @@ public interface IRestClient {
 	 * Disables response caching
 	 */
 	void disableCaching();
+	
+	/**
+	 * Check if caching is enabled 
+	 * @return
+	 */
+	boolean isCachingEnabled();
 }

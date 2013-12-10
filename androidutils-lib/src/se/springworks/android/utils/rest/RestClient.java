@@ -24,7 +24,8 @@ public class RestClient implements IRestClient {
 	private ISimpleHttpClient syncClient;
 
 	private String baseUrl = "";
-	private boolean cachingEnabled = true;
+	
+	private boolean cachingEnabled = false;
 
 	@Inject(optional=true)
 	@Named("restclient")
@@ -46,16 +47,21 @@ public class RestClient implements IRestClient {
 	}
 	
 	@Override
+	public boolean isCachingEnabled() {
+		return cachingEnabled && cache != null;
+	}
+	
+	@Override
 	public String get(final String url, Map<String, String> params) {
 		logger.debug("get() %s", url);
 		final String result;
 		final String absoluteUrl = getAbsoluteUrl(url, params);
-		if(cachingEnabled && cache.contains(absoluteUrl)) {
+		if(isCachingEnabled() && cache.contains(absoluteUrl)) {
 			result = cache.get(absoluteUrl);
 		}
 		else {
 			result = syncClient.getAsString(absoluteUrl);
-			if(result != null && cachingEnabled) {
+			if(result != null && isCachingEnabled()) {
 				try {
 					cache.cache(absoluteUrl, result);
 				}
@@ -72,14 +78,14 @@ public class RestClient implements IRestClient {
 		final String absoluteUrl = getAbsoluteUrl(url, params);
 		logger.debug("get() %s", absoluteUrl);
 
-		if(cachingEnabled && cache.contains(absoluteUrl)) {
+		if(isCachingEnabled() && cache.contains(absoluteUrl)) {
 			responseHandler.onSuccess(cache.get(absoluteUrl));
 		}
 		else {
 			asyncClient.get(absoluteUrl, new IAsyncHttpResponseHandler() {				
 				@Override
 				public final void onSuccess(String response) {
-					if(cachingEnabled) {
+					if(isCachingEnabled()) {
 						try {
 							cache.cache(absoluteUrl, response);
 						}
@@ -157,7 +163,7 @@ public class RestClient implements IRestClient {
 	@Override
 	public void delete(String url, final OnHttpResponseHandler responseHandler) {
 		logger.debug("delete() %s", url);
-		asyncClient.delete(url, new IAsyncHttpResponseHandler() {
+		asyncClient.delete(getAbsoluteUrl(url), new IAsyncHttpResponseHandler() {
 			@Override
 			public final void onSuccess(String response) {
 				responseHandler.onSuccess(response);
