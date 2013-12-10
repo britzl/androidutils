@@ -6,17 +6,26 @@ notifications:
   email: true
 
 before_install:
+  # debug output of travis dir and id
   - echo Before install
   - echo ${TRAVIS_BUILD_DIR}
   - echo ${TRAVIS_JOB_ID}
+
+  # 
   - sudo apt-get update -qq
   - sudo apt-get install -qq libstdc++6:i386 lib32z1
+
+  # download and unpack android sdk
   - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
   - tar -v -zxf android-sdk_r22.2.1-linux.tgz
-  - ls -la
+
+  # export variables
   - export ANDROID_HOME=${TRAVIS_BUILD_DIR}/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools
   - export PATH=${PATH}:${ANDROID_HOME}/platform-tools
+  - ls -la
+  - set
+  - android --help
 
 install:
   # update android sdk
