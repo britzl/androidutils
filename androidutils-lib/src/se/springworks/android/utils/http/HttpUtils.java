@@ -9,6 +9,10 @@ public class HttpUtils {
 
 	
 	public static String createUrlWithQueryString(String url, Map<String, String> keyValuePairs) {
+		if(keyValuePairs == null) {
+			return url;
+		}
+		
         StringBuffer buffer = new StringBuffer();
         Iterator<String> keys = keyValuePairs.keySet().iterator();
         while(keys.hasNext()) {
