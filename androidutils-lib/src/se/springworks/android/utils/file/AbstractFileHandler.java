@@ -28,6 +28,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	public boolean createEmptyFile(String filename) {
 		File file = getFile(filename);
 		try {
+			file.getParentFile().mkdirs();
 			return file.createNewFile();
 		}
 		catch (IOException e) {
