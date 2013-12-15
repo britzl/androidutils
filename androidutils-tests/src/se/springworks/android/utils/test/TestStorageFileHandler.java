@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -47,6 +48,8 @@ public class TestStorageFileHandler extends AndroidTestCase {
 	
 	@Test
 	public void testCreateEmptyFile() {
+		assertFalse(fileHandler.createEmptyFile("../../../../../../../*"));
+		
 		final String filename = "emptyfile";
 		assertFalse(fileHandler.exists(filename));
 		fileHandler.createEmptyFile(filename);
@@ -55,6 +58,8 @@ public class TestStorageFileHandler extends AndroidTestCase {
 	
 	@Test
 	public void testDelete() throws IOException {
+		assertFalse(fileHandler.delete("doesnotexist"));
+		
 		final String filename = "filetodelete";
 		assertFalse(fileHandler.exists(filename));
 		fileHandler.createEmptyFile(filename);
@@ -128,6 +133,7 @@ public class TestStorageFileHandler extends AndroidTestCase {
 	
 	@Test
 	public void testGetSize() throws IOException {
+		assertEquals(-1, fileHandler.getSize("doesnotexist"));
 		final String filename = "filewithfourbytes";
 		OutputStream out = fileHandler.getWritableFile(filename, false);
 		out.write(1);
@@ -178,5 +184,25 @@ public class TestStorageFileHandler extends AndroidTestCase {
 		assertTrue(fileHandler.exists(filename));		
 		
 		assertEquals("SOMESTRING", new String(fileHandler.load(filename)));
+	}
+	
+	
+	@Test
+	public void testGetFileModifiedDate() {
+		// note, there's not point testing further since there's a problem with some devices not being able to set
+		// an accurate file modification date. Need to test this more using the ImprovedStorageFileHandler
+		fileHandler.createEmptyFile("emptyfile");
+		assertTrue(fileHandler.getFileModifiedDate("emptyfile") instanceof Date);
+		assertNull(fileHandler.getFileModifiedDate("doesnotexist"));
+	}
+	
+	@Test
+	public void testSetFileModifiedDate() {
+		// note, there's not point testing further since there's a problem with some devices not being able to set
+		// an accurate file modification date. Need to test this more using the ImprovedStorageFileHandler
+		assertFalse(fileHandler.setFileModifiedTime("doesnotexist", 123456));
+
+		fileHandler.createEmptyFile("emptyfile");
+		assertTrue(fileHandler.setFileModifiedTime("emptyfile", 123456));
 	}
 }

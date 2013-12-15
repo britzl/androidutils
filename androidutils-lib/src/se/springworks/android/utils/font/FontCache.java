@@ -23,4 +23,12 @@ public class FontCache {
 		}
 		return tf;
 	}
+	
+	public static void remove(String name) {
+		fontCache.remove(name);
+	}
+	
+	public static void clear() {
+		fontCache.clear();
+	}
 }

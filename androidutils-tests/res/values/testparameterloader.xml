@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="parameterloaderstring">Lorem ipsum</string>
+    <item type="integer" name="parameterloaderint">12345</item>
+    <item type="bool" name="parameterloaderbool">true</item>
+</resources>
