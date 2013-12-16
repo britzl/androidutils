@@ -47,6 +47,8 @@ public class testParameterLoader extends AndroidTestCase {
 		assertTrue(loader.hasInt("parameterloaderint"));
 		assertEquals(12345, loader.getInt("parameterloaderint", 0));
 
+		assertEquals(12345, loader.getInt("parameterloaderstring", 56789));
+
 		assertFalse(loader.hasInt("doesnotexist"));
 		assertEquals(56789, loader.getInt("doesnotexist", 56789));
 	}
@@ -56,5 +58,6 @@ public class testParameterLoader extends AndroidTestCase {
 		assertTrue(loader.hasBoolean("parameterloaderbool"));
 		assertTrue(loader.getBoolean("parameterloaderbool"));
 		assertFalse(loader.hasBoolean("doesnotexist"));
+		assertFalse(loader.getBoolean("doesnotexist"));
 	}
 }
