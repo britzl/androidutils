@@ -187,4 +187,14 @@ public class RestClient implements IRestClient {
 			cache.clear();
 		}
 	}
+
+	@Override
+	public void setHeader(String header, String value) {
+		asyncClient.setHeader(header, value);
+	}
+
+	@Override
+	public void removeHeader(String header) {
+		asyncClient.removeHeader(header);
+	}
 }

@@ -79,6 +79,19 @@ public interface IRestClient {
 	void setBasicAuth(final String username, final String password);
 	
 	/**
+	 * Sets a header that will be used in all subsequent requests
+	 * @param header
+	 * @param value
+	 */
+	void setHeader(String header, String value);
+	
+	/**
+	 * Removes a previously set header (via {@link #setHeader(String, String)})
+	 * @param header
+	 */
+	void removeHeader(String header);
+	
+	/**
 	 * Enables response caching
 	 */
 	void enableCaching();

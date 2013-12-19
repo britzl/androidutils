@@ -28,5 +28,9 @@ public interface IAsyncHttpClient {
 	
 	void setPreemptiveBasicAuth(String user, String pass);
 	
+	void setHeader(String header, String value);
+	
+	void removeHeader(String header);
+	
 	void clearCookies();
 }

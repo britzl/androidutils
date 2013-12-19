@@ -152,4 +152,15 @@ public class LoopjAsyncHttpClient implements IAsyncHttpClient {
 		loopj.setCookieStore(cookieStore);
 	}
 
+	@Override
+	public void setHeader(String header, String value) {
+		loopj.addHeader(header, value);
+	}
+	
+	@Override
+	public void removeHeader(String header) {
+		loopj.removeHeader(header);
+	}
+
+
 }

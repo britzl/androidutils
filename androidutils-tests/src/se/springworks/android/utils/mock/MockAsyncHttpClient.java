@@ -9,6 +9,7 @@ public class MockAsyncHttpClient implements IAsyncHttpClient {
 	
 	private Map<String, String> responseMap = new HashMap<String, String>();
 	
+	public Map<String, String> headers = new HashMap<String, String>();
 	
 	public void setResponse(String url, String response) {
 		responseMap.put(url, response);
@@ -82,6 +83,16 @@ public class MockAsyncHttpClient implements IAsyncHttpClient {
 	@Override
 	public void clearCookies() {
 		cookiesCleared = true;
+	}
+
+	@Override
+	public void setHeader(String header, String value) {
+		headers.put(header, value);
+	}
+	
+	@Override
+	public void removeHeader(String header) {
+		headers.remove(header);
 	}
 
 }

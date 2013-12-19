@@ -139,6 +139,15 @@ public class TestRestClient extends AndroidTestCase {
 		mockAsyncHttpResponseHandler.await(500);
 		assertNull(mockAsyncHttpResponseHandler.response);
 		assertFalse(mockAsyncHttpResponseHandler.success);
+		
+		assertTrue(asyncHttp.headers.isEmpty());
+		asyncHttp.setHeader("SOMEHEADER1", "SOMEVALUE1");
+		asyncHttp.setHeader("SOMEHEADER2", "SOMEVALUE2");
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER1"));
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER2"));
+		asyncHttp.removeHeader("SOMEHEADER1");
+		assertFalse(asyncHttp.headers.containsKey("SOMEHEADER1"));
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER2"));
 	}
 
 	
@@ -330,5 +339,17 @@ public class TestRestClient extends AndroidTestCase {
 		assertFalse(asyncHttp.cookiesCleared);
 		restClient.clearCookies();
 		assertTrue(asyncHttp.cookiesCleared);
+	}
+	
+	
+	@Test
+	public void testSetHeader() {
+		restClient.setHeader("SOMEHEADER1", "SOMEVALUE1");
+		restClient.setHeader("SOMEHEADER2", "SOMEVALUE2");
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER1"));
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER2"));
+		restClient.removeHeader("SOMEHEADER1");
+		assertFalse(asyncHttp.headers.containsKey("SOMEHEADER1"));
+		assertTrue(asyncHttp.headers.containsKey("SOMEHEADER2"));		
 	}
 }
