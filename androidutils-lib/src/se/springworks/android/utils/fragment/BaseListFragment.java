@@ -32,9 +32,8 @@ public abstract class BaseListFragment extends ListFragment {
 	}
 	
 	
-	
 	@Override
-	public final void onActivityCreated(Bundle savedInstanceState) {
+	public final void onActivityCreated(final Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		logger.debug("onActivityCreated()");
 		
@@ -47,7 +46,21 @@ public abstract class BaseListFragment extends ListFragment {
 			setListAdapter(adapter);
 		}
 		
-		fragmentReadyToUse(savedInstanceState);
+		// we need to delay the fragment ready callback to *after* the view has been
+		// fully setup and measured. If we don't wel'll get width and height of views
+		// reported as 0 if we try to use these values in fragmentReadyToUse()
+		// http://stackoverflow.com/a/15301092/1266551
+		boolean success = getView().post(new Runnable() {			
+			@Override
+			public void run() {
+				logger.debug("Delayed fragmentReadyToUse");
+				fragmentReadyToUse(savedInstanceState);
+			}
+		});
+		if(!success) {
+			logger.debug("Unable to delay fragmentReadyToUse");
+			fragmentReadyToUse(savedInstanceState);
+		}
 	}
 
 	/**
