@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 
 /**
  * Removes a bit of boilerplate code when working with list fragments
@@ -36,8 +37,11 @@ public abstract class BaseListFragment extends ListFragment {
 	public final void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		logger.debug("onActivityCreated()");
-		GrapeGuice.getInjector(this).injectViews(this);
 		
+		addHeadersAndFooters(getListView());
+		
+		GrapeGuice.getInjector(this).injectViews(this);
+
 		adapter = createAdapter();
 		if(adapter != null) {
 			setListAdapter(adapter);
@@ -46,6 +50,17 @@ public abstract class BaseListFragment extends ListFragment {
 		fragmentReadyToUse(savedInstanceState);
 	}
 
+	/**
+	 * Add headers and footers to the listview
+	 * Note that, prior to API level 19, it isn't possible to add headers and footers
+	 * after the adapter has been set. This method provides a point before the adapter
+	 * has been set where the headers and footers can be set.
+	 * @param listView
+	 */
+	protected void addHeadersAndFooters(ListView listView) {
+		// override if you want to add headers and/or footers
+	}
+	
 	/**
 	 * Creates the list adapter used by this fragment
 	 * @return
