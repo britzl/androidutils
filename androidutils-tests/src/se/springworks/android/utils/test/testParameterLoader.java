@@ -10,7 +10,7 @@ import se.springworks.android.utils.resource.ParameterLoader;
 
 import android.test.AndroidTestCase;
 
-public class testParameterLoader extends AndroidTestCase {
+public class TestParameterLoader extends AndroidTestCase {
 
 	private ParameterLoader loader;
 	
