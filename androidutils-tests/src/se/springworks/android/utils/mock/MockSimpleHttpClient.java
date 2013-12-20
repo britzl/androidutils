@@ -6,13 +6,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import se.springworks.android.utils.http.ISimpleHttpClient;
+import se.springworks.android.utils.stream.StreamUtils;
 
 public class MockSimpleHttpClient implements ISimpleHttpClient {
 
-	private Map<String, String> responseMap = new HashMap<String, String>();
+	private Map<String, InputStream> responseMap = new HashMap<String, InputStream>();
+	
+	public void setResponse(String url, InputStream response) {
+		responseMap.put(url, response);
+	}
 	
 	public void setResponse(String url, String response) {
-		responseMap.put(url, response);
+		setResponse(url, new ByteArrayInputStream(response.getBytes()));
 	}
 
 	public void clear() {
@@ -24,12 +29,14 @@ public class MockSimpleHttpClient implements ISimpleHttpClient {
 		if(!responseMap.containsKey(url)) {
 			return null;
 		}
-		return new ByteArrayInputStream(responseMap.get(url).getBytes());
+		return responseMap.get(url);
+//		return new ByteArrayInputStream(responseMap.get(url).getBytes());
 	}
 
 	@Override
 	public String getAsString(String url) {
-		return responseMap.get(url);
+		return StreamUtils.getAsString(responseMap.get(url));
+//		return responseMap.get(url);
 	}
 
 	public String basicAuthUser;

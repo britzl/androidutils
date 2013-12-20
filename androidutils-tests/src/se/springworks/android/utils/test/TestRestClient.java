@@ -1,5 +1,6 @@
 package se.springworks.android.utils.test;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
