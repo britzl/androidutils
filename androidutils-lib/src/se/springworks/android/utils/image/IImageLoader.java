@@ -27,12 +27,25 @@ public interface IImageLoader {
 	 * @param config
 	 */
 	void setBitmapConfig(Bitmap.Config config);
-
-	InputStream getAsStream(String url);
 	
+	/**
+	 * Get a bitmap from a URL
+	 * @param url
+	 * @return
+	 */
 	Bitmap getAsBitmap(String url);
 	
-	Bitmap getAsBitmap(InputStream in);
+	/**
+	 * Get a bitmap from an asset file
+	 * @param fileName
+	 * @return
+	 */
+	Bitmap getFromAssets(String fileName);
 	
-	Bitmap getFromAssets(String filename);
+	/**
+	 * Get a bitmap from a stream
+	 * @param in
+	 * @return
+	 */
+	Bitmap getAsBitmap(InputStream in);
 }
