@@ -1,5 +1,6 @@
 package se.springworks.android.utils.test;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,6 +66,25 @@ public class TestSharedPreferencesStorage extends AndroidTestCase {
 		assertTrue(storage.getString(key, defaultvalue).equals(defaultvalue));
 	}
 
+	@Test
+	public void testPutInts() {
+		final String key = "KEY";
+		final Integer[] a = { Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.valueOf(3), Integer.valueOf(4) };
+		assertFalse(storage.contains(key));
+		storage.put(key, a);
+		assertTrue(storage.contains(key));
+		assertTrue(Arrays.equals(a, storage.getInts(key)));
+	}
+
+	@Test
+	public void testPutLongs() {
+		final String key = "KEY";
+		final Long[] a = { Long.MIN_VALUE, Long.MAX_VALUE, Long.valueOf(3), Long.valueOf(4) };
+		assertFalse(storage.contains(key));
+		storage.put(key, a);
+		assertTrue(storage.contains(key));
+		assertTrue(Arrays.equals(a, storage.getLongs(key)));
+	}
 
 	@Test
 	public void testPutInt() {

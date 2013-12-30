@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import se.springworks.android.utils.collections.ArrayUtils;
 import se.springworks.android.utils.json.IJsonParser;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,30 +16,25 @@ import com.google.inject.Inject;
 
 public class SharedPreferencesStorage implements IKeyValueStorage {
 
-	@Inject
 	private IJsonParser jsonParser;
 	
-	@Inject
 	private Context context;
 	
 	protected SharedPreferences sp;
 
 
 	@Inject
-	public SharedPreferencesStorage(Context context) {
-		this(context, context.getPackageName());
+	public SharedPreferencesStorage(Context context, IJsonParser jsonParser) {
+		this(context, jsonParser, context.getPackageName());
 	}
 		
-	public SharedPreferencesStorage(Context context, String name) {
+	public SharedPreferencesStorage(Context context, IJsonParser jsonParser, String name) {
+		this.jsonParser = jsonParser;
 		sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
 	}
 		
 	public void setStorageName(String name) {
 		sp = context.getSharedPreferences(name, Context.MODE_PRIVATE);
-	}
-	
-	public void setJsonParser(IJsonParser jsonParser) {
-		this.jsonParser = jsonParser;
 	}
 
 	@Override
@@ -120,9 +116,11 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 
 	@Override
 	public Set<String> getStrings(String key) {
-		String json = getString(key, "");
-		
+		String json = getString(key, "");		
 		List<String> list = jsonParser.fromJson(json, new TypeReference<ArrayList<String>>() {});
+		if(list == null) {
+			return null;
+		}
 		return new HashSet<String>(list);
 	}
 
@@ -146,5 +144,45 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	@Override
 	public Map<String, ?> getAll() {
 		return sp.getAll();
+	}
+
+	@Override
+	public void put(String key, int[] value) {
+		List<Integer> list = ArrayUtils.asList(value);
+		String json = jsonParser.toJson(list);
+		put(key, json);
+	}
+
+	@Override
+	public void put(String key, long[] value) {
+		List<Long> list = ArrayUtils.asList(value);
+		String json = jsonParser.toJson(list);
+		put(key, json);
+	}
+
+	@Override
+	public Long[] getLongs(String key) {
+		String json = getString(key);		
+		if(json == null) {
+			return null;
+		}
+		List<Long> list = jsonParser.fromJson(json, new TypeReference<ArrayList<Long>>() {});
+		if(list == null) {
+			return null;
+		}
+		return list.toArray(ArrayUtils.EMPTY_LONG_OBJECT_ARRAY);
+	}
+
+	@Override
+	public Integer[] getInts(String key) {
+		String json = getString(key);
+		if(json == null) {
+			return null;
+		}
+		List<Integer> list = jsonParser.fromJson(json, new TypeReference<ArrayList<Integer>>() {});
+		if(list == null) {
+			return null;
+		}
+		return list.toArray(ArrayUtils.EMPTY_INTEGER_OBJECT_ARRAY);
 	}
 }
