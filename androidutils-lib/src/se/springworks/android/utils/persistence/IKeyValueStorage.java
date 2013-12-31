@@ -1,5 +1,6 @@
 package se.springworks.android.utils.persistence;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,6 +58,36 @@ public interface IKeyValueStorage {
 	 * @param value
 	 */
 	void put(String key, long[] value);
+	
+	/**
+	 * Store a list of values
+	 * @param key
+	 * @param list
+	 */
+	void put(String key, List<?> list);
+	
+	/**
+	 * Store an array of values
+	 * @param key
+	 * @param array
+	 */
+	void put(String key, Object[] array);
+	
+	/**
+	 * Get an array of values of a certain type
+	 * @param key
+	 * @param cls
+	 * @return
+	 */
+	<T> T[] getArray(String key, Class<? extends T[]> cls);	
+	
+	/**
+	 * Get a list of values of a certain type
+	 * @param key
+	 * @param cls
+	 * @return
+	 */
+	<T> List<T> getList(String key, Class<T> cls);
 	
 	/**
 	 * Store a single boolean value
@@ -160,9 +191,22 @@ public interface IKeyValueStorage {
 	 */
 	boolean getBoolean(String key, boolean defaultValue);
 	
+	/**
+	 * Get a stored object of a specific type
+	 * @param key
+	 * @param cls
+	 * @return
+	 */
 	<T> T getObject(String key, Class<T> cls);
 	
+	/**
+	 * Remove a stored value
+	 * @param key
+	 */
 	void remove(String key);
 	
+	/**
+	 * Remove all stored values
+	 */
 	void removeAll();
 }

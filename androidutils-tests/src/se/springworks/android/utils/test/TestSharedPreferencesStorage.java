@@ -1,7 +1,9 @@
 package se.springworks.android.utils.test;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -19,6 +21,15 @@ import com.google.inject.Inject;
 
 public class TestSharedPreferencesStorage extends AndroidTestCase {
 
+	private static final Integer[] INTEGER_OBJECT_ARRAY = { Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.valueOf(3), Integer.valueOf(4) };
+	private static final Long[] LONG_OBJECT_ARRAY = { Long.MIN_VALUE, Long.MAX_VALUE, Long.valueOf(3), Long.valueOf(4) };
+
+	private static class SomeRandomObject {
+		private int intvalue;
+		private String stringvalue;
+		private double doublevale;
+	}
+	
 	@Inject
 	private IKeyValueStorage storage;
 	
@@ -69,21 +80,31 @@ public class TestSharedPreferencesStorage extends AndroidTestCase {
 	@Test
 	public void testPutInts() {
 		final String key = "KEY";
-		final Integer[] a = { Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.valueOf(3), Integer.valueOf(4) };
 		assertFalse(storage.contains(key));
-		storage.put(key, a);
+		storage.put(key, INTEGER_OBJECT_ARRAY);
 		assertTrue(storage.contains(key));
-		assertTrue(Arrays.equals(a, storage.getInts(key)));
+		assertTrue(Arrays.equals(INTEGER_OBJECT_ARRAY, storage.getInts(key)));
+		assertNull(storage.getInts("DOESNOTEXIST"));
 	}
 
 	@Test
 	public void testPutLongs() {
 		final String key = "KEY";
-		final Long[] a = { Long.MIN_VALUE, Long.MAX_VALUE, Long.valueOf(3), Long.valueOf(4) };
 		assertFalse(storage.contains(key));
-		storage.put(key, a);
+		storage.put(key, LONG_OBJECT_ARRAY);
 		assertTrue(storage.contains(key));
-		assertTrue(Arrays.equals(a, storage.getLongs(key)));
+		assertTrue(Arrays.equals(LONG_OBJECT_ARRAY, storage.getLongs(key)));
+		assertNull(storage.getLongs("DOESNOTEXIST"));
+	}
+	
+	@Test
+	public void testPutList() {
+		List<Integer> list = Arrays.asList(INTEGER_OBJECT_ARRAY);
+		final String key = "KEY";
+		assertFalse(storage.contains(key));
+		storage.put(key, list);
+		assertTrue(storage.contains(key));
+		assertTrue(list.equals(storage.getList(key, Long.class)));
 	}
 
 	@Test

@@ -1,6 +1,8 @@
 package se.springworks.android.utils.persistence;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -145,44 +147,53 @@ public class SharedPreferencesStorage implements IKeyValueStorage {
 	public Map<String, ?> getAll() {
 		return sp.getAll();
 	}
+	
+	@Override
+	public void put(String key, List<?> list) {
+		String json = jsonParser.toJson(list);
+		put(key, json);
+	}
+	
+	@Override
+	public <T> List<T> getList(String key, Class<T> cls) {
+		String json = getString(key);
+		return jsonParser.fromJson(json, new TypeReference<ArrayList<T>>() {});		
+	}
+	
+	@Override
+	public void put(String key, Object[] array) {
+		String json = jsonParser.toJson(array);
+		put(key, json);
+	}
+	
+	@Override
+	public <T> T[] getArray(String key, Class<? extends T[]> cls) {
+		String json = getString(key);
+		if(json == null) {
+			return null;
+		}
+		return jsonParser.fromJson(json, cls);
+	}
 
 	@Override
 	public void put(String key, int[] value) {
 		List<Integer> list = ArrayUtils.asList(value);
-		String json = jsonParser.toJson(list);
-		put(key, json);
+		put(key, list);
 	}
 
 	@Override
 	public void put(String key, long[] value) {
 		List<Long> list = ArrayUtils.asList(value);
-		String json = jsonParser.toJson(list);
-		put(key, json);
+		put(key, list);
 	}
 
 	@Override
 	public Long[] getLongs(String key) {
-		String json = getString(key);		
-		if(json == null) {
-			return null;
-		}
-		List<Long> list = jsonParser.fromJson(json, new TypeReference<ArrayList<Long>>() {});
-		if(list == null) {
-			return null;
-		}
-		return list.toArray(ArrayUtils.EMPTY_LONG_OBJECT_ARRAY);
+		return getArray(key, Long[].class);
 	}
 
 	@Override
 	public Integer[] getInts(String key) {
-		String json = getString(key);
-		if(json == null) {
-			return null;
-		}
-		List<Integer> list = jsonParser.fromJson(json, new TypeReference<ArrayList<Integer>>() {});
-		if(list == null) {
-			return null;
-		}
-		return list.toArray(ArrayUtils.EMPTY_INTEGER_OBJECT_ARRAY);
+		return getArray(key,  Integer[].class);
 	}
 }
