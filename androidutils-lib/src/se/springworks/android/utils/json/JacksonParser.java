@@ -3,10 +3,10 @@ package se.springworks.android.utils.json;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
+
+import se.springworks.android.utils.reflect.JavaTypeToken;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -55,9 +55,9 @@ public class JacksonParser implements IJsonParser {
 	}
 	
 	@Override
-	public <T> T fromJson(InputStream json, TypeReference<T> type) {
+	public <T> T fromJson(InputStream json, JavaTypeToken<T> type) {
 		try {
-			return mapper.readValue(json, type);
+			return mapper.readValue(json, TypeFactory.defaultInstance().constructType(type.getType()));
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -66,22 +66,9 @@ public class JacksonParser implements IJsonParser {
 	}
 	
 	@Override
-	public <T> T fromJson(String json, TypeReference<T> type) {		
+	public <T> T fromJson(String json, JavaTypeToken<T> type) {
 		try {
-			return mapper.readValue(json, type);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	@Override
-	@SuppressWarnings("rawtypes")
-	public <T extends Collection, U> T fromJson(String json, Class<T> collectionClass, Class<U> elementClass) {
-		
-		try {
-			return mapper.readValue(json, TypeFactory.defaultInstance().constructCollectionType(collectionClass, elementClass));
+			return mapper.readValue(json, TypeFactory.defaultInstance().constructType(type.getType()));
 		}
 		catch (Exception e) {
 			e.printStackTrace();

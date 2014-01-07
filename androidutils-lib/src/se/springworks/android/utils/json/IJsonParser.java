@@ -3,9 +3,8 @@ package se.springworks.android.utils.json;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collection;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import se.springworks.android.utils.reflect.JavaTypeToken;
 
 public interface IJsonParser {
 	
@@ -19,11 +18,7 @@ public interface IJsonParser {
 	
 	public <T> T fromJson(String json, Class<T> type);
 	
-	public <T> T fromJson(InputStream json, TypeReference<T> type);
+	public <T> T fromJson(InputStream json, JavaTypeToken<T> type);
 	
-	public <T> T fromJson(String json, TypeReference<T> type);
-	
-	@SuppressWarnings("rawtypes")
-	public <T extends Collection, U> T fromJson(String json, Class<T> collectionClass, Class<U> elementClass);
-
+	public <T> T fromJson(String json, JavaTypeToken<T> type);
 }
