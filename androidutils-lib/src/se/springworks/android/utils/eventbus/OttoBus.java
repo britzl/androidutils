@@ -4,12 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 public class OttoBus implements IEventBus {
+	
+	public enum ThreadEnforcement {
+		MAIN,
+		NONE
+	}
 
-	private Bus bus = new Bus();
+	private Bus bus;
 	
 	private List<Object> registeredObjects = new ArrayList<Object>();
+	
+	public OttoBus() {
+		this(ThreadEnforcement.MAIN);
+	}
+	
+	public OttoBus(ThreadEnforcement threadEnforcement) {
+		switch(threadEnforcement) {
+			default:
+			case MAIN:
+				bus = new Bus(ThreadEnforcer.MAIN);
+				break;
+			case NONE:				
+				bus = new Bus(ThreadEnforcer.ANY);
+				break;
+		}
+	}
 	
 	@Override
 	public synchronized void register(Object o) {
