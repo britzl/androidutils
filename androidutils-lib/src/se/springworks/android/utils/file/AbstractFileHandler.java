@@ -48,7 +48,7 @@ public abstract class AbstractFileHandler implements IFileHandler {
 
 	@Override
 	public boolean exists(String name) {
-		logger.debug("exists() " + name);
+//		logger.debug("exists() " + name);
 		File file = getFile(name);
 		return file.exists();
 	}
