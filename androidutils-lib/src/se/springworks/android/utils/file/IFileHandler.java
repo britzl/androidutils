@@ -7,6 +7,13 @@ import java.util.Date;
 
 public interface IFileHandler {
 
+	
+	/**
+	 * Get the base folder for all file operations
+	 * @return
+	 */
+	public String getBaseFolder();
+	
 	/**
 	 * Creates an empty file 
 	 * @param filename

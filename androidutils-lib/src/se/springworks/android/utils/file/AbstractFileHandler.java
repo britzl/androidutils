@@ -18,12 +18,6 @@ public abstract class AbstractFileHandler implements IFileHandler {
 	public AbstractFileHandler() {
 	}
 	
-	/**
-	 * Get the base folder for all file operations
-	 * @return
-	 */
-	public abstract String getBaseFolder();
-	
 	@Override
 	public boolean createEmptyFile(String filename) {
 		File file = getFile(filename);
