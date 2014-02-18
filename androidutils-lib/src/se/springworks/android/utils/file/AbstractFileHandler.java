@@ -39,6 +39,23 @@ public abstract class AbstractFileHandler implements IFileHandler {
 		}
 		return false;
 	}
+	
+	@Override
+	public boolean deleteDir(String path) throws IOException {
+		File dirToDelete = getFile(path);
+		if(dirToDelete == null) {
+			return false;
+		}
+
+		boolean success = true;
+		if(dirToDelete.isDirectory()) {
+			// recursively delete all files and folders first
+			for(String file : dirToDelete.list()) {
+				success = deleteDir(file) && success;
+			}
+		}
+		return dirToDelete.delete() && success;
+	}
 
 	@Override
 	public boolean exists(String name) {

@@ -29,6 +29,14 @@ public interface IFileHandler {
 	public boolean delete(String name) throws IOException;
 	
 	/**
+	 * Deletes a directory and all it's contents
+	 * @param path
+	 * @return true if successful, otherwise false
+	 * @throws IOException
+	 */
+	public boolean deleteDir(String path) throws IOException;
+	
+	/**
 	 * Checks if a file exists
 	 * @param name Name of the file to look for
 	 * @return true if the file exists, otherwise false
