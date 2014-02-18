@@ -40,9 +40,7 @@ public class TestStorageFileHandler extends AndroidTestCase {
 	@Override
 	@After
 	public void tearDown() throws Exception {
-		for(String file : fileHandler.getFileList()) {
-			fileHandler.delete(file);
-		}
+		fileHandler.deleteDir(".");
 	}
 	
 	
@@ -54,6 +52,7 @@ public class TestStorageFileHandler extends AndroidTestCase {
 		assertFalse(fileHandler.exists(filename));
 		fileHandler.createEmptyFile(filename);
 		assertTrue(fileHandler.exists(filename));
+		assertTrue(fileHandler.getSize(filename) == 0);
 	}
 	
 	@Test
@@ -100,7 +99,40 @@ public class TestStorageFileHandler extends AndroidTestCase {
 		filesAsString = new ArrayList<String>(Arrays.asList(files));
 		assertTrue(filesAsString.contains("file1"));	
 	}
+
 	
+	@Test
+	public void testDeleteDir() throws IOException {
+		fileHandler.createEmptyFile("some/path1/file.txt");
+		fileHandler.createEmptyFile("some/path2/file.txt");
+		assertTrue(fileHandler.exists("some"));
+		assertTrue(fileHandler.exists("some/path1"));
+		assertTrue(fileHandler.exists("some/path1/file.txt"));
+		assertTrue(fileHandler.exists("some/path2/file.txt"));
+		fileHandler.deleteDir("some/path1");
+		assertTrue(fileHandler.exists("some"));
+		assertFalse(fileHandler.exists("some/path1"));
+		assertFalse(fileHandler.exists("some/path1/file.txt"));
+		assertTrue(fileHandler.exists("some/path2/file.txt"));
+	}
+	
+	
+	@Test
+	public void testMemory() throws IOException {
+		final long total = fileHandler.getTotalMemory();
+		final long available = fileHandler.getAvailableMemory();
+		assertTrue(available <= total);
+		
+		final String TEXTTOSAVEASSTRING = "ABCDEFGH";
+		fileHandler.save("file", TEXTTOSAVEASSTRING);
+		final long availableNow = fileHandler.getAvailableMemory();
+		assertTrue(availableNow < available);
+		
+		fileHandler.delete("file");
+		assertEquals(fileHandler.getAvailableMemory(), available);
+	}
+
+
 	@Test
 	public void testGetWritableAndReadableFile() throws IOException {
 		final String filename = "fileasstream";

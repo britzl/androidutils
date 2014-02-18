@@ -50,8 +50,9 @@ public abstract class AbstractFileHandler implements IFileHandler {
 		boolean success = true;
 		if(dirToDelete.isDirectory()) {
 			// recursively delete all files and folders first
-			for(String file : dirToDelete.list()) {
-				success = deleteDir(file) && success;
+			final String[] files = dirToDelete.list();
+			for(String file : files) {
+				success = deleteDir(path + File.separatorChar + file) && success;
 			}
 		}
 		return dirToDelete.delete() && success;
