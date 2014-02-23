@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.SpannableString;
+import android.view.WindowManager.BadTokenException;
 import android.widget.TextView;
 
 /**
@@ -108,10 +109,17 @@ public class DialogBuilder {
 	
 	public Dialog show() {
 		AlertDialog dialog = builder.create();
-		dialog.show();
-		TextView message = (TextView)dialog.findViewById(android.R.id.message);
-		if(message != null) {
-			LinkifyUtil.linkify(message);
+		try {
+			dialog.show();
+			TextView message = (TextView)dialog.findViewById(android.R.id.message);
+			if(message != null) {
+				LinkifyUtil.linkify(message);
+			}
+		}
+		catch(BadTokenException e) {
+			// do nothing
+			// reported on google play console
+			// Unable to add window -- token android.os.BinderProxy@4223bb48 is not valid; is your activity running?
 		}
 		return dialog;
 	}

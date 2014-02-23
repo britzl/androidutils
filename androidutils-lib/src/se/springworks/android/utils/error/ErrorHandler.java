@@ -67,7 +67,14 @@ public class ErrorHandler {
 	
 	public static final void dismiss() {
 		if(currentDialog != null) {
-			currentDialog.dismiss();
+			try {
+				currentDialog.dismiss();
+			}
+			catch(IllegalArgumentException e) {
+				// do nothing
+				// java.lang.IllegalArgumentException: View not attached to window manager
+				// reported in dev console
+			}
 		}
 	}
 }
