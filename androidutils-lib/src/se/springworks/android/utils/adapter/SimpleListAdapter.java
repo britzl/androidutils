@@ -37,6 +37,10 @@ public abstract class SimpleListAdapter<T> extends BaseAdapter {
 	public synchronized Object getItem(int position) {
 		return listData.get(position);
 	}
+	
+	public synchronized T getItemAsType(int position) {
+		return (T)listData.get(position);
+	}
 
 	@Override
 	public synchronized long getItemId(int position) {
