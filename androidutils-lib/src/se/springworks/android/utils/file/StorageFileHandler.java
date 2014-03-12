@@ -32,9 +32,13 @@ public class StorageFileHandler extends AbstractFileHandler {
 
 	@Inject
 	public StorageFileHandler(Context context) {
+		this(context, (globalStorageMode != null) ? globalStorageMode : StorageMode.INTERNALFILES);
+	}
+
+	public StorageFileHandler(Context context, StorageMode mode) {
 		super();
 		this.context = context;
-		mode = (globalStorageMode != null) ? globalStorageMode : StorageMode.INTERNALFILES;
+		this.mode = mode;
 	}
 	
 	/**
