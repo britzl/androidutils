@@ -22,6 +22,7 @@ import android.content.Context;
 public class ImprovedStorageFileHandler extends StorageFileHandler {
 
 	private static final String KEYPREFIX = "ISFH";
+	
 	@Inject
 	private IKeyValueStorage fileModificationDateStorage;
 	
@@ -29,6 +30,10 @@ public class ImprovedStorageFileHandler extends StorageFileHandler {
 	@Inject
 	public ImprovedStorageFileHandler(Context context) {
 		super(context);
+	}
+	
+	public ImprovedStorageFileHandler(Context context, StorageMode mode) {
+		super(context, mode);
 	}
 
 	
