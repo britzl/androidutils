@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Window;
+import android.view.WindowManager;
 
 public abstract class BaseActivity extends ActionBarActivity {
 	
@@ -32,6 +33,14 @@ public abstract class BaseActivity extends ActionBarActivity {
 	
 	protected void hideTitleBar() {
 		supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+	}
+	
+	public void disableTouchEvents() {
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);		
+	}
+	
+	public void enableTouchEvents() {
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 	}
 	
 	@Override
