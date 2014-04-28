@@ -103,6 +103,12 @@ public abstract class BaseActivity extends ActionBarActivity {
 	@Override
 	public final void onResume() {
 		super.onResume();
+	}
+	
+	
+	@Override
+	public final void onResumeFragments() {
+		super.onResumeFragments();
 		BaseApplication.getInstance().onActivityResumed(this);
 
 		try {
