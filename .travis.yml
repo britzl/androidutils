@@ -22,6 +22,7 @@ before_install:
 
 install:
   # update android sdk
+  - android list sdk -a -e
   - echo y | android update sdk --filter platform-tools,build-tools-19.0.3 --no-ui -a
   - echo y | android update sdk --filter android-18,android-16,android-14,android-10,android-8 --no-ui -a
   - echo y | android update sdk --filter sysimg-18 --no-ui -a
