@@ -11,7 +11,7 @@ before_install:
   - sudo apt-get install -qq libstdc++6:i386 lib32z1
 
   # download and unpack android sdk
-  - wget http://dl.google.com/android/android-sdk_r22.2.1-linux.tgz
+  - wget http://dl.google.com/android/android-sdk_r22.6.2-linux.tgz
   - tar -v -zxf android-sdk_r22.2.1-linux.tgz
 
   # export variables
