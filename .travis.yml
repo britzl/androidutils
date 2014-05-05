@@ -12,7 +12,7 @@ before_install:
 
   # download and unpack android sdk
   - wget http://dl.google.com/android/android-sdk_r22.6.2-linux.tgz
-  - tar -v -zxf android-sdk_r22.2.1-linux.tgz
+  - tar -v -zxf android-sdk_r22.6.2-linux.tgz
 
   # export variables
   - export ANDROID_HOME=`pwd`/android-sdk-linux
