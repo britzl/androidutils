@@ -30,6 +30,8 @@ public interface IAsyncHttpClient {
 	
 	void setHeader(String header, String value);
 	
+	void setTimeout(int timeoutMillis);
+	
 	void removeHeader(String header);
 	
 	void clearCookies();

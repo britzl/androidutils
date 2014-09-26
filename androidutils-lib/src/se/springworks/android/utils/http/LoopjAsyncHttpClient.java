@@ -162,5 +162,10 @@ public class LoopjAsyncHttpClient implements IAsyncHttpClient {
 		loopj.removeHeader(header);
 	}
 
+	@Override
+	public void setTimeout(int timeoutMillis) {
+		loopj.setTimeout(timeoutMillis);
+	}
+
 
 }
