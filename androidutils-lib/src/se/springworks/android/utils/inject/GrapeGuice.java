@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.test.AndroidTestCase;
 import android.view.View;
@@ -63,8 +64,9 @@ public class GrapeGuice {
 		final Application application = (Application)context.getApplicationContext();
 		GrapeGuice injector = injectors.get(application);
 		if (injector == null) {
-			final int id = application.getResources().getIdentifier("guice_modules", "array", application.getPackageName());
-			final String[] moduleNames = id > 0 ? application.getResources().getStringArray(id) : new String[] {};
+			final Resources resources = application.getResources();
+			final int id = resources.getIdentifier("guice_modules", "array", application.getPackageName());
+			final String[] moduleNames = id > 0 ? resources.getStringArray(id) : new String[] {};
 			final List<AbstractModule> modules = new ArrayList<AbstractModule>();
 
 			try {
