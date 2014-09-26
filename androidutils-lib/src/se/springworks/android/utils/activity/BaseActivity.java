@@ -194,8 +194,23 @@ public abstract class BaseActivity extends ActionBarActivity {
 		startActivity(i);
 	}
 
+	public final void switchActivity(Class<? extends Activity> c, int flags) {
+		Intent i = new Intent(this, c);
+		i.setFlags(flags);
+		startActivity(i);
+	}
+
 	public final void switchActivity(Class<? extends Activity> c, Bundle extras) {
 		Intent i = new Intent(this, c);
+		if(extras != null) {
+			i.putExtras(extras);
+		}
+		startActivity(i);
+	}
+
+	public final void switchActivity(Class<? extends Activity> c, Bundle extras, int flags) {
+		Intent i = new Intent(this, c);
+		i.setFlags(flags);
 		if(extras != null) {
 			i.putExtras(extras);
 		}
