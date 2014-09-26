@@ -1,6 +1,7 @@
 package se.springworks.android.utils.application;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 
@@ -44,6 +45,19 @@ public class ApplicationUtils {
 		}
 		return label.toString();
 //		return info.applicationInfo.name;
+	}
+	
+	/**
+	 * Check if android:debuggable is true 
+	 * @param context
+	 * @return
+	 */
+	public static boolean isDebuggable(Context context) {
+		ApplicationInfo ai = context.getApplicationInfo();
+		if(ai == null) {
+			return false;
+		}
+		return (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 	}
 
 }
